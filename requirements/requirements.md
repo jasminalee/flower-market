@@ -172,7 +172,7 @@
 - POST `/api/products` - 创建产品（商家）
 - PUT `/api/products/{id}` - 更新产品（商家）
 - DELETE `/api/products/{id}` - 删除产品（商家）
-- GET `/api/products/categories` - 产品分类列表
+- GET `/api/products/categories` - 产品分类列表 **（需支持分页参数 current/size）**
 - POST `/api/products/{id}/favorite` - 收藏产品
 - DELETE `/api/products/{id}/favorite` - 取消收藏
 - GET `/api/products/favorites` - 我的收藏列表

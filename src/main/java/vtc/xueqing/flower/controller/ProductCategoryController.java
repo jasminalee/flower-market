@@ -1,5 +1,6 @@
 package vtc.xueqing.flower.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,11 +25,15 @@ public class ProductCategoryController {
     @Resource
     private ProductCategoryService productCategoryService;
 
-    @ApiOperation("获取所有分类列表")
+    @ApiOperation("分页获取分类列表")
     @GetMapping
-    public Result<List<ProductCategory>> getAllCategories() {
-        List<ProductCategory> categories = productCategoryService.getAllCategories();
-        return Result.success(categories);
+    public Result<Page<ProductCategory>> getCategoryPage(
+            @ApiParam("当前页") @RequestParam(defaultValue = "1") Long current,
+            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Long size,
+            @ApiParam("父分类ID，可选") @RequestParam(required = false) Long parentId
+    ) {
+        Page<ProductCategory> page = productCategoryService.getCategoryPage(current, size, parentId);
+        return Result.success(page);
     }
 
     @ApiOperation("根据父分类ID获取子分类")

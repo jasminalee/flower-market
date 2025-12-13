@@ -1,5 +1,6 @@
 package vtc.xueqing.flower.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,15 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     private ProductCategoryMapper productCategoryMapper;
 
     @Override
-    public List<ProductCategory> getAllCategories() {
+    public Page<ProductCategory> getCategoryPage(Long current, Long size, Long parentId) {
         LambdaQueryWrapper<ProductCategory> wrapper = new LambdaQueryWrapper<>();
+        if (parentId != null) {
+            wrapper.eq(ProductCategory::getParentId, parentId);
+        }
         wrapper.orderByAsc(ProductCategory::getSortOrder);
-        return productCategoryMapper.selectList(wrapper);
+
+        Page<ProductCategory> page = new Page<>(current, size);
+        return productCategoryMapper.selectPage(page, wrapper);
     }
 
     @Override

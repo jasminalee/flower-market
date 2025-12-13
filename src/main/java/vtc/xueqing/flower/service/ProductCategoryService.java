@@ -1,5 +1,6 @@
 package vtc.xueqing.flower.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import vtc.xueqing.flower.entity.ProductCategory;
 
 import java.util.List;
@@ -10,10 +11,13 @@ import java.util.List;
 public interface ProductCategoryService {
 
     /**
-     * 获取所有分类列表
-     * @return 分类列表
+     * 分页获取分类列表
+     * @param current 当前页
+     * @param size 每页大小
+     * @param parentId 父分类ID（可选）
+     * @return 分页结果
      */
-    List<ProductCategory> getAllCategories();
+    Page<ProductCategory> getCategoryPage(Long current, Long size, Long parentId);
 
     /**
      * 根据父分类ID获取子分类列表
