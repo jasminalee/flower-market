@@ -50,4 +50,10 @@ public interface AdministratorService {
      * @return 更新后的顾客信息
      */
     Customer updateCustomerLevel(Long userId, String level);
+    
+    /**
+     * 获取管理后台仪表板数据
+     * @return 包含统计数据、最近用户、最近商家、订单趋势的Map
+     */
+    java.util.Map<String, Object> getDashboardData();
 }

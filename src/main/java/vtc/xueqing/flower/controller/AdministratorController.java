@@ -48,6 +48,17 @@ public class AdministratorController {
         }
     }
     
+    @ApiOperation("获取管理后台仪表板数据")
+    @GetMapping("/dashboard")
+    public Result<Map<String, Object>> getDashboardData() {
+        try {
+            Map<String, Object> data = administratorService.getDashboardData();
+            return Result.success(data);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
     @ApiOperation("获取顾客列表（分页）")
     @GetMapping("/customers")
     public Result<IPage<Customer>> getCustomerList(

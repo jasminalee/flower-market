@@ -131,4 +131,58 @@ public class AdministratorServiceImpl implements AdministratorService {
         customer.setPassword(null);
         return customer;
     }
+    
+    @Override
+    public java.util.Map<String, Object> getDashboardData() {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        
+        // 1. 统计数据
+        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+        
+        // 总用户数
+        Long totalUsers = customerMapper.selectCount(null);
+        stats.put("totalUsers", totalUsers);
+        
+        // 总商家数
+        Long totalMerchants = merchantMapper.selectCount(null);
+        stats.put("totalMerchants", totalMerchants);
+        
+        // 总订单数和总销售额（需要OrderMapper）
+        stats.put("totalOrders", 0);
+        stats.put("totalSales", "0.00");
+        
+        result.put("stats", stats);
+        
+        // 2. 最近注册的用户（前10个）
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Customer> customerWrapper = 
+            new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        customerWrapper.orderByDesc(Customer::getCreateDate).last("LIMIT 10");
+        java.util.List<Customer> recentUsers = customerMapper.selectList(customerWrapper);
+        // 清除密码
+        recentUsers.forEach(c -> c.setPassword(null));
+        result.put("recentUsers", recentUsers);
+        
+        // 3. 最近注册的商家（前10个）
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Merchant> merchantWrapper = 
+            new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        merchantWrapper.orderByDesc(Merchant::getCreateDate).last("LIMIT 10");
+        java.util.List<Merchant> recentMerchants = merchantMapper.selectList(merchantWrapper);
+        // 清除密码
+        recentMerchants.forEach(m -> m.setPassword(null));
+        result.put("recentMerchants", recentMerchants);
+        
+        // 4. 订单趋势（最近7天）- 简化实现，返回模拟数据
+        java.util.List<java.util.Map<String, Object>> orderTrend = new java.util.ArrayList<>();
+        java.time.LocalDate today = java.time.LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            java.util.Map<String, Object> dayData = new java.util.HashMap<>();
+            java.time.LocalDate date = today.minusDays(i);
+            dayData.put("date", date.format(java.time.format.DateTimeFormatter.ofPattern("MM-dd")));
+            dayData.put("count", 0); // 实际应该查询数据库
+            orderTrend.add(dayData);
+        }
+        result.put("orderTrend", orderTrend);
+        
+        return result;
+    }
 }
