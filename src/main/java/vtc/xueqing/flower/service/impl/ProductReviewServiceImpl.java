@@ -52,10 +52,10 @@ public class ProductReviewServiceImpl implements ProductReviewService {
             }
             
             if ("COMPLETED".equals(order.getStatus())) {
-                productReview.setVerified(true); // 已购买验证
+                productReview.setVerified(1); // 已购买验证
             }
         } else {
-            productReview.setVerified(false); // 未验证
+            productReview.setVerified(0); // 未验证
         }
         
         // 4. 设置初始状态为待审核

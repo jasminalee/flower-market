@@ -72,7 +72,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         } else {
             // 如果不存在，添加新记录
             if (shoppingCart.getSelected() == null) {
-                shoppingCart.setSelected(true); // 默认选中
+                shoppingCart.setSelected(1); // 默认选中
             }
             shoppingCartMapper.insert(shoppingCart);
             return shoppingCart;

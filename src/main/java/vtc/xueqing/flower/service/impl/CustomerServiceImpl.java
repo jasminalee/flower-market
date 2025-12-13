@@ -3,6 +3,7 @@ package vtc.xueqing.flower.service.impl;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import vtc.xueqing.flower.common.Constants;
 import vtc.xueqing.flower.entity.Customer;

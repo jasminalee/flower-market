@@ -101,10 +101,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
-                <configuration>
-                    <mainClass>vtc.xueqing.flower.FlowerMarket</mainClass>
-                    <skip>true</skip>
-                </configuration>
                 <executions>
                     <execution>
                         <id>repackage</id>
@@ -113,6 +109,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <mainClass>vtc.xueqing.flower.FlowerMarket</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
