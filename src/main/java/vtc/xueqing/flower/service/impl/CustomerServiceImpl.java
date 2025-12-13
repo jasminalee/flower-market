@@ -1,0 +1,109 @@
+package vtc.xueqing.flower.service.impl;
+
+import cn.hutool.crypto.SecureUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import vtc.xueqing.flower.common.Constants;
+import vtc.xueqing.flower.entity.Customer;
+import vtc.xueqing.flower.exception.BusinessException;
+import vtc.xueqing.flower.mapper.CustomerMapper;
+import vtc.xueqing.flower.service.CustomerService;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+/**
+ * 顾客服务实现类
+ */
+@Slf4j
+@Service
+public class CustomerServiceImpl implements CustomerService {
+
+    @Resource
+    private CustomerMapper customerMapper;
+
+    @Override
+    public Customer register(Customer customer) {
+        // 1. 检查邮箱是否已存在
+        LambdaQueryWrapper<Customer> emailWrapper = new LambdaQueryWrapper<>();
+        emailWrapper.eq(Customer::getEmail, customer.getEmail());
+        if (customerMapper.selectCount(emailWrapper) > 0) {
+            throw new BusinessException("该邮箱已被注册");
+        }
+
+        // 2. 检查手机号是否已存在（如果提供了手机号）
+        if (customer.getPhone() != null && !customer.getPhone().isEmpty()) {
+            LambdaQueryWrapper<Customer> phoneWrapper = new LambdaQueryWrapper<>();
+            phoneWrapper.eq(Customer::getPhone, customer.getPhone());
+            if (customerMapper.selectCount(phoneWrapper) > 0) {
+                throw new BusinessException("该手机号已被注册");
+            }
+        }
+
+        // 3. 使用MD5加密密码
+        customer.setPassword(SecureUtil.md5(customer.getPassword()));
+        customer.setBalance(BigDecimal.ZERO);
+        customer.setLevel(Constants.LEVEL_NORMAL);
+        customer.setEmailVerified(0);
+        customer.setCreateDate(LocalDateTime.now());
+        customer.setUpdateDate(LocalDateTime.now());
+
+        // 4. 保存到数据库
+        int result = customerMapper.insert(customer);
+        if (result == 0) {
+            throw new BusinessException("注册失败");
+        }
+
+        log.info("顾客注册成功，邮箱：{}", customer.getEmail());
+
+        // 5. 返回密码置空的customer对象
+        customer.setPassword(null);
+        return customer;
+    }
+
+    @Override
+    public Customer login(Customer login) {
+        // 1. 根据邮箱或手机号查询用户
+        LambdaQueryWrapper<Customer> wrapper = new LambdaQueryWrapper<>();
+        wrapper.and(w -> w.eq(Customer::getEmail, login.getEmail())
+                .or()
+                .eq(Customer::getPhone, login.getEmail()));
+
+        Customer customer = customerMapper.selectOne(wrapper);
+        if (customer == null) {
+            throw new BusinessException("账号不存在");
+        }
+
+        // 2. 验证密码（MD5加密后比较）
+        String encryptedPassword = SecureUtil.md5(login.getPassword());
+        if (!encryptedPassword.equals(customer.getPassword())) {
+            throw new BusinessException("密码错误");
+        }
+
+        log.info("顾客登录成功，ID：{}, 邮箱：{}", customer.getUserId(), customer.getEmail());
+
+        // 3. 返回密码置空的customer对象
+        customer.setPassword(null);
+        return customer;
+    }
+
+    @Override
+    public Customer getCustomerById(Long userId) {
+        Customer customer = customerMapper.selectById(userId);
+        if (customer == null) {
+            throw new BusinessException("用户不存在");
+        }
+        // 密码置空
+        customer.setPassword(null);
+        return customer;
+    }
+
+    @Override
+    public boolean updateCustomer(Customer customer) {
+        customer.setUpdateDate(LocalDateTime.now());
+        int result = customerMapper.updateById(customer);
+        return result > 0;
+    }
+}
