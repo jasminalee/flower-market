@@ -43,4 +43,15 @@ public class MerchantController {
         Merchant merchant = merchantService.getMerchantById(merchId);
         return Result.success(merchant);
     }
+    
+    @ApiOperation("更新商家信息")
+    @PutMapping("/profile")
+    public Result<Merchant> updateProfile(@RequestBody Merchant merchant) {
+        try {
+            Merchant updated = merchantService.updateMerchant(merchant);
+            return Result.success("更新成功", updated);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

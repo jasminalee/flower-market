@@ -31,7 +31,7 @@ public interface MerchantService {
     /**
      * 更新商家信息
      * @param merchant 商家信息
-     * @return 是否成功
+     * @return 更新后的商家信息
      */
-    boolean updateMerchant(Merchant merchant);
+    Merchant updateMerchant(Merchant merchant);
 }

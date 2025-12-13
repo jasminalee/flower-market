@@ -43,4 +43,26 @@ public class CustomerController {
         Customer customer = customerService.getCustomerById(userId);
         return Result.success(customer);
     }
+    
+    @ApiOperation("更新个人信息")
+    @PutMapping("/profile")
+    public Result<Customer> updateProfile(@RequestBody Customer customer) {
+        try {
+            Customer updated = customerService.updateCustomer(customer);
+            return Result.success("更新成功", updated);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("查询余额")
+    @GetMapping("/balance")
+    public Result<java.math.BigDecimal> getBalance(@RequestParam Long userId) {
+        try {
+            java.math.BigDecimal balance = customerService.getBalance(userId);
+            return Result.success(balance);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

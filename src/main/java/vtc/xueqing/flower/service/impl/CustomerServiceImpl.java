@@ -101,9 +101,38 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public boolean updateCustomer(Customer customer) {
+    @Transactional(rollbackFor = Exception.class)
+    public Customer updateCustomer(Customer customer) {
+        // 1. 检查用户是否存在
+        Customer existing = customerMapper.selectById(customer.getUserId());
+        if (existing == null) {
+            throw new BusinessException("用户不存在");
+        }
+        
+        // 2. 如果更新密码，需要加密
+        if (customer.getPassword() != null && !customer.getPassword().isEmpty()) {
+            customer.setPassword(SecureUtil.md5(customer.getPassword()));
+        } else {
+            // 不更新密码
+            customer.setPassword(null);
+        }
+        
+        // 3. 更新
         customer.setUpdateDate(LocalDateTime.now());
-        int result = customerMapper.updateById(customer);
-        return result > 0;
+        customerMapper.updateById(customer);
+        
+        // 4. 返回更新后的信息（密码置空）
+        Customer updated = customerMapper.selectById(customer.getUserId());
+        updated.setPassword(null);
+        return updated;
+    }
+    
+    @Override
+    public BigDecimal getBalance(Long userId) {
+        Customer customer = customerMapper.selectById(userId);
+        if (customer == null) {
+            throw new BusinessException("用户不存在");
+        }
+        return customer.getBalance();
     }
 }

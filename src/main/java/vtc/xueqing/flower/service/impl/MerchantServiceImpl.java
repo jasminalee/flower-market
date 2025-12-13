@@ -4,6 +4,7 @@ import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vtc.xueqing.flower.common.Constants;
 import vtc.xueqing.flower.entity.Merchant;
 import vtc.xueqing.flower.exception.BusinessException;
@@ -108,9 +109,29 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public boolean updateMerchant(Merchant merchant) {
+    @Transactional(rollbackFor = Exception.class)
+    public Merchant updateMerchant(Merchant merchant) {
+        // 1. 检查商家是否存在
+        Merchant existing = merchantMapper.selectById(merchant.getMerchId());
+        if (existing == null) {
+            throw new BusinessException("商家不存在");
+        }
+        
+        // 2. 如果更新密码，需要加密
+        if (merchant.getPassword() != null && !merchant.getPassword().isEmpty()) {
+            merchant.setPassword(SecureUtil.md5(merchant.getPassword()));
+        } else {
+            // 不更新密码
+            merchant.setPassword(null);
+        }
+        
+        // 3. 更新
         merchant.setUpdateDate(LocalDateTime.now());
-        int result = merchantMapper.updateById(merchant);
-        return result > 0;
+        merchantMapper.updateById(merchant);
+        
+        // 4. 返回更新后的信息（密码置空）
+        Merchant updated = merchantMapper.selectById(merchant.getMerchId());
+        updated.setPassword(null);
+        return updated;
     }
 }

@@ -31,7 +31,14 @@ public interface CustomerService {
     /**
      * 更新顾客信息
      * @param customer 用户信息
-     * @return 是否成功
+     * @return 更新后的用户信息
      */
-    boolean updateCustomer(Customer customer);
+    Customer updateCustomer(Customer customer);
+    
+    /**
+     * 查询用户余额
+     * @param userId 用户ID
+     * @return 余额
+     */
+    java.math.BigDecimal getBalance(Long userId);
 }
