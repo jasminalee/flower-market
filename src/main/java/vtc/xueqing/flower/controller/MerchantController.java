@@ -54,4 +54,15 @@ public class MerchantController {
             return Result.error(e.getMessage());
         }
     }
+    
+    @ApiOperation("获取商家工作台数据")
+    @GetMapping("/dashboard")
+    public Result<java.util.Map<String, Object>> getDashboardData(@RequestParam Long merchId) {
+        try {
+            java.util.Map<String, Object> data = merchantService.getDashboardData(merchId);
+            return Result.success(data);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

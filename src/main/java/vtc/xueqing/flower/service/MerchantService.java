@@ -34,4 +34,11 @@ public interface MerchantService {
      * @return 更新后的商家信息
      */
     Merchant updateMerchant(Merchant merchant);
+    
+    /**
+     * 获取商家工作台数据
+     * @param merchId 商家ID
+     * @return 工作台数据
+     */
+    java.util.Map<String, Object> getDashboardData(Long merchId);
 }
