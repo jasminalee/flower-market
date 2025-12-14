@@ -101,4 +101,22 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         
         return review;
     }
+    
+    @Override
+    public IPage<ProductReview> getAllReviews(Page<ProductReview> page, String status) {
+        LambdaQueryWrapper<ProductReview> wrapper = new LambdaQueryWrapper<>();
+        
+        // 如果指定了状态，则按状态筛选
+        wrapper.eq(status != null && !status.isEmpty(), ProductReview::getStatus, status)
+                .orderByDesc(ProductReview::getCreateDate);
+        
+        return productReviewMapper.selectPage(page, wrapper);
+    }
+    
+    @Override
+    public IPage<vtc.xueqing.flower.vo.ProductReviewVO> getAllReviewsWithDetail(
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.vo.ProductReviewVO> page, 
+            String status) {
+        return productReviewMapper.selectAllReviewsWithDetail(page, status);
+    }
 }

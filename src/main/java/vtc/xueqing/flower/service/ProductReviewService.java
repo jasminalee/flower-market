@@ -32,4 +32,20 @@ public interface ProductReviewService {
      * @return 更新后的评价
      */
     ProductReview reviewApproval(Long reviewId, String status);
+    
+    /**
+     * 获取所有评价列表（管理员）
+     * @param page 分页信息
+     * @param status 审核状态（可选）：PENDING-待审核，APPROVED-已通过，REJECTED-已拒绝
+     * @return 评价列表
+     */
+    IPage<ProductReview> getAllReviews(Page<ProductReview> page, String status);
+    
+    /**
+     * 获取所有评价列表（管理员）- 包含关联信息
+     * @param page 分页信息
+     * @param status 审核状态（可选）：PENDING-待审核，APPROVED-已通过，REJECTED-已拒绝
+     * @return 评价VO列表
+     */
+    IPage<vtc.xueqing.flower.vo.ProductReviewVO> getAllReviewsWithDetail(Page<vtc.xueqing.flower.vo.ProductReviewVO> page, String status);
 }

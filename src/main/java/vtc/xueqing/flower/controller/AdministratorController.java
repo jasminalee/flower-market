@@ -10,7 +10,10 @@ import vtc.xueqing.flower.common.Result;
 import vtc.xueqing.flower.entity.Administrator;
 import vtc.xueqing.flower.entity.Customer;
 import vtc.xueqing.flower.entity.Merchant;
+import vtc.xueqing.flower.entity.ProductReview;
 import vtc.xueqing.flower.service.AdministratorService;
+import vtc.xueqing.flower.service.ProductReviewService;
+import vtc.xueqing.flower.vo.ProductReviewVO;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -25,6 +28,9 @@ public class AdministratorController {
     
     @Resource
     private AdministratorService administratorService;
+    
+    @Resource
+    private ProductReviewService productReviewService;
     
     @ApiOperation("管理员登录")
     @PostMapping("/login")
@@ -136,6 +142,22 @@ public class AdministratorController {
         try {
             Customer customer = administratorService.updateCustomerLevel(userId, level);
             return Result.success(customer);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("获取所有评价列表（管理员）")
+    @GetMapping("/reviews")
+    public Result<IPage<ProductReviewVO>> getAllReviews(
+            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("审核状态") @RequestParam(required = false) String status
+    ) {
+        try {
+            Page<ProductReviewVO> page = new Page<>(current, size);
+            IPage<ProductReviewVO> reviewPage = productReviewService.getAllReviewsWithDetail(page, status);
+            return Result.success(reviewPage);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
