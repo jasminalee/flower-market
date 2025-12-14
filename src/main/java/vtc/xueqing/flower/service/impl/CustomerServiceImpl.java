@@ -137,4 +137,54 @@ public class CustomerServiceImpl implements CustomerService {
         }
         return customer.getBalance();
     }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public BigDecimal recharge(Long userId, BigDecimal amount, String paymentMethod) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("充值金额必须大于0");
+        }
+        
+        Customer customer = customerMapper.selectById(userId);
+        if (customer == null) {
+            throw new BusinessException("用户不存在");
+        }
+        
+        // 更新余额
+        BigDecimal newBalance = customer.getBalance().add(amount);
+        customer.setBalance(newBalance);
+        customer.setUpdateDate(LocalDateTime.now());
+        customerMapper.updateById(customer);
+        
+        log.info("用户{}充值成功，充值金额：{}，当前余额：{}", userId, amount, newBalance);
+        
+        return newBalance;
+    }
+    
+    @Override
+    public com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>> getBalanceHistory(
+            Long userId, 
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<java.util.Map<String, Object>> page) {
+        
+        // TODO: 实际项目中应该有专门的余额变动记录表
+        // 这里返回模拟数据
+        java.util.List<java.util.Map<String, Object>> records = new java.util.ArrayList<>();
+        
+        // 模拟一些余额变动记录
+        Customer customer = customerMapper.selectById(userId);
+        if (customer != null) {
+            java.util.Map<String, Object> record = new java.util.HashMap<>();
+            record.put("createDate", LocalDateTime.now().toString());
+            record.put("type", "RECHARGE");
+            record.put("amount", 100.00);
+            record.put("description", "余额充值");
+            record.put("balance", customer.getBalance());
+            records.add(record);
+        }
+        
+        page.setRecords(records);
+        page.setTotal(records.size());
+        
+        return page;
+    }
 }

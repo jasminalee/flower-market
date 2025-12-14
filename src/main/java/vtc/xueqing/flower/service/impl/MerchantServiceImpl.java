@@ -21,6 +21,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 商家服务实现类
@@ -146,13 +148,22 @@ public class MerchantServiceImpl implements MerchantService {
         merchant.setUpdateDate(LocalDateTime.now());
         merchantMapper.updateById(merchant);
         
+        // 4. 返回更新后的信息（密码置空）
+        Merchant updated = merchantMapper.selectById(merchant.getMerchId());
+        updated.setPassword(null);
+        return updated;
+    }
+    
+    @Override
+    public Map<String, Object> getDashboardData(Long merchId) {
+        Map<String, Object> result = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
         LocalDateTime weekStart = now.minusDays(7);
         LocalDateTime monthStart = now.minusDays(30);
         
         // 1. 统计数据
-        java.util.Map<String, Object> stats = new java.util.HashMap<>();
+        Map<String, Object> stats = new HashMap<>();
         
         // 今日订单数
         LambdaQueryWrapper<Order> todayWrapper = new LambdaQueryWrapper<>();
@@ -162,9 +173,9 @@ public class MerchantServiceImpl implements MerchantService {
         stats.put("todayOrders", todayOrders);
         
         // 今日销售额
-        java.util.List<Order> todayOrderList = orderMapper.selectList(todayWrapper);
+        List<Order> todayOrderList = orderMapper.selectList(todayWrapper);
         BigDecimal todaySales = todayOrderList.stream()
-            .map(Order::getTotalAmount)
+            .map(Order::getTotalPrice)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
         stats.put("todaySales", todaySales.doubleValue());
         
@@ -179,69 +190,69 @@ public class MerchantServiceImpl implements MerchantService {
         LambdaQueryWrapper<Order> monthWrapper = new LambdaQueryWrapper<>();
         monthWrapper.eq(Order::getMerchId, merchId)
                    .ge(Order::getOrderDate, monthStart);
-        java.util.List<Order> monthOrderList = orderMapper.selectList(monthWrapper);
+        List<Order> monthOrderList = orderMapper.selectList(monthWrapper);
         BigDecimal monthSales = monthOrderList.stream()
-            .map(Order::getTotalAmount)
+            .map(Order::getTotalPrice)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
         stats.put("monthSales", monthSales.doubleValue());
         
         result.put("stats", stats);
         
         // 2. 近期订单（最近5条）
-        java.util.List<java.util.Map<String, Object>> recentOrders = new java.util.ArrayList<>();
+        List<Map<String, Object>> recentOrders = new ArrayList<>();
         LambdaQueryWrapper<Order> recentWrapper = new LambdaQueryWrapper<>();
         recentWrapper.eq(Order::getMerchId, merchId)
                     .orderByDesc(Order::getOrderDate)
                     .last("LIMIT 5");
-        java.util.List<Order> orders = orderMapper.selectList(recentWrapper);
+        List<Order> orders = orderMapper.selectList(recentWrapper);
         
         for (Order order : orders) {
-            java.util.Map<String, Object> orderMap = new java.util.HashMap<>();
+            Map<String, Object> orderMap = new HashMap<>();
             orderMap.put("orderNo", order.getOrderNo());
-            orderMap.put("totalAmount", order.getTotalAmount().doubleValue());
+            orderMap.put("totalAmount", order.getTotalPrice().doubleValue());
             orderMap.put("status", order.getStatus());
             orderMap.put("statusText", getStatusText(order.getStatus()));
             
             // 获取客户名称
             Customer customer = customerMapper.selectById(order.getUserId());
-            orderMap.put("customerName", customer != null ? customer.getRealName() : "未知");
+            orderMap.put("customerName", customer != null ? customer.getName() : "未知");
             
             recentOrders.add(orderMap);
         }
         result.put("recentOrders", recentOrders);
         
         // 3. 热销商品（按销量统计，前5名）
-        java.util.List<java.util.Map<String, Object>> topProducts = new java.util.ArrayList<>();
+        List<Map<String, Object>> topProducts = new ArrayList<>();
         
         // 获取该商家所有已完成订单的订单ID
         LambdaQueryWrapper<Order> completedWrapper = new LambdaQueryWrapper<>();
         completedWrapper.eq(Order::getMerchId, merchId)
                        .in(Order::getStatus, "DELIVERED", "COMPLETED");
-        java.util.List<Order> completedOrders = orderMapper.selectList(completedWrapper);
+        List<Order> completedOrders = orderMapper.selectList(completedWrapper);
         
         if (!completedOrders.isEmpty()) {
-            java.util.List<Long> orderIds = completedOrders.stream()
+            List<Long> orderIds = completedOrders.stream()
                 .map(Order::getId)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
             
             // 统计各商品的销量和销售额
             LambdaQueryWrapper<OrderItem> itemWrapper = new LambdaQueryWrapper<>();
             itemWrapper.in(OrderItem::getOrderId, orderIds);
-            java.util.List<OrderItem> items = orderItemMapper.selectList(itemWrapper);
+            List<OrderItem> items = orderItemMapper.selectList(itemWrapper);
             
             // 按商品ID分组统计
-            java.util.Map<Long, java.util.Map<String, Object>> productStats = new java.util.HashMap<>();
+            Map<Long, Map<String, Object>> productStats = new HashMap<>();
             for (OrderItem item : items) {
                 Long prodId = item.getProdId();
-                productStats.putIfAbsent(prodId, new java.util.HashMap<>());
-                java.util.Map<String, Object> stat = productStats.get(prodId);
+                productStats.putIfAbsent(prodId, new HashMap<>());
+                Map<String, Object> stat = productStats.get(prodId);
                 
                 stat.put("name", item.getName());
                 int sales = (int) stat.getOrDefault("sales", 0) + item.getQuantity();
                 stat.put("sales", sales);
                 
                 BigDecimal revenue = (BigDecimal) stat.getOrDefault("revenue", BigDecimal.ZERO);
-                revenue = revenue.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+                revenue = revenue.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
                 stat.put("revenue", revenue.doubleValue());
             }
             
@@ -249,12 +260,12 @@ public class MerchantServiceImpl implements MerchantService {
             topProducts = productStats.values().stream()
                 .sorted((a, b) -> Integer.compare((int)b.get("sales"), (int)a.get("sales")))
                 .limit(5)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
         }
         result.put("topProducts", topProducts);
         
         // 4. 销售趋势（近7天）
-        java.util.List<java.util.Map<String, Object>> salesTrend = new java.util.ArrayList<>();
+        List<Map<String, Object>> salesTrend = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
             LocalDate date = LocalDate.now().minusDays(i);
             LocalDateTime dayStart = date.atStartOfDay();
@@ -264,13 +275,13 @@ public class MerchantServiceImpl implements MerchantService {
             dayWrapper.eq(Order::getMerchId, merchId)
                      .ge(Order::getOrderDate, dayStart)
                      .lt(Order::getOrderDate, dayEnd);
-            java.util.List<Order> dayOrders = orderMapper.selectList(dayWrapper);
+            List<Order> dayOrders = orderMapper.selectList(dayWrapper);
             
             BigDecimal dayAmount = dayOrders.stream()
-                .map(Order::getTotalAmount)
+                .map(Order::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
             
-            java.util.Map<String, Object> item = new java.util.HashMap<>();
+            Map<String, Object> item = new HashMap<>();
             item.put("date", (date.getMonthValue()) + "/" + date.getDayOfMonth());
             item.put("amount", dayAmount.doubleValue());
             salesTrend.add(item);

@@ -65,4 +65,40 @@ public class CustomerController {
             return Result.error(e.getMessage());
         }
     }
+    
+    @ApiOperation("余额充值")
+    @PostMapping("/balance/recharge")
+    public Result<java.util.Map<String, Object>> recharge(@RequestBody java.util.Map<String, Object> params) {
+        try {
+            Long userId = Long.valueOf(params.get("userId").toString());
+            java.math.BigDecimal amount = new java.math.BigDecimal(params.get("amount").toString());
+            String paymentMethod = params.get("paymentMethod").toString();
+            
+            java.math.BigDecimal newBalance = customerService.recharge(userId, amount, paymentMethod);
+            
+            java.util.Map<String, Object> result = new java.util.HashMap<>();
+            result.put("balance", newBalance);
+            
+            return Result.success("充值成功", result);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("查询余额明细")
+    @GetMapping("/balance/history")
+    public Result<com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>>> getBalanceHistory(
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size) {
+        try {
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<java.util.Map<String, Object>> page = 
+                new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(current, size);
+            com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>> history = 
+                customerService.getBalanceHistory(userId, page);
+            return Result.success(history);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

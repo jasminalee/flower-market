@@ -41,4 +41,24 @@ public interface CustomerService {
      * @return 余额
      */
     java.math.BigDecimal getBalance(Long userId);
+    
+    /**
+     * 余额充值
+     * @param userId 用户ID
+     * @param amount 充值金额
+     * @param paymentMethod 支付方式
+     * @return 充值后的余额
+     */
+    java.math.BigDecimal recharge(Long userId, java.math.BigDecimal amount, String paymentMethod);
+    
+    /**
+     * 查询余额明细
+     * @param userId 用户ID
+     * @param page 分页参数
+     * @return 余额明细列表
+     */
+    com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>> getBalanceHistory(
+        Long userId, 
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<java.util.Map<String, Object>> page
+    );
 }
