@@ -29,12 +29,12 @@ public interface CouponService {
     CustomerCoupon receiveCoupon(Long userId, Long couponId);
     
     /**
-     * 获取用户的优惠券列表
+     * 获取用户的优惠券列表（包含详细信息）
      * @param userId 用户ID
      * @param status 状态（可选）：UNUSED-未使用，USED-已使用，EXPIRED-已过期
      * @return 用户优惠券列表
      */
-    List<CustomerCoupon> getUserCoupons(Long userId, String status);
+    List<vtc.xueqing.flower.vo.CustomerCouponVO> getUserCoupons(Long userId, String status);
     
     /**
      * 使用优惠券（在订单支付时调用）

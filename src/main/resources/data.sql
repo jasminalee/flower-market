@@ -36,24 +36,24 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- 密码：admin123（MD5: 0192023a7bbd73250516f069df18b500）
 -- ============================================
 INSERT INTO `administrators` (`admin_id`, `name`, `password`, `email`, `permission`, `status`) VALUES
-(1, '超级管理员', '21232f297a57a5a743894a0e4a801fc3', 'admin@flowermarket.com', 'SUPER_ADMIN', 'ACTIVE'),
-(2, '普通管理员', '0192023a7bbd73250516f069df18b500', 'admin2@flowermarket.com', 'ADMIN', 'ACTIVE');
+(1, '超级管理员', 'e10adc3949ba59abbe56e057f20f883e', 'admin@flowermarket.com', 'SUPER_ADMIN', 'ACTIVE'),
+(2, '普通管理员', 'e10adc3949ba59abbe56e057f20f883e', 'admin2@flowermarket.com', 'ADMIN', 'ACTIVE');
 
 -- ============================================
 -- 2. 插入顾客数据
--- 密码与邮箱前缀一致（MD5加密）
+-- 密码：123456（MD5加密）
 -- ============================================
 INSERT INTO `customers` (`user_id`, `name`, `email`, `phone`, `password`, `balance`, `level`, `gender`, `address`, `email_verified`) VALUES
--- zhangsan 的MD5: 96e79218965eb72c92a549dd5a330112
-(1, '张三', 'zhangsan@example.com', '13800138001', '96e79218965eb72c92a549dd5a330112', 1000.00, 'VIP', '男', '北京市朝阳区建国路88号', 1),
--- lisi 的MD5: a7f5f35426b927411fc9231b56382173
-(2, '李四', 'lisi@example.com', '13800138002', 'a7f5f35426b927411fc9231b56382173', 500.50, 'NORMAL', '女', '上海市浦东新区世纪大道100号', 1),
--- wangwu 的MD5: 594f803b380a41396ed63dca39503542
-(3, '王五', 'wangwu@example.com', '13800138003', '594f803b380a41396ed63dca39503542', 2000.00, 'SVIP', '男', '广州市天河区天河路123号', 1),
--- zhaoliu 的MD5: 0acf4539a14b3aa27deeb4cbdf6e989f
-(4, '赵六', 'zhaoliu@example.com', '13800138004', '0acf4539a14b3aa27deeb4cbdf6e989f', 300.00, 'NORMAL', '女', '深圳市南山区科技园路66号', 1),
--- sunqi 的MD5: 49f68a5c8493ec2c0bf489821c21fc3b
-(5, '孙七', 'sunqi@example.com', '13800138005', '49f68a5c8493ec2c0bf489821c21fc3b', 150.00, 'NORMAL', '男', '成都市武侯区人民南路55号', 0);
+-- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
+(1, '张三', 'zhangsan@example.com', '13800138001', 'e10adc3949ba59abbe56e057f20f883e', 1000.00, 'VIP', '男', '北京市朝阳区建国路88号', 1),
+-- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
+(2, '李四', 'lisi@example.com', '13800138002', 'e10adc3949ba59abbe56e057f20f883e', 500.50, 'NORMAL', '女', '上海市浦东新区世纪大道100号', 1),
+-- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
+(3, '王五', 'wangwu@example.com', '13800138003', 'e10adc3949ba59abbe56e057f20f883e', 2000.00, 'SVIP', '男', '广州市天河区天河路123号', 1),
+-- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
+(4, '赵六', 'zhaoliu@example.com', '13800138004', 'e10adc3949ba59abbe56e057f20f883e', 300.00, 'NORMAL', '女', '深圳市南山区科技园路66号', 1),
+-- sunqi 的MD5: e10adc3949ba59abbe56e057f20f883e
+(5, '孙七', 'sunqi@example.com', '13800138005', 'e10adc3949ba59abbe56e057f20f883e', 150.00, 'NORMAL', '男', '成都市武侯区人民南路55号', 0);
 
 -- ============================================
 -- 3. 插入商家数据
@@ -61,17 +61,17 @@ INSERT INTO `customers` (`user_id`, `name`, `email`, `phone`, `password`, `balan
 -- ============================================
 INSERT INTO `merchants` (`merch_id`, `name`, `email`, `password`, `phone`, `shop_logo`, `qualification`, `address`, `description`, `status`) VALUES
 -- huadianzhuangjia 的MD5: 5e5d3c8d4c8e8f0e7c9a8b5c6d7e8f9a（示例，实际使用 flower1）
--- flower1 的MD5: 0a791842f52a0acfbb3a783378c066b8
-(1, '花店专家', 'flower1@merchant.com', '0a791842f52a0acfbb3a783378c066b8', '13900139001', '/images/shop/flower1.jpg', '/images/qualification/cert1.jpg', '北京市朝阳区花卉市场A区1号', '专注高端鲜花定制，10年经验', 'ACTIVE'),
--- flower2 的MD5: 6f7ce61be3e437af92f5c9c9b5c7f44e
-(2, '绿植生活馆', 'flower2@merchant.com', '6f7ce61be3e437af92f5c9c9b5c7f44e', '13900139002', '/images/shop/flower2.jpg', '/images/qualification/cert2.jpg', '上海市徐汇区植物园路18号', '各类绿植盆栽，呵护您的绿色生活', 'ACTIVE'),
+-- flower1 的MD5: e10adc3949ba59abbe56e057f20f883e
+(1, '花店专家', 'flower1@merchant.com', 'e10adc3949ba59abbe56e057f20f883e', '13900139001', '/images/shop/flower1.jpg', '/images/qualification/cert1.jpg', '北京市朝阳区花卉市场A区1号', '专注高端鲜花定制，10年经验', 'ACTIVE'),
+-- flower2 的MD5: e10adc3949ba59abbe56e057f20f883e
+(2, '绿植生活馆', 'flower2@merchant.com', 'e10adc3949ba59abbe56e057f20f883e', '13900139002', '/images/shop/flower2.jpg', '/images/qualification/cert2.jpg', '上海市徐汇区植物园路18号', '各类绿植盆栽，呵护您的绿色生活', 'ACTIVE'),
 -- flower3 的MD5: cf2b8b4c9f4f3e2e1c8b7d6e5f4e3d2c
 -- 使用简化的MD5: e10adc3949ba59abbe56e057f20f883e (123456)
 (3, '鲜花速递', 'flower3@merchant.com', 'e10adc3949ba59abbe56e057f20f883e', '13900139003', '/images/shop/flower3.jpg', '/images/qualification/cert3.jpg', '广州市天河区花城大道200号', '全城配送，2小时送达', 'ACTIVE'),
--- merchant4 的MD5: 6f4b6612125fb3a0daecd2799dfd6c9c
-(4, '待审核商家', 'merchant4@merchant.com', '6f4b6612125fb3a0daecd2799dfd6c9c', '13900139004', NULL, NULL, '深圳市福田区华强北路99号', '新注册商家，等待审核', 'PENDING'),
--- merchant5 的MD5: b68fe43f0d1a52d1da29072c8c6d9bbb
-(5, '暂停营业商家', 'merchant5@merchant.com', 'b68fe43f0d1a52d1da29072c8c6d9bbb', '13900139005', '/images/shop/flower5.jpg', '/images/qualification/cert5.jpg', '杭州市西湖区文三路77号', '因故暂停营业', 'SUSPENDED');
+-- merchant4 的MD5: e10adc3949ba59abbe56e057f20f883e
+(4, '待审核商家', 'merchant4@merchant.com', 'e10adc3949ba59abbe56e057f20f883e', '13900139004', NULL, NULL, '深圳市福田区华强北路99号', '新注册商家，等待审核', 'PENDING'),
+-- merchant5 的MD5: e10adc3949ba59abbe56e057f20f883e
+(5, '暂停营业商家', 'merchant5@merchant.com', 'e10adc3949ba59abbe56e057f20f883e', '13900139005', '/images/shop/flower5.jpg', '/images/qualification/cert5.jpg', '杭州市西湖区文三路77号', '因故暂停营业', 'SUSPENDED');
 
 -- ============================================
 -- 4. 插入产品分类数据

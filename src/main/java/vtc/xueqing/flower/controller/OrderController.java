@@ -54,10 +54,10 @@ public class OrderController {
     
     @ApiOperation("获取订单详情")
     @GetMapping("/{id}")
-    public Result<Order> getOrderById(@PathVariable("id") Long id) {
+    public Result<vtc.xueqing.flower.vo.OrderDetailVO> getOrderById(@PathVariable("id") Long id) {
         try {
-            Order order = orderService.getOrderById(id);
-            return Result.success(order);
+            vtc.xueqing.flower.vo.OrderDetailVO orderDetail = orderService.getOrderDetailById(id);
+            return Result.success(orderDetail);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

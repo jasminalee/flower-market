@@ -3,6 +3,7 @@ package vtc.xueqing.flower.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import vtc.xueqing.flower.entity.ShoppingCart;
+import vtc.xueqing.flower.vo.ShoppingCartVO;
 
 import java.util.List;
 
@@ -12,11 +13,11 @@ import java.util.List;
 public interface ShoppingCartService {
     
     /**
-     * 获取用户的购物车列表
+     * 获取用户的购物车列表（包含商品信息）
      * @param userId 用户ID
      * @return 购物车列表
      */
-    List<ShoppingCart> getCartByUserId(Long userId);
+    List<ShoppingCartVO> getCartByUserId(Long userId);
     
     /**
      * 添加商品到购物车（如果已存在则增加数量）

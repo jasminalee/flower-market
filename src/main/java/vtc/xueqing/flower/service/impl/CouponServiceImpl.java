@@ -97,13 +97,8 @@ public class CouponServiceImpl implements CouponService {
     }
     
     @Override
-    public List<CustomerCoupon> getUserCoupons(Long userId, String status) {
-        LambdaQueryWrapper<CustomerCoupon> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(CustomerCoupon::getUserId, userId)
-                .eq(status != null && !status.isEmpty(), CustomerCoupon::getStatus, status)
-                .orderByDesc(CustomerCoupon::getReceiveDate);
-        
-        return customerCouponMapper.selectList(wrapper);
+    public List<vtc.xueqing.flower.vo.CustomerCouponVO> getUserCoupons(Long userId, String status) {
+        return customerCouponMapper.selectCouponListWithDetail(userId, status);
     }
     
     @Override

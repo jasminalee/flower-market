@@ -14,6 +14,7 @@ import vtc.xueqing.flower.mapper.OrderItemMapper;
 import vtc.xueqing.flower.mapper.OrderMapper;
 import vtc.xueqing.flower.mapper.ProductMapper;
 import vtc.xueqing.flower.service.OrderService;
+import vtc.xueqing.flower.vo.OrderDetailVO;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -100,6 +101,23 @@ public class OrderServiceImpl implements OrderService {
         // 或者创建OrderVO来包含订单项信息
         
         return order;
+    }
+    
+    @Override
+    public OrderDetailVO getOrderDetailById(Long orderId) {
+        // 1. 查询订单基本信息（带客户和商家名称）
+        OrderDetailVO orderDetail = orderMapper.selectOrderDetailById(orderId);
+        if (orderDetail == null) {
+            throw new RuntimeException("订单不存在");
+        }
+        
+        // 2. 查询订单项
+        LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OrderItem::getOrderId, orderId);
+        List<OrderItem> orderItems = orderItemMapper.selectList(wrapper);
+        orderDetail.setItems(orderItems);
+        
+        return orderDetail;
     }
     
     @Override

@@ -32,4 +32,31 @@ public interface ProductCategoryService {
      * @return 分类信息
      */
     ProductCategory getCategoryById(Long cateId);
+
+    /**
+     * 获取所有分类列表（不分页）
+     * @return 所有分类列表
+     */
+    List<ProductCategory> getAllCategories();
+
+    /**
+     * 创建分类
+     * @param category 分类信息
+     * @return 创建的分类
+     */
+    ProductCategory createCategory(ProductCategory category);
+
+    /**
+     * 更新分类
+     * @param cateId 分类ID
+     * @param category 分类信息
+     * @return 更新后的分类
+     */
+    ProductCategory updateCategory(Long cateId, ProductCategory category);
+
+    /**
+     * 删除分类（级联删除子分类）
+     * @param cateId 分类ID
+     */
+    void deleteCategory(Long cateId);
 }

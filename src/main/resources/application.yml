@@ -11,12 +11,22 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/flower_market?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
+  # SQL初始化配置
+  sql:
+    init:
+      mode: never  # 改为never，避免每次启动都重新初始化
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      encoding: UTF-8
+      continue-on-error: false
 
 # MyBatis-Plus 配置
 mybatis-plus:
   configuration:
     # SQL 日志打印
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 开启驼峰命名转换：数据库字段 create_date -> Java字段 createDate
+    map-underscore-to-camel-case: true
   global-config:
     db-config:
       # 主键策略

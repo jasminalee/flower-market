@@ -79,6 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         // 2. 验证密码（MD5加密后比较）
         String encryptedPassword = SecureUtil.md5(login.getPassword());
+        log.info("密码验证 - 输入密码: {}, MD5加密后: {}, 数据库密码: {}", login.getPassword(), encryptedPassword, customer.getPassword());
         if (!encryptedPassword.equals(customer.getPassword())) {
             throw new BusinessException("密码错误");
         }

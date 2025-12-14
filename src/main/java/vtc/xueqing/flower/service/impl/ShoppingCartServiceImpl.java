@@ -8,6 +8,7 @@ import vtc.xueqing.flower.entity.ShoppingCart;
 import vtc.xueqing.flower.mapper.ProductMapper;
 import vtc.xueqing.flower.mapper.ShoppingCartMapper;
 import vtc.xueqing.flower.service.ShoppingCartService;
+import vtc.xueqing.flower.vo.ShoppingCartVO;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,11 +26,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private ProductMapper productMapper;
     
     @Override
-    public List<ShoppingCart> getCartByUserId(Long userId) {
-        LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ShoppingCart::getUserId, userId)
-                .orderByDesc(ShoppingCart::getCreateDate);
-        return shoppingCartMapper.selectList(wrapper);
+    public List<ShoppingCartVO> getCartByUserId(Long userId) {
+        return shoppingCartMapper.selectCartWithProductByUserId(userId);
     }
     
     @Override

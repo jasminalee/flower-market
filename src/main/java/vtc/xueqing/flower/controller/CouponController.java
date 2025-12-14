@@ -57,12 +57,12 @@ public class CouponController {
     
     @ApiOperation("获取用户的优惠券列表")
     @GetMapping("/my")
-    public Result<List<CustomerCoupon>> getUserCoupons(
+    public Result<List<vtc.xueqing.flower.vo.CustomerCouponVO>> getUserCoupons(
             @ApiParam("用户ID") @RequestParam Long userId,
             @ApiParam("状态：UNUSED-未使用，USED-已使用，EXPIRED-已过期") @RequestParam(required = false) String status
     ) {
         try {
-            List<CustomerCoupon> customerCoupons = couponService.getUserCoupons(userId, status);
+            List<vtc.xueqing.flower.vo.CustomerCouponVO> customerCoupons = couponService.getUserCoupons(userId, status);
             return Result.success(customerCoupons);
         } catch (Exception e) {
             return Result.error(e.getMessage());

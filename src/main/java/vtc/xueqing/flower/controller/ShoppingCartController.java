@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import vtc.xueqing.flower.common.Result;
 import vtc.xueqing.flower.entity.ShoppingCart;
 import vtc.xueqing.flower.service.ShoppingCartService;
+import vtc.xueqing.flower.vo.ShoppingCartVO;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,9 +25,9 @@ public class ShoppingCartController {
     
     @ApiOperation("获取用户购物车列表")
     @GetMapping
-    public Result<List<ShoppingCart>> getCart(@ApiParam("用户ID") @RequestParam Long userId) {
+    public Result<List<ShoppingCartVO>> getCart(@ApiParam("用户ID") @RequestParam Long userId) {
         try {
-            List<ShoppingCart> cartList = shoppingCartService.getCartByUserId(userId);
+            List<ShoppingCartVO> cartList = shoppingCartService.getCartByUserId(userId);
             return Result.success(cartList);
         } catch (Exception e) {
             return Result.error(e.getMessage());

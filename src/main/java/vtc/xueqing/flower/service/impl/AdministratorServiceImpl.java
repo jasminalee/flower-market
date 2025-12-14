@@ -9,10 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import vtc.xueqing.flower.entity.Administrator;
 import vtc.xueqing.flower.entity.Customer;
 import vtc.xueqing.flower.entity.Merchant;
+import vtc.xueqing.flower.entity.CareKnowledge;
 import vtc.xueqing.flower.mapper.AdministratorMapper;
+import vtc.xueqing.flower.mapper.CareKnowledgeMapper;
 import vtc.xueqing.flower.mapper.CustomerMapper;
 import vtc.xueqing.flower.mapper.MerchantMapper;
+import vtc.xueqing.flower.mapper.OrderMapper;
 import vtc.xueqing.flower.service.AdministratorService;
+import vtc.xueqing.flower.vo.OrderVO;
 
 import javax.annotation.Resource;
 
@@ -30,6 +34,12 @@ public class AdministratorServiceImpl implements AdministratorService {
     
     @Resource
     private MerchantMapper merchantMapper;
+    
+    @Resource
+    private OrderMapper orderMapper;
+    
+    @Resource
+    private CareKnowledgeMapper careKnowledgeMapper;
     
     @Override
     public Administrator login(String email, String password) {
@@ -206,5 +216,145 @@ public class AdministratorServiceImpl implements AdministratorService {
         result.put("orderTrend", orderTrend);
         
         return result;
+    }
+    
+    @Override
+    public IPage<OrderVO> getAllOrders(Page<OrderVO> page, String status, String keyword) {
+        return orderMapper.selectAllOrdersWithDetail(page, status, keyword);
+    }
+    
+    @Override
+    public IPage<CareKnowledge> getKnowledgeList(Page<CareKnowledge> page, String keyword, String category, String status) {
+        LambdaQueryWrapper<CareKnowledge> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(keyword != null && !keyword.isEmpty(), CareKnowledge::getTitle, keyword)
+                .eq(category != null && !category.isEmpty(), CareKnowledge::getCategory, category)
+                .eq(status != null && !status.isEmpty(), CareKnowledge::getStatus, status)
+                .orderByDesc(CareKnowledge::getCreateDate);
+        return careKnowledgeMapper.selectPage(page, wrapper);
+    }
+    
+    @Override
+    public CareKnowledge getKnowledgeById(Long id) {
+        CareKnowledge knowledge = careKnowledgeMapper.selectById(id);
+        if (knowledge == null) {
+            throw new RuntimeException("养护知识不存在");
+        }
+        return knowledge;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CareKnowledge createKnowledge(CareKnowledge knowledge) {
+        // 设置默认状态
+        if (knowledge.getStatus() == null || knowledge.getStatus().isEmpty()) {
+            knowledge.setStatus("PUBLISHED");
+        }
+        
+        // 初始化浏览次数
+        if (knowledge.getViewCount() == null) {
+            knowledge.setViewCount(0);
+        }
+        
+        // 验证必填字段
+        if (knowledge.getTitle() == null || knowledge.getTitle().isEmpty()) {
+            throw new RuntimeException("标题不能为空");
+        }
+        
+        if (knowledge.getContent() == null || knowledge.getContent().isEmpty()) {
+            throw new RuntimeException("内容不能为空");
+        }
+        
+        careKnowledgeMapper.insert(knowledge);
+        return knowledge;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CareKnowledge updateKnowledge(CareKnowledge knowledge) {
+        CareKnowledge existing = careKnowledgeMapper.selectById(knowledge.getId());
+        if (existing == null) {
+            throw new RuntimeException("养护知识不存在");
+        }
+        
+        careKnowledgeMapper.updateById(knowledge);
+        return careKnowledgeMapper.selectById(knowledge.getId());
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CareKnowledge updateKnowledgeStatus(Long id, String status) {
+        CareKnowledge knowledge = careKnowledgeMapper.selectById(id);
+        if (knowledge == null) {
+            throw new RuntimeException("养护知识不存在");
+        }
+        
+        // 验证状态值
+        if (!"PUBLISHED".equals(status) && !"DRAFT".equals(status)) {
+            throw new RuntimeException("状态只能是PUBLISHED或DRAFT");
+        }
+        
+        knowledge.setStatus(status);
+        careKnowledgeMapper.updateById(knowledge);
+        return knowledge;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteKnowledge(Long id) {
+        CareKnowledge knowledge = careKnowledgeMapper.selectById(id);
+        if (knowledge == null) {
+            throw new RuntimeException("养护知识不存在");
+        }
+        
+        careKnowledgeMapper.deleteById(id);
+    }
+    
+    @Override
+    public Administrator getProfileById(Long adminId) {
+        Administrator admin = administratorMapper.selectById(adminId);
+        if (admin == null) {
+            throw new RuntimeException("管理员不存在");
+        }
+        // 密码置空
+        admin.setPassword(null);
+        return admin;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Administrator updateProfile(Long adminId, String name) {
+        Administrator admin = administratorMapper.selectById(adminId);
+        if (admin == null) {
+            throw new RuntimeException("管理员不存在");
+        }
+        
+        if (name != null && !name.trim().isEmpty()) {
+            admin.setName(name);
+        }
+        
+        administratorMapper.updateById(admin);
+        // 密码置空
+        admin.setPassword(null);
+        return admin;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePassword(Long adminId, String oldPassword, String newPassword) {
+        Administrator admin = administratorMapper.selectById(adminId);
+        if (admin == null) {
+            throw new RuntimeException("管理员不存在");
+        }
+        
+        // 验证原密码
+        String encryptedOldPassword = SecureUtil.md5(oldPassword);
+        if (!encryptedOldPassword.equals(admin.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+        
+        // 设置新密码
+        String encryptedNewPassword = SecureUtil.md5(newPassword);
+        admin.setPassword(encryptedNewPassword);
+        administratorMapper.updateById(admin);
     }
 }

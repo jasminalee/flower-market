@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import vtc.xueqing.flower.common.Result;
 import vtc.xueqing.flower.entity.Administrator;
+import vtc.xueqing.flower.entity.CareKnowledge;
 import vtc.xueqing.flower.entity.Customer;
 import vtc.xueqing.flower.entity.Merchant;
 import vtc.xueqing.flower.entity.ProductReview;
@@ -158,6 +159,155 @@ public class AdministratorController {
             Page<ProductReviewVO> page = new Page<>(current, size);
             IPage<ProductReviewVO> reviewPage = productReviewService.getAllReviewsWithDetail(page, status);
             return Result.success(reviewPage);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("获取所有订单列表（管理员）")
+    @GetMapping("/orders")
+    public Result<IPage<vtc.xueqing.flower.vo.OrderVO>> getAllOrders(
+            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("订单状态") @RequestParam(required = false) String status,
+            @ApiParam("搜索关键词") @RequestParam(required = false) String keyword
+    ) {
+        try {
+            Page<vtc.xueqing.flower.vo.OrderVO> page = new Page<>(current, size);
+            IPage<vtc.xueqing.flower.vo.OrderVO> orderPage = administratorService.getAllOrders(page, status, keyword);
+            return Result.success(orderPage);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("获取养护知识列表（管理员）")
+    @GetMapping("/knowledge")
+    public Result<IPage<vtc.xueqing.flower.entity.CareKnowledge>> getKnowledgeList(
+            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("搜索关键词") @RequestParam(required = false) String keyword,
+            @ApiParam("分类") @RequestParam(required = false) String category,
+            @ApiParam("状态") @RequestParam(required = false) String status
+    ) {
+        try {
+            Page<vtc.xueqing.flower.entity.CareKnowledge> page = new Page<>(current, size);
+            IPage<vtc.xueqing.flower.entity.CareKnowledge> knowledgePage = administratorService.getKnowledgeList(page, keyword, category, status);
+            return Result.success(knowledgePage);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("获取养护知识详情（管理员）")
+    @GetMapping("/knowledge/{id}")
+    public Result<vtc.xueqing.flower.entity.CareKnowledge> getKnowledgeById(@PathVariable("id") Long id) {
+        try {
+            vtc.xueqing.flower.entity.CareKnowledge knowledge = administratorService.getKnowledgeById(id);
+            return Result.success(knowledge);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("创建养护知识（管理员）")
+    @PostMapping("/knowledge")
+    public Result<vtc.xueqing.flower.entity.CareKnowledge> createKnowledge(@RequestBody vtc.xueqing.flower.entity.CareKnowledge knowledge) {
+        try {
+            vtc.xueqing.flower.entity.CareKnowledge created = administratorService.createKnowledge(knowledge);
+            return Result.success(created);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("更新养护知识（管理员）")
+    @PutMapping("/knowledge/{id}")
+    public Result<vtc.xueqing.flower.entity.CareKnowledge> updateKnowledge(
+            @PathVariable("id") Long id,
+            @RequestBody vtc.xueqing.flower.entity.CareKnowledge knowledge
+    ) {
+        try {
+            knowledge.setId(id);
+            vtc.xueqing.flower.entity.CareKnowledge updated = administratorService.updateKnowledge(knowledge);
+            return Result.success(updated);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("更新养护知识状态（管理员）")
+    @PutMapping("/knowledge/{id}/status")
+    public Result<vtc.xueqing.flower.entity.CareKnowledge> updateKnowledgeStatus(
+            @PathVariable("id") Long id,
+            @ApiParam("状态：PUBLISHED-已发布，DRAFT-草稿") @RequestParam String status
+    ) {
+        try {
+            vtc.xueqing.flower.entity.CareKnowledge updated = administratorService.updateKnowledgeStatus(id, status);
+            return Result.success(updated);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("删除养护知识（管理员）")
+    @DeleteMapping("/knowledge/{id}")
+    public Result<Void> deleteKnowledge(@PathVariable("id") Long id) {
+        try {
+            administratorService.deleteKnowledge(id);
+            return Result.success(null);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("获取管理员个人信息")
+    @GetMapping("/profile")
+    public Result<Administrator> getProfile(@RequestParam Long adminId) {
+        try {
+            Administrator admin = administratorService.getProfileById(adminId);
+            return Result.success(admin);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("更新管理员个人信息")
+    @PutMapping("/profile")
+    public Result<Administrator> updateProfile(@RequestBody Map<String, Object> profileData) {
+        try {
+            Long adminId = Long.valueOf(profileData.get("adminId").toString());
+            String name = (String) profileData.get("name");
+            
+            Administrator admin = administratorService.updateProfile(adminId, name);
+            return Result.success(admin);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("修改管理员密码")
+    @PutMapping("/password")
+    public Result<Void> updatePassword(@RequestBody Map<String, String> passwordData) {
+        try {
+            Long adminId = Long.valueOf(passwordData.get("adminId"));
+            String oldPassword = passwordData.get("oldPassword");
+            String newPassword = passwordData.get("newPassword");
+            
+            if (oldPassword == null || oldPassword.isEmpty()) {
+                return Result.error("原密码不能为空");
+            }
+            
+            if (newPassword == null || newPassword.isEmpty()) {
+                return Result.error("新密码不能为空");
+            }
+            
+            if (newPassword.length() < 6) {
+                return Result.error("新密码长度不能少于6位");
+            }
+            
+            administratorService.updatePassword(adminId, oldPassword, newPassword);
+            return Result.success(null);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

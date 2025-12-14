@@ -34,6 +34,13 @@ public interface OrderService {
     Order getOrderById(Long orderId);
     
     /**
+     * 根据ID获取订单详情（带客户和商家名称及订单项）
+     * @param orderId 订单ID
+     * @return 订单详情VO
+     */
+    vtc.xueqing.flower.vo.OrderDetailVO getOrderDetailById(Long orderId);
+    
+    /**
      * 支付订单
      * @param orderId 订单ID
      * @param paymentMethod 支付方式：ALIPAY-支付宝，WECHAT-微信，BALANCE-余额

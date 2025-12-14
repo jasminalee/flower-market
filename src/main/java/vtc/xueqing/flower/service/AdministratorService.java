@@ -70,4 +70,81 @@ public interface AdministratorService {
      * @return 包含统计数据、最近用户、最近商家、订单趋势的Map
      */
     java.util.Map<String, Object> getDashboardData();
+    
+    /**
+     * 获取所有订单列表（管理员）- 带客户和商家名称
+     * @param page 分页信息
+     * @param status 订单状态（可选）
+     * @param keyword 搜索关键词：订单号或客户名（可选）
+     * @return 订单VO列表
+     */
+    IPage<vtc.xueqing.flower.vo.OrderVO> getAllOrders(Page<vtc.xueqing.flower.vo.OrderVO> page, String status, String keyword);
+    
+    /**
+     * 获取养护知识列表（管理员）
+     * @param page 分页信息
+     * @param keyword 搜索关键词：标题（可选）
+     * @param category 分类（可选）
+     * @param status 状态（可选）
+     * @return 养护知识列表
+     */
+    IPage<vtc.xueqing.flower.entity.CareKnowledge> getKnowledgeList(Page<vtc.xueqing.flower.entity.CareKnowledge> page, String keyword, String category, String status);
+    
+    /**
+     * 获取养护知识详情（管理员）
+     * @param id 知识ID
+     * @return 养护知识详情
+     */
+    vtc.xueqing.flower.entity.CareKnowledge getKnowledgeById(Long id);
+    
+    /**
+     * 创建养护知识（管理员）
+     * @param knowledge 养护知识信息
+     * @return 创建的养护知识
+     */
+    vtc.xueqing.flower.entity.CareKnowledge createKnowledge(vtc.xueqing.flower.entity.CareKnowledge knowledge);
+    
+    /**
+     * 更新养护知识（管理员）
+     * @param knowledge 养护知识信息
+     * @return 更新后的养护知识
+     */
+    vtc.xueqing.flower.entity.CareKnowledge updateKnowledge(vtc.xueqing.flower.entity.CareKnowledge knowledge);
+    
+    /**
+     * 更新养护知识状态（管理员）
+     * @param id 知识ID
+     * @param status 状态
+     * @return 更新后的养护知识
+     */
+    vtc.xueqing.flower.entity.CareKnowledge updateKnowledgeStatus(Long id, String status);
+    
+    /**
+     * 删除养护知识（管理员）
+     * @param id 知识ID
+     */
+    void deleteKnowledge(Long id);
+    
+    /**
+     * 根据管理员ID获取个人信息
+     * @param adminId 管理员ID
+     * @return 管理员信息
+     */
+    Administrator getProfileById(Long adminId);
+    
+    /**
+     * 更新管理员个人信息
+     * @param adminId 管理员ID
+     * @param name 姓名
+     * @return 更新后的管理员信息
+     */
+    Administrator updateProfile(Long adminId, String name);
+    
+    /**
+     * 修改管理员密码
+     * @param adminId 管理员ID
+     * @param oldPassword 原密码
+     * @param newPassword 新密码
+     */
+    void updatePassword(Long adminId, String oldPassword, String newPassword);
 }
