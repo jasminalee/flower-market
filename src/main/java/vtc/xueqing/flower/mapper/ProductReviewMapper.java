@@ -26,7 +26,7 @@ public interface ProductReviewMapper extends BaseMapper<ProductReview> {
             "  pr.status, pr.create_date, " +
             "  c.name AS user_name, " +
             "  p.name AS product_name, " +
-            "  p.image AS product_image " +
+            "  p.main_image AS product_image " +
             "FROM product_reviews pr " +
             "LEFT JOIN customers c ON pr.user_id = c.user_id " +
             "LEFT JOIN products p ON pr.prod_id = p.prod_id " +
