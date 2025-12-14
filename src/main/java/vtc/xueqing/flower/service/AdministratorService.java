@@ -28,12 +28,26 @@ public interface AdministratorService {
     IPage<Customer> getCustomerList(Page<Customer> page, String level);
     
     /**
+     * 获取顾客详情
+     * @param userId 用户ID
+     * @return 顾客信息
+     */
+    Customer getCustomerById(Long userId);
+    
+    /**
      * 获取商家列表（分页）
      * @param page 分页信息
      * @param status 商家状态（可选）
      * @return 商家列表
      */
     IPage<Merchant> getMerchantList(Page<Merchant> page, String status);
+    
+    /**
+     * 获取商家详情
+     * @param merchId 商家ID
+     * @return 商家信息
+     */
+    Merchant getMerchantById(Long merchId);
     
     /**
      * 商家审核

@@ -75,6 +75,17 @@ public class AdministratorController {
         }
     }
     
+    @ApiOperation("获取顾客详情")
+    @GetMapping("/customers/{id}")
+    public Result<Customer> getCustomerById(@PathVariable("id") Long userId) {
+        try {
+            Customer customer = administratorService.getCustomerById(userId);
+            return Result.success(customer);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
     @ApiOperation("获取商家列表（分页）")
     @GetMapping("/merchants")
     public Result<IPage<Merchant>> getMerchantList(
@@ -91,8 +102,19 @@ public class AdministratorController {
         }
     }
     
+    @ApiOperation("获取商家详情")
+    @GetMapping("/merchants/{id}")
+    public Result<Merchant> getMerchantById(@PathVariable("id") Long merchId) {
+        try {
+            Merchant merchant = administratorService.getMerchantById(merchId);
+            return Result.success(merchant);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
     @ApiOperation("商家审核")
-    @PutMapping("/merchants/{id}/verify")
+    @PutMapping({"/merchants/{id}/verify", "/merchants/{id}/audit"})
     public Result<Merchant> verifyMerchant(
             @PathVariable("id") Long merchId,
             @ApiParam("审核状态：ACTIVE-通过，REJECTED-拒绝，SUSPENDED-暂停") @RequestParam String status

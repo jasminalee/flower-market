@@ -73,6 +73,28 @@ public class AdministratorServiceImpl implements AdministratorService {
     }
     
     @Override
+    public Customer getCustomerById(Long userId) {
+        Customer customer = customerMapper.selectById(userId);
+        if (customer == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        // 密码置空
+        customer.setPassword(null);
+        return customer;
+    }
+    
+    @Override
+    public Merchant getMerchantById(Long merchId) {
+        Merchant merchant = merchantMapper.selectById(merchId);
+        if (merchant == null) {
+            throw new RuntimeException("商家不存在");
+        }
+        // 密码置空
+        merchant.setPassword(null);
+        return merchant;
+    }
+    
+    @Override
     public IPage<Merchant> getMerchantList(Page<Merchant> page, String status) {
         LambdaQueryWrapper<Merchant> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(status != null && !status.isEmpty(), Merchant::getStatus, status)
