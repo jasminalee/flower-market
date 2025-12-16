@@ -14,7 +14,7 @@ spring:
   # SQL初始化配置
   sql:
     init:
-      mode: never  # 改为never，避免每次启动都重新初始化
+      mode: always  # 改为never，避免每次启动都重新初始化
       schema-locations: classpath:schema.sql
       data-locations: classpath:data.sql
       encoding: UTF-8

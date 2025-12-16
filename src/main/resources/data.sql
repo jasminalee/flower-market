@@ -267,24 +267,3 @@ UNION ALL
 SELECT '评价数量', COUNT(*) FROM product_reviews
 UNION ALL
 SELECT '优惠券数量', COUNT(*) FROM coupons;
-
-
-
-
--- 1. 为customers表添加points字段
-ALTER TABLE `customers`
-    ADD COLUMN `points` INT DEFAULT 0 COMMENT '会员总积分'
-AFTER `balance`;
-
--- 2. 根据签到历史计算并更新每个用户的总积分
-UPDATE `customers` c
-SET c.`points` = (
-    SELECT IFNULL(SUM(ci.`reward_points`), 0)
-    FROM `check_ins` ci
-    WHERE ci.`user_id` = c.`user_id`
-);
-
--- 3. 查看更新结果
-SELECT user_id, name, points, balance
-FROM `customers`
-ORDER BY user_id;
