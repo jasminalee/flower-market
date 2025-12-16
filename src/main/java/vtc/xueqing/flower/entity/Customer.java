@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -57,6 +59,12 @@ public class Customer implements Serializable {
     private BigDecimal balance;
 
     /**
+     * 会员总积分
+     */
+    @TableField("points")
+    private Integer points;
+
+    /**
      * 会员等级：NORMAL-普通，VIP-VIP，SVIP-超级VIP
      */
     @TableField("level")
@@ -91,4 +99,30 @@ public class Customer implements Serializable {
      */
     @TableField("update_date")
     private LocalDateTime updateDate;
+
+    // 为前端提供字段别名的getter方法
+    
+    /**
+     * 获取用户名（前端字段：username）
+     */
+    @JsonProperty("username")
+    public String getUsername() {
+        return this.name;
+    }
+
+    /**
+     * 获取会员等级（前端字段：memberLevel）
+     */
+    @JsonProperty("memberLevel")
+    public String getMemberLevel() {
+        return this.level;
+    }
+
+    /**
+     * 获取创建时间（前端字段：createTime）
+     */
+    @JsonProperty("createTime")
+    public LocalDateTime getCreateTime() {
+        return this.createDate;
+    }
 }

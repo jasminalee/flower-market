@@ -43,17 +43,20 @@ INSERT INTO `administrators` (`admin_id`, `name`, `password`, `email`, `permissi
 -- 2. 插入顾客数据
 -- 密码：123456（MD5加密）
 -- ============================================
-INSERT INTO `customers` (`user_id`, `name`, `email`, `phone`, `password`, `balance`, `level`, `gender`, `address`, `email_verified`) VALUES
+INSERT INTO `customers` (`user_id`, `name`, `email`, `phone`, `password`, `balance`, `points`, `level`, `gender`, `address`, `email_verified`) VALUES
 -- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
-(1, '张三', 'zhangsan@example.com', '13800138001', 'e10adc3949ba59abbe56e057f20f883e', 1000.00, 'VIP', '男', '北京市朝阳区建国路88号', 1),
+-- 张三签到7次，积分：10+10+10+10+15+15+15=85
+(1, '张三', 'zhangsan@example.com', '13800138001', 'e10adc3949ba59abbe56e057f20f883e', 1000.00, 85, 'VIP', '男', '北京市朝阳区建国路88号', 1),
 -- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
-(2, '李四', 'lisi@example.com', '13800138002', 'e10adc3949ba59abbe56e057f20f883e', 500.50, 'NORMAL', '女', '上海市浦东新区世纪大道100号', 1),
+-- 李四签到2次，积分：10+10=20
+(2, '李四', 'lisi@example.com', '13800138002', 'e10adc3949ba59abbe56e057f20f883e', 500.50, 20, 'NORMAL', '女', '上海市浦东新区世纪大道100号', 1),
 -- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
-(3, '王五', 'wangwu@example.com', '13800138003', 'e10adc3949ba59abbe56e057f20f883e', 2000.00, 'SVIP', '男', '广州市天河区天河路123号', 1),
+-- 王五签到2次，积分：10+10=20
+(3, '王五', 'wangwu@example.com', '13800138003', 'e10adc3949ba59abbe56e057f20f883e', 2000.00, 20, 'SVIP', '男', '广州市天河区天河路123号', 1),
 -- 密码: 123456, MD5: e10adc3949ba59abbe56e057f20f883e
-(4, '赵六', 'zhaoliu@example.com', '13800138004', 'e10adc3949ba59abbe56e057f20f883e', 300.00, 'NORMAL', '女', '深圳市南山区科技园路66号', 1),
+(4, '赵六', 'zhaoliu@example.com', '13800138004', 'e10adc3949ba59abbe56e057f20f883e', 300.00, 0, 'NORMAL', '女', '深圳市南山区科技园路66号', 1),
 -- sunqi 的MD5: e10adc3949ba59abbe56e057f20f883e
-(5, '孙七', 'sunqi@example.com', '13800138005', 'e10adc3949ba59abbe56e057f20f883e', 150.00, 'NORMAL', '男', '成都市武侯区人民南路55号', 0);
+(5, '孙七', 'sunqi@example.com', '13800138005', 'e10adc3949ba59abbe56e057f20f883e', 150.00, 0, 'NORMAL', '男', '成都市武侯区人民南路55号', 0);
 
 -- ============================================
 -- 3. 插入商家数据
@@ -264,3 +267,24 @@ UNION ALL
 SELECT '评价数量', COUNT(*) FROM product_reviews
 UNION ALL
 SELECT '优惠券数量', COUNT(*) FROM coupons;
+
+
+
+
+-- 1. 为customers表添加points字段
+ALTER TABLE `customers`
+    ADD COLUMN `points` INT DEFAULT 0 COMMENT '会员总积分'
+AFTER `balance`;
+
+-- 2. 根据签到历史计算并更新每个用户的总积分
+UPDATE `customers` c
+SET c.`points` = (
+    SELECT IFNULL(SUM(ci.`reward_points`), 0)
+    FROM `check_ins` ci
+    WHERE ci.`user_id` = c.`user_id`
+);
+
+-- 3. 查看更新结果
+SELECT user_id, name, points, balance
+FROM `customers`
+ORDER BY user_id;

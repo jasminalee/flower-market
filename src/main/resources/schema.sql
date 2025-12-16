@@ -18,6 +18,7 @@ CREATE TABLE `customers` (
   `phone` VARCHAR(20) COMMENT '手机号',
   `password` VARCHAR(255) NOT NULL COMMENT '密码（加密）',
   `balance` DECIMAL(10, 2) DEFAULT 0.00 COMMENT '账户余额',
+  `points` INT DEFAULT 0 COMMENT '会员总积分',
   `level` VARCHAR(20) DEFAULT 'NORMAL' COMMENT '会员等级：NORMAL-普通，VIP-VIP，SVIP-超级VIP',
   `gender` VARCHAR(10) COMMENT '性别',
   `address` VARCHAR(255) COMMENT '默认地址',

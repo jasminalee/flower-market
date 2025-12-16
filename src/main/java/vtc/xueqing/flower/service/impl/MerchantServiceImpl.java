@@ -15,6 +15,7 @@ import vtc.xueqing.flower.mapper.MerchantMapper;
 import vtc.xueqing.flower.mapper.OrderMapper;
 import vtc.xueqing.flower.mapper.OrderItemMapper;
 import vtc.xueqing.flower.mapper.CustomerMapper;
+import vtc.xueqing.flower.mapper.ProductMapper;
 import vtc.xueqing.flower.service.MerchantService;
 
 import javax.annotation.Resource;
@@ -42,6 +43,12 @@ public class MerchantServiceImpl implements MerchantService {
     
     @Resource
     private CustomerMapper customerMapper;
+    
+    @Resource
+    private ProductMapper productMapper;
+    
+    @Resource
+    private vtc.xueqing.flower.mapper.CouponMapper couponMapper;
 
     @Override
     public Merchant register(Merchant merchant) {
@@ -251,9 +258,10 @@ public class MerchantServiceImpl implements MerchantService {
                 int sales = (int) stat.getOrDefault("sales", 0) + item.getQuantity();
                 stat.put("sales", sales);
                 
-                BigDecimal revenue = (BigDecimal) stat.getOrDefault("revenue", BigDecimal.ZERO);
-                revenue = revenue.add(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
-                stat.put("revenue", revenue.doubleValue());
+                // 使用Double类型避免类型转换错误
+                double revenue = (double) stat.getOrDefault("revenue", 0.0);
+                revenue += item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())).doubleValue();
+                stat.put("revenue", revenue);
             }
             
             // 按销量排序，取前5
@@ -300,5 +308,137 @@ public class MerchantServiceImpl implements MerchantService {
             case "CANCELLED": return "已取消";
             default: return status;
         }
+    }
+    
+    @Override
+    public com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> getMerchantProducts(
+            Long merchId, Long current, Long size, String keyword) {
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> page = 
+            new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(current, size);
+        
+        LambdaQueryWrapper<vtc.xueqing.flower.entity.Product> wrapper = 
+            new LambdaQueryWrapper<>();
+        wrapper.eq(vtc.xueqing.flower.entity.Product::getMerchId, merchId);
+        
+        // 关键词搜索（搜索商品名称和描述）
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            wrapper.and(w -> w.like(vtc.xueqing.flower.entity.Product::getName, keyword)
+                             .or()
+                             .like(vtc.xueqing.flower.entity.Product::getDescription, keyword));
+        }
+        
+        wrapper.orderByDesc(vtc.xueqing.flower.entity.Product::getCreateDate);
+        
+        return productMapper.selectPage(page, wrapper);
+    }
+    
+    /**
+     * 获取商家商品列表（支持更多筛选条件）
+     */
+    public com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> getMerchantProductsWithFilter(
+            Long merchId, Long current, Long size, String name, Long catId, String status) {
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> page = 
+            new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(current, size);
+        
+        LambdaQueryWrapper<vtc.xueqing.flower.entity.Product> wrapper = 
+            new LambdaQueryWrapper<>();
+        wrapper.eq(vtc.xueqing.flower.entity.Product::getMerchId, merchId);
+        
+        // 商品名称搜索
+        if (name != null && !name.trim().isEmpty()) {
+            wrapper.like(vtc.xueqing.flower.entity.Product::getName, name);
+        }
+        
+        // 分类筛选
+        if (catId != null) {
+            wrapper.eq(vtc.xueqing.flower.entity.Product::getCatId, catId);
+        }
+        
+        // 状态筛选
+        if (status != null && !status.trim().isEmpty()) {
+            wrapper.eq(vtc.xueqing.flower.entity.Product::getStatus, status);
+        }
+        
+        wrapper.orderByDesc(vtc.xueqing.flower.entity.Product::getCreateDate);
+        
+        return productMapper.selectPage(page, wrapper);
+    }
+    
+    @Override
+    public com.baomidou.mybatisplus.core.metadata.IPage<Order> getMerchantOrders(
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Order> page,
+            Long merchId, String status) {
+        
+        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Order::getMerchId, merchId);
+        
+        // 状态筛选
+        if (status != null && !status.trim().isEmpty()) {
+            wrapper.eq(Order::getStatus, status);
+        }
+        
+        wrapper.orderByDesc(Order::getOrderDate);
+        
+        return orderMapper.selectPage(page, wrapper);
+    }
+    
+    @Override
+    public com.baomidou.mybatisplus.core.metadata.IPage<vtc.xueqing.flower.entity.Coupon> getMerchantCoupons(
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Coupon> page,
+            Long merchId, String status) {
+        
+        LambdaQueryWrapper<vtc.xueqing.flower.entity.Coupon> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(vtc.xueqing.flower.entity.Coupon::getMerchId, merchId);
+        
+        // 状态筛选
+        if (status != null && !status.trim().isEmpty()) {
+            wrapper.eq(vtc.xueqing.flower.entity.Coupon::getStatus, status);
+        }
+        
+        wrapper.orderByDesc(vtc.xueqing.flower.entity.Coupon::getCreateDate);
+        
+        return couponMapper.selectPage(page, wrapper);
+    }
+    
+    @Override
+    public vtc.xueqing.flower.entity.Coupon getMerchantCouponById(Long id) {
+        return couponMapper.selectById(id);
+    }
+    
+    @Override
+    @Transactional
+    public vtc.xueqing.flower.entity.Coupon createMerchantCoupon(vtc.xueqing.flower.entity.Coupon coupon) {
+        coupon.setCreateDate(LocalDateTime.now());
+        coupon.setUpdateDate(LocalDateTime.now());
+        if (coupon.getReceivedQuantity() == null) {
+            coupon.setReceivedQuantity(0);
+        }
+        if (coupon.getStatus() == null) {
+            coupon.setStatus("ACTIVE");
+        }
+        couponMapper.insert(coupon);
+        return coupon;
+    }
+    
+    @Override
+    @Transactional
+    public vtc.xueqing.flower.entity.Coupon updateMerchantCoupon(vtc.xueqing.flower.entity.Coupon coupon) {
+        vtc.xueqing.flower.entity.Coupon existing = couponMapper.selectById(coupon.getCouponId());
+        if (existing == null) {
+            throw new BusinessException("优惠券不存在");
+        }
+        coupon.setUpdateDate(LocalDateTime.now());
+        couponMapper.updateById(coupon);
+        return couponMapper.selectById(coupon.getCouponId());
+    }
+    
+    @Override
+    @Transactional
+    public void deleteMerchantCoupon(Long id) {
+        vtc.xueqing.flower.entity.Coupon existing = couponMapper.selectById(id);
+        if (existing == null) {
+            throw new BusinessException("优惠券不存在");
+        }
+        couponMapper.deleteById(id);
     }
 }

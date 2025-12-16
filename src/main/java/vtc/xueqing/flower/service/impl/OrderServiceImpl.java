@@ -52,21 +52,27 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentStatus("UNPAID");
         order.setStatus("PENDING");
         
-        // 3. 计算订单金额（如果前端没传）
-        if (order.getTotalPrice() == null || order.getTotalPrice().compareTo(BigDecimal.ZERO) == 0) {
-            // 从订单项中计算总价
-            BigDecimal totalPrice = BigDecimal.ZERO;
-            // 这里假设订单项已经在Order实体的transient字段中传入
-            // 实际项目中可能需要单独的DTO
+        // 3. 如果没有传merchId，设置为NULL（需要确保数据库字段允许NULL）
+        // 或者可以设置为默认商家ID，例如1
+        if (order.getMerchId() == null) {
+            order.setMerchId(1L); // 设置默认商家ID为1
         }
         
-        // 4. 计算实付金额 = 总价 - 优惠金额
+        // 4. 计算订单金额（如果前端没传）
+        if (order.getTotalPrice() == null || order.getTotalPrice().compareTo(BigDecimal.ZERO) == 0) {
+            // 如果没有传总价，设置为0
+            order.setTotalPrice(BigDecimal.ZERO);
+        }
+        
+        // 5. 计算实付金额 = 总价 - 优惠金额（不能小于0）
         if (order.getDiscountAmount() == null) {
             order.setDiscountAmount(BigDecimal.ZERO);
         }
-        order.setActualPrice(order.getTotalPrice().subtract(order.getDiscountAmount()));
+        BigDecimal actualPrice = order.getTotalPrice().subtract(order.getDiscountAmount());
+        // 如果实付金额小于0，设置为0
+        order.setActualPrice(actualPrice.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : actualPrice);
         
-        // 5. 保存订单
+        // 6. 保存订单
         orderMapper.insert(order);
         
         return order;
@@ -285,6 +291,15 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus("COMPLETED");
         order.setCompletionTime(LocalDateTime.now());
         orderMapper.updateById(order);
+        
+        // 4. 给用户增加消费积分（1元=1积分）
+        Customer customer = customerMapper.selectById(order.getUserId());
+        if (customer != null && order.getTotalPrice() != null) {
+            int earnedPoints = order.getTotalPrice().intValue(); // 消费金额取整作为积分
+            Integer currentPoints = customer.getPoints() == null ? 0 : customer.getPoints();
+            customer.setPoints(currentPoints + earnedPoints);
+            customerMapper.updateById(customer);
+        }
         
         return order;
     }

@@ -51,4 +51,11 @@ public class ProductCategoryController {
         ProductCategory category = productCategoryService.getCategoryById(id);
         return Result.success(category);
     }
+    
+    @ApiOperation("获取所有分类列表")
+    @GetMapping("/all")
+    public Result<List<ProductCategory>> getAllCategories() {
+        List<ProductCategory> categories = productCategoryService.getAllCategories();
+        return Result.success(categories);
+    }
 }

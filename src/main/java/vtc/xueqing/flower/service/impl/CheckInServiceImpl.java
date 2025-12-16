@@ -62,12 +62,17 @@ public class CheckInServiceImpl implements CheckInService {
         checkIn.setRewardPoints(rewardPoints);
         checkInMapper.insert(checkIn);
         
-        // 6. 更新用户余额（积分可以转换为余额，这里简化处理）
-        // 实际项目中可以单独设计积分表
-        // 这里简单处理：1积分 = 0.1元
+        // 6. 更新用户积分和余额
+        // 更新总积分
+        Integer currentPoints = customer.getPoints() == null ? 0 : customer.getPoints();
+        customer.setPoints(currentPoints + rewardPoints);
+        
+        // 更新余额（积分可以转换为余额，这里简化处理）
+        // 1积分 = 0.1元
         customer.setBalance(customer.getBalance().add(
             java.math.BigDecimal.valueOf(rewardPoints * 0.1)
         ));
+        
         customerMapper.updateById(customer);
         
         return checkIn;
