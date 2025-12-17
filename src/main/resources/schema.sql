@@ -7,7 +7,8 @@ CREATE DATABASE IF NOT EXISTS `flower_market` DEFAULT CHARACTER SET utf8mb4 COLL
 
 USE `flower_market`;
 
--- 设置外键检查关闭，确保可以顺利删除表
+
+    -- 设置外键检查关闭，确保可以顺利删除表
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ============================================
@@ -31,29 +32,11 @@ DROP TABLE IF EXISTS `customers`;
 DROP TABLE IF EXISTS `administrators`;
 DROP TABLE IF EXISTS `system_configuration`;
 
--- 重新启用外键检查
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================
--- 1. 管理员表 (administrators)
+-- 1. 顾客表 (customers)
 -- ============================================
-CREATE TABLE `administrators` (
-  `admin_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
-  `name` VARCHAR(50) NOT NULL COMMENT '管理员姓名',
-  `password` VARCHAR(255) NOT NULL COMMENT '密码（加密）',
-  `email` VARCHAR(100) NOT NULL COMMENT '邮箱',
-  `permission` VARCHAR(50) DEFAULT 'ADMIN' COMMENT '权限等级：SUPER_ADMIN-超级管理员，ADMIN-管理员',
-  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE-正常，INACTIVE-禁用',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`admin_id`),
-  UNIQUE KEY `uk_email` (`email`),
-  KEY `idx_permission` (`permission`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
-
--- ============================================
--- 2. 顾客表 (customers)
--- ============================================
+DROP TABLE IF EXISTS `customers`;
 CREATE TABLE `customers` (
   `user_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `name` VARCHAR(50) NOT NULL COMMENT '用户名',
@@ -76,8 +59,9 @@ CREATE TABLE `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='顾客表';
 
 -- ============================================
--- 3. 商家表 (merchants)
+-- 2. 商家表 (merchants)
 -- ============================================
+DROP TABLE IF EXISTS `merchants`;
 CREATE TABLE `merchants` (
   `merch_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '商家ID',
   `name` VARCHAR(100) NOT NULL COMMENT '商家名称',
@@ -99,8 +83,27 @@ CREATE TABLE `merchants` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商家表';
 
 -- ============================================
+-- 3. 管理员表 (administrators)
+-- ============================================
+DROP TABLE IF EXISTS `administrators`;
+CREATE TABLE `administrators` (
+  `admin_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '管理员姓名',
+  `password` VARCHAR(255) NOT NULL COMMENT '密码（加密）',
+  `email` VARCHAR(100) NOT NULL COMMENT '邮箱',
+  `permission` VARCHAR(50) DEFAULT 'ADMIN' COMMENT '权限等级：SUPER_ADMIN-超级管理员，ADMIN-管理员',
+  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE-正常，INACTIVE-禁用',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`admin_id`),
+  UNIQUE KEY `uk_email` (`email`),
+  KEY `idx_permission` (`permission`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
+
+-- ============================================
 -- 4. 产品分类表 (product_categories)
 -- ============================================
+DROP TABLE IF EXISTS `product_categories`;
 CREATE TABLE `product_categories` (
   `cate_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '分类ID',
   `name` VARCHAR(50) NOT NULL COMMENT '分类名称',
@@ -118,6 +121,7 @@ CREATE TABLE `product_categories` (
 -- ============================================
 -- 5. 产品表 (products)
 -- ============================================
+DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `prod_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '产品ID',
   `merch_id` BIGINT NOT NULL COMMENT '商家ID',
@@ -147,6 +151,7 @@ CREATE TABLE `products` (
 -- ============================================
 -- 6. 产品收藏表 (product_favorites)
 -- ============================================
+DROP TABLE IF EXISTS `product_favorites`;
 CREATE TABLE `product_favorites` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '收藏ID',
   `user_id` BIGINT NOT NULL COMMENT '用户ID',
@@ -164,6 +169,7 @@ CREATE TABLE `product_favorites` (
 -- ============================================
 -- 7. 产品评价表 (product_reviews)
 -- ============================================
+DROP TABLE IF EXISTS `product_reviews`;
 CREATE TABLE `product_reviews` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '评价ID',
   `user_id` BIGINT NOT NULL COMMENT '用户ID',
@@ -188,6 +194,7 @@ CREATE TABLE `product_reviews` (
 -- ============================================
 -- 8. 产品溯源表 (product_trackability)
 -- ============================================
+DROP TABLE IF EXISTS `product_trackability`;
 CREATE TABLE `product_trackability` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '溯源ID',
   `prod_id` BIGINT NOT NULL COMMENT '产品ID',
@@ -207,6 +214,7 @@ CREATE TABLE `product_trackability` (
 -- ============================================
 -- 9. 订单表 (orders)
 -- ============================================
+DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单ID',
   `order_no` VARCHAR(50) NOT NULL COMMENT '订单号',
@@ -243,6 +251,7 @@ CREATE TABLE `orders` (
 -- ============================================
 -- 10. 订单项表 (order_items)
 -- ============================================
+DROP TABLE IF EXISTS `order_items`;
 CREATE TABLE `order_items` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单项ID',
   `order_id` BIGINT NOT NULL COMMENT '订单ID',
@@ -263,6 +272,7 @@ CREATE TABLE `order_items` (
 -- ============================================
 -- 11. 购物车表 (shopping_cart)
 -- ============================================
+DROP TABLE IF EXISTS `shopping_cart`;
 CREATE TABLE `shopping_cart` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '购物车ID',
   `user_id` BIGINT NOT NULL COMMENT '用户ID',
@@ -282,6 +292,7 @@ CREATE TABLE `shopping_cart` (
 -- ============================================
 -- 12. 优惠券表 (coupons)
 -- ============================================
+DROP TABLE IF EXISTS `coupons`;
 CREATE TABLE `coupons` (
   `coupon_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '优惠券ID',
   `merch_id` BIGINT COMMENT '商家ID，NULL表示平台优惠券',
@@ -308,6 +319,7 @@ CREATE TABLE `coupons` (
 -- ============================================
 -- 13. 优惠券券码表 (coupon_coupons)
 -- ============================================
+DROP TABLE IF EXISTS `coupon_coupons`;
 CREATE TABLE `coupon_coupons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `coupon_id` BIGINT NOT NULL COMMENT '优惠券ID',
@@ -327,6 +339,7 @@ CREATE TABLE `coupon_coupons` (
 -- ============================================
 -- 14. 用户优惠券表 (customer_coupons)
 -- ============================================
+DROP TABLE IF EXISTS `customer_coupons`;
 CREATE TABLE `customer_coupons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `user_id` BIGINT NOT NULL COMMENT '用户ID',
@@ -348,6 +361,7 @@ CREATE TABLE `customer_coupons` (
 -- ============================================
 -- 15. 签到表 (check_ins)
 -- ============================================
+DROP TABLE IF EXISTS `check_ins`;
 CREATE TABLE `check_ins` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '签到ID',
   `user_id` BIGINT NOT NULL COMMENT '用户ID',
@@ -365,6 +379,7 @@ CREATE TABLE `check_ins` (
 -- ============================================
 -- 16. 养护知识表 (care_knowledge)
 -- ============================================
+DROP TABLE IF EXISTS `care_knowledge`;
 CREATE TABLE `care_knowledge` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '知识ID',
   `title` VARCHAR(100) NOT NULL COMMENT '标题',
@@ -387,6 +402,7 @@ CREATE TABLE `care_knowledge` (
 -- ============================================
 -- 17. 系统配置表 (system_configuration)
 -- ============================================
+DROP TABLE IF EXISTS `system_configuration`;
 CREATE TABLE `system_configuration` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '配置ID',
   `config_key` VARCHAR(100) NOT NULL COMMENT '配置键',
