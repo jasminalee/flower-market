@@ -5,31 +5,6 @@
 
 USE `flower_market`;
 
--- ============================================
--- 清空现有数据（按照外键依赖顺序）
--- ============================================
-SET FOREIGN_KEY_CHECKS = 0;
-
--- 按正确顺序清空表数据
-TRUNCATE TABLE `customer_coupons`;
-TRUNCATE TABLE `coupon_coupons`;
-TRUNCATE TABLE `check_ins`;
-TRUNCATE TABLE `order_items`;
-TRUNCATE TABLE `orders`;
-TRUNCATE TABLE `shopping_cart`;
-TRUNCATE TABLE `product_reviews`;
-TRUNCATE TABLE `product_favorites`;
-TRUNCATE TABLE `product_trackability`;
-TRUNCATE TABLE `products`;
-TRUNCATE TABLE `product_categories`;
-TRUNCATE TABLE `care_knowledge`;
-TRUNCATE TABLE `coupons`;
-TRUNCATE TABLE `merchants`;
-TRUNCATE TABLE `customers`;
-TRUNCATE TABLE `administrators`;
-TRUNCATE TABLE `system_configuration`;
-
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================
 -- 1. 插入管理员数据
