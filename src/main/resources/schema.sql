@@ -416,33 +416,7 @@ CREATE TABLE `system_configuration` (
   KEY `idx_category` (`category`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统配置表';
 
--- ============================================
--- 插入初始数据
--- ============================================
 
--- 插入管理员
-INSERT INTO `administrators` (`name`, `password`, `email`, `permission`) VALUES
-('超级管理员', '$2a$10$5F6E5L8SAMPLE.HASH.HERE', 'admin@flowermarket.com', 'SUPER_ADMIN'),
-('普通管理员', '$2a$10$5F6E5L8SAMPLE.HASH.HERE', 'admin2@flowermarket.com', 'ADMIN');
-
--- 插入产品分类
-INSERT INTO `product_categories` (`name`, `parent_id`, `sort_order`) VALUES
-('鲜花', 0, 1),
-('绿植', 0, 2),
-('花束', 1, 1),
-('盆栽', 1, 2),
-('永生花', 1, 3),
-('多肉植物', 2, 1),
-('观叶植物', 2, 2);
-
--- 插入系统配置
-INSERT INTO `system_configuration` (`config_key`, `config_value`, `description`, `category`) VALUES
-('site_name', '鲜花市场', '网站名称', 'basic'),
-('site_logo', '/images/logo.png', '网站Logo', 'basic'),
-('check_in_points', '10', '每日签到奖励积分', 'reward'),
-('continuous_check_in_bonus', '5', '连续签到额外奖励积分', 'reward'),
-('free_shipping_amount', '99.00', '免运费金额', 'shipping'),
-('default_shipping_fee', '10.00', '默认运费', 'shipping');
 
 -- ============================================
 -- 创建视图（可选）
