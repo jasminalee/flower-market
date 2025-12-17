@@ -10,9 +10,9 @@ USE `flower_market`;
 -- ============================================
 SET FOREIGN_KEY_CHECKS = 0;
 
+-- 按正确顺序清空表数据
 TRUNCATE TABLE `customer_coupons`;
 TRUNCATE TABLE `coupon_coupons`;
-TRUNCATE TABLE `coupons`;
 TRUNCATE TABLE `check_ins`;
 TRUNCATE TABLE `order_items`;
 TRUNCATE TABLE `orders`;
@@ -23,6 +23,7 @@ TRUNCATE TABLE `product_trackability`;
 TRUNCATE TABLE `products`;
 TRUNCATE TABLE `product_categories`;
 TRUNCATE TABLE `care_knowledge`;
+TRUNCATE TABLE `coupons`;
 TRUNCATE TABLE `merchants`;
 TRUNCATE TABLE `customers`;
 TRUNCATE TABLE `administrators`;
