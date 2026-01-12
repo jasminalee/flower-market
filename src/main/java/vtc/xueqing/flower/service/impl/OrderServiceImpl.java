@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import vtc.xueqing.flower.entity.Customer;
 import vtc.xueqing.flower.entity.Order;
 import vtc.xueqing.flower.entity.OrderItem;
 import vtc.xueqing.flower.entity.Product;
+import vtc.xueqing.flower.dto.OrderCreateRequest;
 import vtc.xueqing.flower.mapper.CustomerMapper;
 import vtc.xueqing.flower.mapper.OrderItemMapper;
 import vtc.xueqing.flower.mapper.OrderMapper;
@@ -22,6 +24,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 订单服务实现类
@@ -43,39 +47,106 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Order createOrder(Order order) {
-        // 1. 生成订单号
+    public OrderDetailVO createOrder(OrderCreateRequest request) {
+        if (request == null || CollectionUtils.isEmpty(request.getItems())) {
+            throw new RuntimeException("订单商品不能为空");
+        }
+
+        // 查询商品信息，以数据库价格为准
+        Set<Long> prodIds = request.getItems().stream()
+                .map(OrderCreateRequest.OrderItemRequest::getProdId)
+                .collect(Collectors.toSet());
+        List<Product> products = productMapper.selectBatchIds(prodIds);
+        if (products.size() != prodIds.size()) {
+            throw new RuntimeException("部分商品不存在或已下架");
+        }
+
+        // 校验商家一致并获取商家ID
+        Long merchId = request.getMerchId();
+        Set<Long> merchIds = products.stream()
+                .map(Product::getMerchId)
+                .collect(Collectors.toSet());
+        if (merchIds.size() > 1) {
+            throw new RuntimeException("不同商家的商品请分开下单");
+        }
+        if (merchId == null) {
+            merchId = merchIds.iterator().next();
+        } else if (!merchIds.contains(merchId)) {
+            throw new RuntimeException("订单所属商家与商品不一致");
+        }
+
+        // 计算金额
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        LocalDateTime now = LocalDateTime.now();
+
+        for (OrderCreateRequest.OrderItemRequest item : request.getItems()) {
+            Product product = products.stream()
+                    .filter(p -> p.getProdId().equals(item.getProdId()))
+                    .findFirst()
+                    .orElse(null);
+            if (product == null) {
+                throw new RuntimeException("商品不存在");
+            }
+            BigDecimal unitPrice = product.getPrice();
+            BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
+            totalPrice = totalPrice.add(lineTotal);
+        }
+
+        BigDecimal discountAmount = request.getDiscountAmount() == null
+                ? BigDecimal.ZERO
+                : request.getDiscountAmount();
+        if (discountAmount.compareTo(BigDecimal.ZERO) < 0) {
+            discountAmount = BigDecimal.ZERO;
+        }
+        BigDecimal actualPrice = totalPrice.subtract(discountAmount);
+        if (actualPrice.compareTo(BigDecimal.ZERO) < 0) {
+            actualPrice = BigDecimal.ZERO;
+        }
+
+        // 构建订单实体
+        Order order = new Order();
         order.setOrderNo(generateOrderNo());
-        
-        // 2. 设置订单初始状态
-        order.setOrderDate(LocalDateTime.now());
+        order.setUserId(request.getUserId());
+        order.setMerchId(merchId);
+        order.setOrderDate(now);
         order.setPaymentStatus("UNPAID");
         order.setStatus("PENDING");
-        
-        // 3. 如果没有传merchId，设置为NULL（需要确保数据库字段允许NULL）
-        // 或者可以设置为默认商家ID，例如1
-        if (order.getMerchId() == null) {
-            order.setMerchId(1L); // 设置默认商家ID为1
-        }
-        
-        // 4. 计算订单金额（如果前端没传）
-        if (order.getTotalPrice() == null || order.getTotalPrice().compareTo(BigDecimal.ZERO) == 0) {
-            // 如果没有传总价，设置为0
-            order.setTotalPrice(BigDecimal.ZERO);
-        }
-        
-        // 5. 计算实付金额 = 总价 - 优惠金额（不能小于0）
-        if (order.getDiscountAmount() == null) {
-            order.setDiscountAmount(BigDecimal.ZERO);
-        }
-        BigDecimal actualPrice = order.getTotalPrice().subtract(order.getDiscountAmount());
-        // 如果实付金额小于0，设置为0
-        order.setActualPrice(actualPrice.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : actualPrice);
-        
-        // 6. 保存订单
+        order.setAddress(request.getAddress());
+        order.setReceiverName(request.getReceiverName());
+        order.setReceiverPhone(request.getReceiverPhone());
+        order.setRemark(request.getRemark());
+        order.setTotalPrice(totalPrice);
+        order.setDiscountAmount(discountAmount);
+        order.setActualPrice(actualPrice);
+        order.setCreateDate(now);
+        order.setUpdateDate(now);
+
         orderMapper.insert(order);
-        
-        return order;
+
+        // 保存订单项
+        Long orderId = order.getId();
+        for (OrderCreateRequest.OrderItemRequest item : request.getItems()) {
+            Product product = products.stream()
+                    .filter(p -> p.getProdId().equals(item.getProdId()))
+                    .findFirst()
+                    .orElse(null);
+            if (product == null) {
+                continue;
+            }
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrderId(orderId);
+            orderItem.setProdId(product.getProdId());
+            orderItem.setName(product.getName());
+            orderItem.setMainImage(product.getMainImage());
+            orderItem.setQuantity(item.getQuantity());
+            orderItem.setUnitPrice(product.getPrice());
+            orderItem.setTotalPrice(product.getPrice()
+                    .multiply(BigDecimal.valueOf(item.getQuantity())));
+            orderItem.setCreateDate(now);
+            orderItemMapper.insert(orderItem);
+        }
+
+        return getOrderDetailById(orderId);
     }
     
     @Override

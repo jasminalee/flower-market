@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 import vtc.xueqing.flower.common.Result;
+import vtc.xueqing.flower.dto.OrderCreateRequest;
 import vtc.xueqing.flower.entity.Order;
 import vtc.xueqing.flower.service.OrderService;
 
@@ -25,9 +26,9 @@ public class OrderController {
     
     @ApiOperation("创建订单")
     @PostMapping
-    public Result<Order> createOrder(@RequestBody Order order) {
+    public Result<vtc.xueqing.flower.vo.OrderDetailVO> createOrder(@RequestBody OrderCreateRequest request) {
         try {
-            Order createdOrder = orderService.createOrder(order);
+            vtc.xueqing.flower.vo.OrderDetailVO createdOrder = orderService.createOrder(request);
             return Result.success(createdOrder);
         } catch (Exception e) {
             return Result.error(e.getMessage());

@@ -48,7 +48,7 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param orderId 订单ID
      * @return 订单详情VO
      */
-    @Select("SELECT o.*, c.name AS customer_name, m.name AS merchant_name " +
+    @Select("SELECT o.*, c.name AS customer_name, c.phone AS customer_phone, m.name AS merchant_name " +
             "FROM orders o " +
             "LEFT JOIN customers c ON o.user_id = c.user_id " +
             "LEFT JOIN merchants m ON o.merch_id = m.merch_id " +

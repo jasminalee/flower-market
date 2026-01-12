@@ -38,6 +38,11 @@ public class OrderDetailVO implements Serializable {
     private String customerName;
 
     /**
+     * 客户手机号（JOIN customers表）
+     */
+    private String customerPhone;
+
+    /**
      * 商家ID
      */
     private Long merchId;

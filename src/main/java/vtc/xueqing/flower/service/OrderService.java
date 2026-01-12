@@ -2,7 +2,9 @@ package vtc.xueqing.flower.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import vtc.xueqing.flower.dto.OrderCreateRequest;
 import vtc.xueqing.flower.entity.Order;
+import vtc.xueqing.flower.vo.OrderDetailVO;
 
 /**
  * 订单服务接口
@@ -14,7 +16,7 @@ public interface OrderService {
      * @param order 订单信息
      * @return 创建的订单
      */
-    Order createOrder(Order order);
+    OrderDetailVO createOrder(OrderCreateRequest request);
     
     /**
      * 获取订单列表（分页）
