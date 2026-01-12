@@ -33,6 +33,12 @@ public class Product implements Serializable {
     private Long merchId;
 
     /**
+     * 商家名称（关联查询填充）
+     */
+    @TableField(exist = false)
+    private String merchantName;
+
+    /**
      * 分类ID
      */
     @TableField("cat_id")

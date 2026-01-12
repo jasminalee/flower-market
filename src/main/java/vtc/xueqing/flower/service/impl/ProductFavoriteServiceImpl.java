@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vtc.xueqing.flower.entity.Product;
 import vtc.xueqing.flower.entity.ProductFavorite;
+import vtc.xueqing.flower.entity.Merchant;
 import vtc.xueqing.flower.mapper.ProductFavoriteMapper;
 import vtc.xueqing.flower.mapper.ProductMapper;
+import vtc.xueqing.flower.mapper.MerchantMapper;
 import vtc.xueqing.flower.service.ProductFavoriteService;
 
 import javax.annotation.Resource;
@@ -23,6 +25,9 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
     
     @Resource
     private ProductMapper productMapper;
+
+    @Resource
+    private MerchantMapper merchantMapper;
     
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -62,12 +67,37 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
     }
     
     @Override
-    public List<ProductFavorite> getUserFavorites(Long userId) {
+        public List<Product> getUserFavorites(Long userId) {
         LambdaQueryWrapper<ProductFavorite> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ProductFavorite::getUserId, userId)
-                .orderByDesc(ProductFavorite::getFavDate);
-        
-        return productFavoriteMapper.selectList(wrapper);
+            .orderByDesc(ProductFavorite::getFavDate);
+        List<ProductFavorite> favorites = productFavoriteMapper.selectList(wrapper);
+
+        if (favorites.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        java.util.Set<Long> prodIds = favorites.stream()
+            .map(ProductFavorite::getProdId)
+            .collect(java.util.stream.Collectors.toSet());
+        List<Product> products = productMapper.selectBatchIds(prodIds);
+
+        // 补充商家名称
+        java.util.Set<Long> merchIds = products.stream()
+            .map(Product::getMerchId)
+            .filter(java.util.Objects::nonNull)
+            .collect(java.util.stream.Collectors.toSet());
+        java.util.Map<Long, String> merchMap = merchantMapper.selectBatchIds(merchIds).stream()
+            .collect(java.util.stream.Collectors.toMap(Merchant::getMerchId, Merchant::getName));
+        products.forEach(p -> p.setMerchantName(merchMap.get(p.getMerchId())));
+
+        // 保持与收藏顺序一致
+        java.util.Map<Long, Product> productMap = products.stream()
+            .collect(java.util.stream.Collectors.toMap(Product::getProdId, p -> p));
+        return favorites.stream()
+            .map(fav -> productMap.get(fav.getProdId()))
+            .filter(java.util.Objects::nonNull)
+            .collect(java.util.stream.Collectors.toList());
     }
     
     @Override

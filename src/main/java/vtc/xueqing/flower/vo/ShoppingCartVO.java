@@ -65,6 +65,16 @@ public class ShoppingCartVO implements Serializable {
     private Integer prodStock;
 
     /**
+     * 商家ID
+     */
+    private Long merchId;
+
+    /**
+     * 商家名称
+     */
+    private String merchantName;
+
+    /**
      * 添加时间
      */
     private LocalDateTime createDate;

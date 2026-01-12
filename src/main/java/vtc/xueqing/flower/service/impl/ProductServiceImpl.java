@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import vtc.xueqing.flower.common.Constants;
 import vtc.xueqing.flower.entity.Product;
 import vtc.xueqing.flower.exception.BusinessException;
+import vtc.xueqing.flower.entity.Merchant;
 import vtc.xueqing.flower.mapper.ProductMapper;
+import vtc.xueqing.flower.mapper.MerchantMapper;
 import vtc.xueqing.flower.service.ProductService;
 
 import javax.annotation.Resource;
@@ -23,6 +25,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Resource
     private ProductMapper productMapper;
+
+    @Resource
+    private MerchantMapper merchantMapper;
 
     @Override
     public Product createProduct(Product product) {
@@ -93,6 +98,8 @@ public class ProductServiceImpl implements ProductService {
         if (product == null) {
             throw new BusinessException("产品不存在");
         }
+        // 补充商家名称
+        fillMerchantName(java.util.Collections.singletonList(product));
         return product;
     }
 
@@ -119,7 +126,9 @@ public class ProductServiceImpl implements ProductService {
 
         // 2. 分页查询
         Page<Product> page = new Page<>(current, size);
-        return productMapper.selectPage(page, wrapper);
+        Page<Product> resultPage = productMapper.selectPage(page, wrapper);
+        fillMerchantName(resultPage.getRecords());
+        return resultPage;
     }
 
     @Override
@@ -148,5 +157,25 @@ public class ProductServiceImpl implements ProductService {
         } else {
             return Constants.STOCK_STATUS_IN_STOCK;
         }
+    }
+
+    /**
+     * 批量补充商家名称，避免前端再次查询。
+     */
+    private void fillMerchantName(java.util.List<Product> products) {
+        if (products == null || products.isEmpty()) {
+            return;
+        }
+        java.util.Set<Long> merchIds = products.stream()
+                .map(Product::getMerchId)
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
+        if (merchIds.isEmpty()) {
+            return;
+        }
+        java.util.List<Merchant> merchants = merchantMapper.selectBatchIds(merchIds);
+        java.util.Map<Long, String> merchNameMap = merchants.stream()
+                .collect(java.util.stream.Collectors.toMap(Merchant::getMerchId, Merchant::getName));
+        products.forEach(p -> p.setMerchantName(merchNameMap.get(p.getMerchId())));
     }
 }

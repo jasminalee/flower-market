@@ -1,5 +1,6 @@
 package vtc.xueqing.flower.service;
 
+import vtc.xueqing.flower.entity.Product;
 import vtc.xueqing.flower.entity.ProductFavorite;
 
 import java.util.List;
@@ -28,7 +29,10 @@ public interface ProductFavoriteService {
      * @param userId 用户ID
      * @return 收藏列表
      */
-    List<ProductFavorite> getUserFavorites(Long userId);
+    /**
+     * 获取用户收藏的商品（带商家信息）
+     */
+    List<Product> getUserFavorites(Long userId);
     
     /**
      * 检查用户是否已收藏某商品

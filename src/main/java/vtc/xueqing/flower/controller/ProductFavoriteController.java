@@ -56,11 +56,11 @@ public class ProductFavoriteController {
     
     @ApiOperation("获取用户收藏列表")
     @GetMapping("/favorites")
-    public Result<List<ProductFavorite>> getUserFavorites(
+    public Result<List<vtc.xueqing.flower.entity.Product>> getUserFavorites(
             @ApiParam("用户ID") @RequestParam Long userId
     ) {
         try {
-            List<ProductFavorite> favorites = productFavoriteService.getUserFavorites(userId);
+            List<vtc.xueqing.flower.entity.Product> favorites = productFavoriteService.getUserFavorites(userId);
             return Result.success(favorites);
         } catch (Exception e) {
             return Result.error(e.getMessage());
