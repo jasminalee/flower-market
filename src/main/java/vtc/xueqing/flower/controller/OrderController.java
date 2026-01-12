@@ -10,6 +10,9 @@ import vtc.xueqing.flower.common.Result;
 import vtc.xueqing.flower.dto.OrderCreateRequest;
 import vtc.xueqing.flower.entity.Order;
 import vtc.xueqing.flower.service.OrderService;
+import vtc.xueqing.flower.vo.OrderDetailVO;
+import vtc.xueqing.flower.vo.OrderVO;
+import vtc.xueqing.flower.vo.ParentOrderCreateResult;
 
 import javax.annotation.Resource;
 
@@ -26,9 +29,9 @@ public class OrderController {
     
     @ApiOperation("创建订单")
     @PostMapping
-    public Result<vtc.xueqing.flower.vo.OrderDetailVO> createOrder(@RequestBody OrderCreateRequest request) {
+    public Result<ParentOrderCreateResult> createOrder(@RequestBody OrderCreateRequest request) {
         try {
-            vtc.xueqing.flower.vo.OrderDetailVO createdOrder = orderService.createOrder(request);
+            ParentOrderCreateResult createdOrder = orderService.createOrder(request);
             return Result.success(createdOrder);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -37,7 +40,7 @@ public class OrderController {
     
     @ApiOperation("获取订单列表（分页）")
     @GetMapping
-    public Result<IPage<Order>> getOrderList(
+    public Result<IPage<OrderVO>> getOrderList(
             @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
             @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
             @ApiParam("用户ID") @RequestParam(required = false) Long userId,
@@ -46,7 +49,7 @@ public class OrderController {
     ) {
         try {
             Page<Order> page = new Page<>(current, size);
-            IPage<Order> orderPage = orderService.getOrderPage(page, userId, merchId, status);
+            IPage<OrderVO> orderPage = orderService.getOrderPage(page, userId, merchId, status);
             return Result.success(orderPage);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -55,9 +58,9 @@ public class OrderController {
     
     @ApiOperation("获取订单详情")
     @GetMapping("/{id}")
-    public Result<vtc.xueqing.flower.vo.OrderDetailVO> getOrderById(@PathVariable("id") Long id) {
+    public Result<OrderDetailVO> getOrderById(@PathVariable("id") Long id) {
         try {
-            vtc.xueqing.flower.vo.OrderDetailVO orderDetail = orderService.getOrderDetailById(id);
+            OrderDetailVO orderDetail = orderService.getOrderDetailById(id);
             return Result.success(orderDetail);
         } catch (Exception e) {
             return Result.error(e.getMessage());

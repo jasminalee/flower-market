@@ -234,7 +234,7 @@ public class MerchantServiceImpl implements MerchantService {
         // 获取该商家所有已完成订单的订单ID
         LambdaQueryWrapper<Order> completedWrapper = new LambdaQueryWrapper<>();
         completedWrapper.eq(Order::getMerchId, merchId)
-                       .in(Order::getStatus, "DELIVERED", "COMPLETED");
+                   .eq(Order::getStatus, Constants.ORDER_STATUS_COMPLETED);
         List<Order> completedOrders = orderMapper.selectList(completedWrapper);
         
         if (!completedOrders.isEmpty()) {
@@ -301,11 +301,11 @@ public class MerchantServiceImpl implements MerchantService {
     
     private String getStatusText(String status) {
         switch (status) {
-            case "PENDING": return "待支付";
-            case "PAID": return "已支付";
-            case "SHIPPED": return "已发货";
-            case "DELIVERED": return "已完成";
-            case "CANCELLED": return "已取消";
+            case Constants.ORDER_STATUS_SUBMITTED: return "待支付";
+            case Constants.ORDER_STATUS_PAID: return "已支付";
+            case Constants.ORDER_STATUS_SHIPPED: return "已发货";
+            case Constants.ORDER_STATUS_COMPLETED: return "已完成";
+            case Constants.ORDER_STATUS_CANCELLED: return "已取消";
             default: return status;
         }
     }

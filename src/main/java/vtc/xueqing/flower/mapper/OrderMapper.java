@@ -15,6 +15,38 @@ import vtc.xueqing.flower.vo.OrderVO;
 public interface OrderMapper extends BaseMapper<Order> {
 
     /**
+     * 查询订单列表，附带客户和商家名称
+     *
+     * @param page 分页对象
+     * @param userId 用户ID（可选）
+     * @param merchId 商家ID（可选）
+     * @param status 订单状态（可选）
+     * @return 订单VO分页列表
+     */
+    @Select("<script>" +
+            "SELECT o.*, c.name AS customer_name, m.name AS merchant_name " +
+            "FROM orders o " +
+            "LEFT JOIN customers c ON o.user_id = c.user_id " +
+            "LEFT JOIN merchants m ON o.merch_id = m.merch_id " +
+            "<where>" +
+            "  <if test='userId != null'>" +
+            "    AND o.user_id = #{userId} " +
+            "  </if>" +
+            "  <if test='merchId != null'>" +
+            "    AND o.merch_id = #{merchId} " +
+            "  </if>" +
+            "  <if test='status != null and status != \"\"'>" +
+            "    AND o.status = #{status} " +
+            "  </if>" +
+            "</where> " +
+            "ORDER BY o.order_date DESC" +
+            "</script>")
+    IPage<OrderVO> selectOrdersWithMerchant(Page<OrderVO> page,
+                                            @Param("userId") Long userId,
+                                            @Param("merchId") Long merchId,
+                                            @Param("status") String status);
+
+    /**
      * 查询所有订单（带客户和商家名称）- 管理员用
      * 
      * @param page 分页对象

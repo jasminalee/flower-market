@@ -105,7 +105,7 @@ public class Order implements Serializable {
     private String paymentMethod;
 
     /**
-     * 订单状态：PENDING-待支付，PROCESSING-处理中，SHIPPED-已发货，COMPLETED-已完成，CANCELLED-已取消
+     * 订单状态：SUBMITTED-提交订单/待支付，PAID-已支付/待发货，SHIPPED-已发货/待收货，COMPLETED-交易完成，CANCELLED-已取消
      */
     @TableField("status")
     private String status;

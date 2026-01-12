@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import vtc.xueqing.flower.common.Constants;
 import vtc.xueqing.flower.entity.Customer;
 import vtc.xueqing.flower.entity.Order;
 import vtc.xueqing.flower.entity.OrderItem;
@@ -17,14 +18,14 @@ import vtc.xueqing.flower.mapper.OrderMapper;
 import vtc.xueqing.flower.mapper.ProductMapper;
 import vtc.xueqing.flower.service.OrderService;
 import vtc.xueqing.flower.vo.OrderDetailVO;
+import vtc.xueqing.flower.vo.OrderVO;
+import vtc.xueqing.flower.vo.ParentOrderCreateResult;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OrderDetailVO createOrder(OrderCreateRequest request) {
+    public ParentOrderCreateResult createOrder(OrderCreateRequest request) {
         if (request == null || CollectionUtils.isEmpty(request.getItems())) {
             throw new RuntimeException("订单商品不能为空");
         }
@@ -61,105 +62,105 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("部分商品不存在或已下架");
         }
 
-        // 校验商家一致并获取商家ID
-        Long merchId = request.getMerchId();
-        Set<Long> merchIds = products.stream()
-                .map(Product::getMerchId)
-                .collect(Collectors.toSet());
-        if (merchIds.size() > 1) {
-            throw new RuntimeException("不同商家的商品请分开下单");
-        }
-        if (merchId == null) {
-            merchId = merchIds.iterator().next();
-        } else if (!merchIds.contains(merchId)) {
-            throw new RuntimeException("订单所属商家与商品不一致");
-        }
+        // 以商品所在商家分组，执行拆单
+        Map<Long, List<OrderCreateRequest.OrderItemRequest>> merchItems = request.getItems().stream()
+                .collect(Collectors.groupingBy(item -> {
+                    Product product = products.stream()
+                            .filter(p -> p.getProdId().equals(item.getProdId()))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("商品不存在"));
+                    return product.getMerchId();
+                }));
 
-        // 计算金额
-        BigDecimal totalPrice = BigDecimal.ZERO;
         LocalDateTime now = LocalDateTime.now();
+        BigDecimal totalAll = merchItems.values().stream()
+                .flatMap(List::stream)
+                .map(i -> {
+                    Product p = products.stream().filter(prod -> prod.getProdId().equals(i.getProdId())).findFirst().orElse(null);
+                    return p == null ? BigDecimal.ZERO : p.getPrice().multiply(BigDecimal.valueOf(i.getQuantity()));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        for (OrderCreateRequest.OrderItemRequest item : request.getItems()) {
-            Product product = products.stream()
-                    .filter(p -> p.getProdId().equals(item.getProdId()))
-                    .findFirst()
-                    .orElse(null);
-            if (product == null) {
-                throw new RuntimeException("商品不存在");
+        BigDecimal discountTotal = request.getDiscountAmount() == null ? BigDecimal.ZERO : request.getDiscountAmount();
+        if (discountTotal.compareTo(BigDecimal.ZERO) < 0) {
+            discountTotal = BigDecimal.ZERO;
+        }
+
+        String parentOrderNo = generateParentOrderNo();
+        List<OrderDetailVO> subOrders = new ArrayList<>();
+
+        for (Map.Entry<Long, List<OrderCreateRequest.OrderItemRequest>> entry : merchItems.entrySet()) {
+            Long merchId = entry.getKey();
+            List<OrderCreateRequest.OrderItemRequest> items = entry.getValue();
+
+            BigDecimal merchSubtotal = items.stream()
+                    .map(i -> {
+                        Product p = products.stream().filter(prod -> prod.getProdId().equals(i.getProdId())).findFirst().orElse(null);
+                        return p == null ? BigDecimal.ZERO : p.getPrice().multiply(BigDecimal.valueOf(i.getQuantity()));
+                    })
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            BigDecimal merchDiscount = allocateDiscount(merchSubtotal, totalAll, discountTotal);
+            BigDecimal merchActual = merchSubtotal.subtract(merchDiscount);
+            if (merchActual.compareTo(BigDecimal.ZERO) < 0) {
+                merchActual = BigDecimal.ZERO;
             }
-            BigDecimal unitPrice = product.getPrice();
-            BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
-            totalPrice = totalPrice.add(lineTotal);
-        }
 
-        BigDecimal discountAmount = request.getDiscountAmount() == null
-                ? BigDecimal.ZERO
-                : request.getDiscountAmount();
-        if (discountAmount.compareTo(BigDecimal.ZERO) < 0) {
-            discountAmount = BigDecimal.ZERO;
-        }
-        BigDecimal actualPrice = totalPrice.subtract(discountAmount);
-        if (actualPrice.compareTo(BigDecimal.ZERO) < 0) {
-            actualPrice = BigDecimal.ZERO;
-        }
+            Order order = new Order();
+            order.setOrderNo(generateOrderNo());
+            order.setUserId(request.getUserId());
+            order.setMerchId(merchId);
+            order.setOrderDate(now);
+            order.setPaymentStatus(Constants.PAYMENT_STATUS_UNPAID);
+            order.setStatus(Constants.ORDER_STATUS_SUBMITTED);
+            order.setAddress(request.getAddress());
+            order.setReceiverName(request.getReceiverName());
+            order.setReceiverPhone(request.getReceiverPhone());
+            order.setRemark(request.getRemark());
+            order.setTotalPrice(merchSubtotal);
+            order.setDiscountAmount(merchDiscount);
+            order.setActualPrice(merchActual);
+            order.setCreateDate(now);
+            order.setUpdateDate(now);
 
-        // 构建订单实体
-        Order order = new Order();
-        order.setOrderNo(generateOrderNo());
-        order.setUserId(request.getUserId());
-        order.setMerchId(merchId);
-        order.setOrderDate(now);
-        order.setPaymentStatus("UNPAID");
-        order.setStatus("PENDING");
-        order.setAddress(request.getAddress());
-        order.setReceiverName(request.getReceiverName());
-        order.setReceiverPhone(request.getReceiverPhone());
-        order.setRemark(request.getRemark());
-        order.setTotalPrice(totalPrice);
-        order.setDiscountAmount(discountAmount);
-        order.setActualPrice(actualPrice);
-        order.setCreateDate(now);
-        order.setUpdateDate(now);
+            orderMapper.insert(order);
 
-        orderMapper.insert(order);
-
-        // 保存订单项
-        Long orderId = order.getId();
-        for (OrderCreateRequest.OrderItemRequest item : request.getItems()) {
-            Product product = products.stream()
-                    .filter(p -> p.getProdId().equals(item.getProdId()))
-                    .findFirst()
-                    .orElse(null);
-            if (product == null) {
-                continue;
+            Long orderId = order.getId();
+            for (OrderCreateRequest.OrderItemRequest item : items) {
+                Product product = products.stream()
+                        .filter(p -> p.getProdId().equals(item.getProdId()))
+                        .findFirst()
+                        .orElse(null);
+                if (product == null) {
+                    continue;
+                }
+                OrderItem orderItem = new OrderItem();
+                orderItem.setOrderId(orderId);
+                orderItem.setProdId(product.getProdId());
+                orderItem.setName(product.getName());
+                orderItem.setMainImage(product.getMainImage());
+                orderItem.setQuantity(item.getQuantity());
+                orderItem.setUnitPrice(product.getPrice());
+                orderItem.setTotalPrice(product.getPrice()
+                        .multiply(BigDecimal.valueOf(item.getQuantity())));
+                orderItem.setCreateDate(now);
+                orderItemMapper.insert(orderItem);
             }
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrderId(orderId);
-            orderItem.setProdId(product.getProdId());
-            orderItem.setName(product.getName());
-            orderItem.setMainImage(product.getMainImage());
-            orderItem.setQuantity(item.getQuantity());
-            orderItem.setUnitPrice(product.getPrice());
-            orderItem.setTotalPrice(product.getPrice()
-                    .multiply(BigDecimal.valueOf(item.getQuantity())));
-            orderItem.setCreateDate(now);
-            orderItemMapper.insert(orderItem);
+
+            subOrders.add(getOrderDetailById(orderId));
         }
 
-        return getOrderDetailById(orderId);
+        ParentOrderCreateResult result = new ParentOrderCreateResult();
+        result.setParentOrderNo(parentOrderNo);
+        result.setSubOrders(subOrders);
+        return result;
     }
     
     @Override
-    public IPage<Order> getOrderPage(Page<Order> page, Long userId, Long merchId, String status) {
-        LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
-        
-        // 条件筛选
-        wrapper.eq(userId != null, Order::getUserId, userId)
-                .eq(merchId != null, Order::getMerchId, merchId)
-                .eq(status != null && !status.isEmpty(), Order::getStatus, status)
-                .orderByDesc(Order::getOrderDate);
-        
-        return orderMapper.selectPage(page, wrapper);
+    public IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status) {
+        // 仅分页参数从外部 Page<Order> 透传，查询返回 OrderVO（含商家名）
+        Page<OrderVO> voPage = new Page<>(page.getCurrent(), page.getSize());
+        return orderMapper.selectOrdersWithMerchant(voPage, userId, merchId, status);
     }
     
     @Override
@@ -207,16 +208,16 @@ public class OrderServiceImpl implements OrderService {
         }
         
         // 2. 检查订单状态
-        if (!"PENDING".equals(order.getStatus())) {
+        if (!Constants.ORDER_STATUS_SUBMITTED.equals(order.getStatus())) {
             throw new RuntimeException("订单状态不正确，无法支付");
         }
         
-        if ("PAID".equals(order.getPaymentStatus())) {
+        if (Constants.PAYMENT_STATUS_PAID.equals(order.getPaymentStatus())) {
             throw new RuntimeException("订单已支付");
         }
         
         // 3. 根据支付方式处理（课程项目模拟实现）
-        if ("BALANCE".equals(paymentMethod)) {
+        if (Constants.PAYMENT_METHOD_BALANCE.equals(paymentMethod)) {
             // 余额支付：扣除用户余额
             Customer customer = customerMapper.selectById(order.getUserId());
             if (customer == null) {
@@ -230,7 +231,7 @@ public class OrderServiceImpl implements OrderService {
             // 扣除余额
             customer.setBalance(customer.getBalance().subtract(order.getActualPrice()));
             customerMapper.updateById(customer);
-        } else if ("ALIPAY".equals(paymentMethod) || "WECHAT".equals(paymentMethod)) {
+        } else if (Constants.PAYMENT_METHOD_ALIPAY.equals(paymentMethod) || Constants.PAYMENT_METHOD_WECHAT.equals(paymentMethod)) {
             // 支付宝/微信支付：模拟实现，直接标记为已支付
             // 实际项目中需要对接第三方支付接口
             System.out.println("模拟" + paymentMethod + "支付成功");
@@ -239,10 +240,10 @@ public class OrderServiceImpl implements OrderService {
         }
         
         // 4. 更新订单状态
-        order.setPaymentStatus("PAID");
+        order.setPaymentStatus(Constants.PAYMENT_STATUS_PAID);
         order.setPaymentMethod(paymentMethod);
         order.setPaymentTime(LocalDateTime.now());
-        order.setStatus("PROCESSING"); // 支付后进入处理中状态
+        order.setStatus(Constants.ORDER_STATUS_PAID);
         
         // 5. 扣减商品库存
         LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
@@ -286,21 +287,21 @@ public class OrderServiceImpl implements OrderService {
         }
         
         // 2. 检查订单状态（只有待支付和处理中的订单可以取消）
-        if ("CANCELLED".equals(order.getStatus())) {
+        if (Constants.ORDER_STATUS_CANCELLED.equals(order.getStatus())) {
             throw new RuntimeException("订单已取消");
         }
         
-        if ("COMPLETED".equals(order.getStatus())) {
+        if (Constants.ORDER_STATUS_COMPLETED.equals(order.getStatus())) {
             throw new RuntimeException("订单已完成，无法取消");
         }
         
-        if ("SHIPPED".equals(order.getStatus())) {
+        if (Constants.ORDER_STATUS_SHIPPED.equals(order.getStatus())) {
             throw new RuntimeException("订单已发货，无法取消");
         }
         
         // 3. 如果已支付，需要退款
-        if ("PAID".equals(order.getPaymentStatus())) {
-            if ("BALANCE".equals(order.getPaymentMethod())) {
+        if (Constants.PAYMENT_STATUS_PAID.equals(order.getPaymentStatus())) {
+            if (Constants.PAYMENT_METHOD_BALANCE.equals(order.getPaymentMethod())) {
                 // 余额支付：退回余额
                 Customer customer = customerMapper.selectById(order.getUserId());
                 if (customer != null) {
@@ -309,11 +310,11 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             // 其他支付方式模拟退款
-            order.setPaymentStatus("REFUNDED");
+            order.setPaymentStatus(Constants.PAYMENT_STATUS_REFUNDED);
         }
         
         // 4. 恢复商品库存（如果已支付）
-        if ("PAID".equals(order.getPaymentStatus())) {
+        if (Constants.PAYMENT_STATUS_PAID.equals(order.getPaymentStatus())) {
             LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(OrderItem::getOrderId, orderId);
             List<OrderItem> orderItems = orderItemMapper.selectList(wrapper);
@@ -337,7 +338,7 @@ public class OrderServiceImpl implements OrderService {
         }
         
         // 5. 更新订单状态
-        order.setStatus("CANCELLED");
+        order.setStatus(Constants.ORDER_STATUS_CANCELLED);
         order.setCancelReason(cancelReason);
         orderMapper.updateById(order);
         
@@ -354,12 +355,12 @@ public class OrderServiceImpl implements OrderService {
         }
         
         // 2. 检查订单状态（只有已发货的订单可以确认收货）
-        if (!"SHIPPED".equals(order.getStatus())) {
+        if (!Constants.ORDER_STATUS_SHIPPED.equals(order.getStatus())) {
             throw new RuntimeException("订单状态不正确，无法确认收货");
         }
         
         // 3. 更新订单状态
-        order.setStatus("COMPLETED");
+        order.setStatus(Constants.ORDER_STATUS_COMPLETED);
         order.setCompletionTime(LocalDateTime.now());
         orderMapper.updateById(order);
         
@@ -385,12 +386,12 @@ public class OrderServiceImpl implements OrderService {
         }
         
         // 2. 检查订单状态（只有处理中的订单可以发货）
-        if (!"PROCESSING".equals(order.getStatus())) {
+        if (!Constants.ORDER_STATUS_PAID.equals(order.getStatus())) {
             throw new RuntimeException("订单状态不正确，无法发货");
         }
         
         // 3. 更新订单状态
-        order.setStatus("SHIPPED");
+        order.setStatus(Constants.ORDER_STATUS_SHIPPED);
         order.setDeliveryTime(LocalDateTime.now());
         orderMapper.updateById(order);
         
@@ -405,5 +406,17 @@ public class OrderServiceImpl implements OrderService {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         int randomNum = new Random().nextInt(900000) + 100000; // 6位随机数
         return timestamp + randomNum;
+    }
+
+    private String generateParentOrderNo() {
+        return "P" + generateOrderNo();
+    }
+
+    private BigDecimal allocateDiscount(BigDecimal partAmount, BigDecimal totalAmount, BigDecimal discountTotal) {
+        if (discountTotal.compareTo(BigDecimal.ZERO) <= 0 || totalAmount.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal ratio = partAmount.divide(totalAmount, 4, BigDecimal.ROUND_HALF_UP);
+        return discountTotal.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 }

@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import vtc.xueqing.flower.dto.OrderCreateRequest;
 import vtc.xueqing.flower.entity.Order;
+import vtc.xueqing.flower.vo.OrderVO;
+import vtc.xueqing.flower.vo.ParentOrderCreateResult;
 import vtc.xueqing.flower.vo.OrderDetailVO;
 
 /**
@@ -12,11 +14,11 @@ import vtc.xueqing.flower.vo.OrderDetailVO;
 public interface OrderService {
     
     /**
-     * 创建订单
-     * @param order 订单信息
-     * @return 创建的订单
-     */
-    OrderDetailVO createOrder(OrderCreateRequest request);
+    * 创建订单（支持多商家拆单）
+    * @param request 创建订单请求
+    * @return 父订单号及子订单详情列表
+    */
+    ParentOrderCreateResult createOrder(OrderCreateRequest request);
     
     /**
      * 获取订单列表（分页）
@@ -26,7 +28,7 @@ public interface OrderService {
      * @param status 订单状态（可选）
      * @return 订单列表
      */
-    IPage<Order> getOrderPage(Page<Order> page, Long userId, Long merchId, String status);
+    IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status);
     
     /**
      * 根据ID获取订单详情

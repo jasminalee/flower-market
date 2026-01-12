@@ -37,10 +37,15 @@ public class Constants {
     /**
      * 订单状态
      */
-    public static final String ORDER_STATUS_PENDING = "PENDING";
-    public static final String ORDER_STATUS_PROCESSING = "PROCESSING";
+    /** 提交订单 */
+    public static final String ORDER_STATUS_SUBMITTED = "SUBMITTED";
+    /** 支付成功 */
+    public static final String ORDER_STATUS_PAID = "PAID";
+    /** 商家发货 */
     public static final String ORDER_STATUS_SHIPPED = "SHIPPED";
+    /** 交易完成（确认收货） */
     public static final String ORDER_STATUS_COMPLETED = "COMPLETED";
+    /** 订单取消 */
     public static final String ORDER_STATUS_CANCELLED = "CANCELLED";
 
     /**
