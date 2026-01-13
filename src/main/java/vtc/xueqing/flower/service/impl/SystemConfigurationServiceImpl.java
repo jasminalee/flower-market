@@ -13,7 +13,7 @@ import vtc.xueqing.flower.service.SystemConfigurationService;
 import java.util.List;
 
 /**
- * 系统配置服务实现类
+ * System configuration service implementation.
  */
 @Service
 public class SystemConfigurationServiceImpl implements SystemConfigurationService {
@@ -52,12 +52,12 @@ public class SystemConfigurationServiceImpl implements SystemConfigurationServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean createConfig(SystemConfiguration config) {
-        // 检查配置键是否已存在
+        // Check if the config key already exists
         QueryWrapper<SystemConfiguration> wrapper = new QueryWrapper<>();
         wrapper.eq("config_key", config.getConfigKey());
         Long count = systemConfigurationMapper.selectCount(wrapper);
         if (count > 0) {
-            throw new RuntimeException("配置键已存在: " + config.getConfigKey());
+            throw new RuntimeException("Config key already exists: " + config.getConfigKey());
         }
         
         return systemConfigurationMapper.insert(config) > 0;
@@ -68,17 +68,17 @@ public class SystemConfigurationServiceImpl implements SystemConfigurationServic
     public boolean updateConfig(SystemConfiguration config) {
         SystemConfiguration existing = systemConfigurationMapper.selectById(config.getId());
         if (existing == null) {
-            throw new RuntimeException("配置不存在");
+            throw new RuntimeException("Configuration not found");
         }
         
-        // 如果修改了configKey，检查新的key是否重复
+        // If configKey changed, check whether the new key is duplicated
         if (!existing.getConfigKey().equals(config.getConfigKey())) {
             QueryWrapper<SystemConfiguration> wrapper = new QueryWrapper<>();
             wrapper.eq("config_key", config.getConfigKey());
             wrapper.ne("id", config.getId());
             Long count = systemConfigurationMapper.selectCount(wrapper);
             if (count > 0) {
-                throw new RuntimeException("配置键已存在: " + config.getConfigKey());
+                throw new RuntimeException("Config key already exists: " + config.getConfigKey());
             }
         }
         

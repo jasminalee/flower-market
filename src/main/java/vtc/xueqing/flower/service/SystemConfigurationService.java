@@ -6,42 +6,42 @@ import vtc.xueqing.flower.entity.SystemConfiguration;
 import java.util.List;
 
 /**
- * 系统配置服务接口
+ * System configuration service interface.
  */
 public interface SystemConfigurationService {
     
     /**
-     * 获取配置列表（分页）
+     * Get configuration list (paginated).
      */
     Page<SystemConfiguration> getConfigList(Integer pageNum, Integer pageSize, String category);
     
     /**
-     * 根据配置键获取配置
+     * Get configuration by key.
      */
     SystemConfiguration getByKey(String configKey);
     
     /**
-     * 根据分类获取配置列表
+     * Get configuration list by category.
      */
     List<SystemConfiguration> getByCategory(String category);
     
     /**
-     * 创建配置
+     * Create configuration.
      */
     boolean createConfig(SystemConfiguration config);
     
     /**
-     * 更新配置
+     * Update configuration.
      */
     boolean updateConfig(SystemConfiguration config);
     
     /**
-     * 删除配置
+     * Delete configuration.
      */
     boolean deleteConfig(Long id);
     
     /**
-     * 批量更新配置
+     * Batch update configurations.
      */
     boolean batchUpdateConfigs(List<SystemConfiguration> configs);
 }

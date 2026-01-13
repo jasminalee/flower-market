@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 产品分类服务实现类
+ * Product category service implementation.
  */
 @Slf4j
 @Service
@@ -46,7 +46,7 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     public ProductCategory getCategoryById(Long cateId) {
         ProductCategory category = productCategoryMapper.selectById(cateId);
         if (category == null) {
-            throw new BusinessException("分类不存在");
+            throw new BusinessException("Category does not exist");
         }
         return category;
     }
@@ -60,17 +60,17 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public ProductCategory createCategory(ProductCategory category) {
-        // 验证父分类是否存在
+        // Validate that the parent category exists
         if (category.getParentId() != null && category.getParentId() != 0) {
             ProductCategory parent = productCategoryMapper.selectById(category.getParentId());
             if (parent == null) {
-                throw new BusinessException("父分类不存在");
+                throw new BusinessException("Parent category does not exist");
             }
         } else {
             category.setParentId(0L);
         }
 
-        // 设置默认值
+        // Set default values
         if (category.getSortOrder() == null) {
             category.setSortOrder(0);
         }
@@ -81,24 +81,24 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public ProductCategory updateCategory(Long cateId, ProductCategory category) {
-        // 检查分类是否存在
+        // Check whether the category exists
         ProductCategory existCategory = productCategoryMapper.selectById(cateId);
         if (existCategory == null) {
-            throw new BusinessException("分类不存在");
+            throw new BusinessException("Category does not exist");
         }
 
-        // 验证父分类
+        // Validate parent category
         if (category.getParentId() != null && category.getParentId() != 0) {
             if (category.getParentId().equals(cateId)) {
-                throw new BusinessException("不能将自己设置为父分类");
+                throw new BusinessException("Cannot set the category itself as its parent");
             }
             ProductCategory parent = productCategoryMapper.selectById(category.getParentId());
             if (parent == null) {
-                throw new BusinessException("父分类不存在");
+                throw new BusinessException("Parent category does not exist");
             }
         }
 
-        // 更新分类
+        // Update category
         category.setCateId(cateId);
         productCategoryMapper.updateById(category);
         return productCategoryMapper.selectById(cateId);
@@ -106,22 +106,22 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     @Override
     public void deleteCategory(Long cateId) {
-        // 检查分类是否存在
+        // Check whether the category exists
         ProductCategory category = productCategoryMapper.selectById(cateId);
         if (category == null) {
-            throw new BusinessException("分类不存在");
+            throw new BusinessException("Category does not exist");
         }
 
-        // 递归删除所有子分类
+        // Recursively delete all child categories
         deleteChildCategories(cateId);
 
-        // 删除当前分类
+        // Delete current category
         productCategoryMapper.deleteById(cateId);
-        log.info("删除分类: {}", cateId);
+        log.info("Deleted category: {}", cateId);
     }
 
     /**
-     * 递归删除子分类
+     * Recursively delete child categories.
      */
     private void deleteChildCategories(Long parentId) {
         List<ProductCategory> children = getCategoriesByParentId(parentId);

@@ -9,68 +9,68 @@ import vtc.xueqing.flower.vo.ParentOrderCreateResult;
 import vtc.xueqing.flower.vo.OrderDetailVO;
 
 /**
- * 订单服务接口
+ * Order service interface.
  */
 public interface OrderService {
     
     /**
-    * 创建订单（支持多商家拆单）
-    * @param request 创建订单请求
-    * @return 父订单号及子订单详情列表
+    * Create order (supports multi-merchant split orders).
+    * @param request order creation request
+    * @return parent order number and child order details
     */
     ParentOrderCreateResult createOrder(OrderCreateRequest request);
     
     /**
-     * 获取订单列表（分页）
-     * @param page 分页信息
-     * @param userId 用户ID（可选）
-     * @param merchId 商家ID（可选）
-     * @param status 订单状态（可选）
-     * @return 订单列表
+     * Get order list (paginated).
+     * @param page pagination info
+     * @param userId user ID (optional)
+     * @param merchId merchant ID (optional)
+     * @param status order status (optional)
+     * @return order list
      */
     IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status);
     
     /**
-     * 根据ID获取订单详情
-     * @param orderId 订单ID
-     * @return 订单详情
+     * Get order detail by ID.
+     * @param orderId order ID
+     * @return order detail
      */
     Order getOrderById(Long orderId);
     
     /**
-     * 根据ID获取订单详情（带客户和商家名称及订单项）
-     * @param orderId 订单ID
-     * @return 订单详情VO
+     * Get order detail with customer/merchant names and items by ID.
+     * @param orderId order ID
+     * @return order detail VO
      */
     vtc.xueqing.flower.vo.OrderDetailVO getOrderDetailById(Long orderId);
     
     /**
-     * 支付订单
-     * @param orderId 订单ID
-     * @param paymentMethod 支付方式：ALIPAY-支付宝，WECHAT-微信，BALANCE-余额
-     * @return 支付后的订单
+     * Pay order.
+     * @param orderId order ID
+     * @param paymentMethod payment method: ALIPAY, WECHAT, BALANCE
+     * @return paid order
      */
     Order payOrder(Long orderId, String paymentMethod);
     
     /**
-     * 取消订单
-     * @param orderId 订单ID
-     * @param cancelReason 取消原因
-     * @return 取消后的订单
+     * Cancel order.
+     * @param orderId order ID
+     * @param cancelReason cancel reason
+     * @return cancelled order
      */
     Order cancelOrder(Long orderId, String cancelReason);
     
     /**
-     * 确认收货
-     * @param orderId 订单ID
-     * @return 确认后的订单
+     * Confirm receipt.
+     * @param orderId order ID
+     * @return confirmed order
      */
     Order confirmOrder(Long orderId);
     
     /**
-     * 发货（商家操作）
-     * @param orderId 订单ID
-     * @return 发货后的订单
+     * Ship order (merchant action).
+     * @param orderId order ID
+     * @return shipped order
      */
     Order shipOrder(Long orderId);
 }

@@ -3,49 +3,50 @@ package vtc.xueqing.flower.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import vtc.xueqing.flower.entity.ProductReview;
+import vtc.xueqing.flower.vo.ProductReviewVO;
 
 /**
- * 产品评价服务接口
+ * Product review service interface.
  */
 public interface ProductReviewService {
     
     /**
-     * 发布评价
-     * @param productReview 评价信息
-     * @return 评价记录
+     * Publish a review.
+     * @param productReview review info
+     * @return review record
      */
     ProductReview addReview(ProductReview productReview);
     
     /**
-     * 获取商品的评价列表（分页）
-     * @param page 分页信息
-     * @param prodId 产品ID
-     * @param rating 评分（可选）
-     * @return 评价列表
+     * Get product review list (paginated).
+     * @param page pagination info
+     * @param prodId product ID
+     * @param rating rating filter (optional)
+     * @return review list
      */
     IPage<ProductReview> getProductReviews(Page<ProductReview> page, Long prodId, Integer rating);
     
     /**
-     * 审核评价（管理员操作）
-     * @param reviewId 评价ID
-     * @param status 审核状态：APPROVED-已通过，REJECTED-已拒绝
-     * @return 更新后的评价
+     * Review moderation (admin).
+     * @param reviewId review ID
+     * @param status review status: APPROVED-approved, REJECTED-rejected
+     * @return updated review
      */
     ProductReview reviewApproval(Long reviewId, String status);
     
     /**
-     * 获取所有评价列表（管理员）
-     * @param page 分页信息
-     * @param status 审核状态（可选）：PENDING-待审核，APPROVED-已通过，REJECTED-已拒绝
-     * @return 评价列表
+     * Get all reviews (admin).
+     * @param page pagination info
+     * @param status status filter (optional): PENDING, APPROVED, REJECTED
+     * @return review list
      */
     IPage<ProductReview> getAllReviews(Page<ProductReview> page, String status);
     
     /**
-     * 获取所有评价列表（管理员）- 包含关联信息
-     * @param page 分页信息
-     * @param status 审核状态（可选）：PENDING-待审核，APPROVED-已通过，REJECTED-已拒绝
-     * @return 评价VO列表
+     * Get all reviews with detail (admin).
+     * @param page pagination info
+     * @param status status filter (optional): PENDING, APPROVED, REJECTED
+     * @return review VO list
      */
-    IPage<vtc.xueqing.flower.vo.ProductReviewVO> getAllReviewsWithDetail(Page<vtc.xueqing.flower.vo.ProductReviewVO> page, String status);
+    IPage<ProductReviewVO> getAllReviewsWithDetail(Page<ProductReviewVO> page, String status);
 }

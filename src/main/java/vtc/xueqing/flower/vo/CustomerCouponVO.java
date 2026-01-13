@@ -6,8 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 用户优惠券视图对象
- * 包含优惠券详细信息
+ * Customer coupon view object with coupon details.
  */
 @Data
 public class CustomerCouponVO implements Serializable {
@@ -15,79 +14,79 @@ public class CustomerCouponVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户优惠券ID
+     * Customer coupon ID.
      */
     private Long id;
 
     /**
-     * 用户ID
+     * User ID.
      */
     private Long userId;
 
     /**
-     * 优惠券ID
+     * Coupon ID.
      */
     private Long couponId;
 
     /**
-     * 券码
+     * Coupon code.
      */
     private String code;
 
     /**
-     * 状态：UNUSED-未使用，USED-已使用，EXPIRED-已过期
+     * Status: UNUSED-unused, USED-used, EXPIRED-expired.
      */
     private String status;
 
     /**
-     * 领取时间
+     * Received time.
      */
     private LocalDateTime receiveDate;
 
     /**
-     * 使用时间
+     * Used time.
      */
     private LocalDateTime usedDate;
 
     /**
-     * 使用的订单ID
+     * Order ID where used.
      */
     private Long orderId;
 
-    // ===== 优惠券详细信息 =====
+    // ===== Coupon details =====
     
     /**
-     * 优惠券名称
+     * Coupon name.
      */
     private String couponName;
 
     /**
-     * 优惠券类型
+     * Coupon type.
      */
     private String type;
 
     /**
-     * 优惠值
+     * Coupon value.
      */
     private BigDecimal value;
 
     /**
-     * 最低消费金额
+     * Minimum spend amount.
      */
     private BigDecimal minPrice;
 
     /**
-     * 有效期开始
+     * Validity start time.
      */
     private LocalDateTime startDate;
 
     /**
-     * 有效期结束
+     * Validity end time.
      */
     private LocalDateTime endDate;
 
     /**
-     * 优惠券描述
+     * Coupon description.
      */
     private String description;
 }

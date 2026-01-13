@@ -1,35 +1,35 @@
-# 应用服务 WEB 访问端口
+# Application service web port
 server:
   port: 18091
 spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  # 数据库配置
+  # Database configuration
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/flower_market?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
-  # SQL初始化配置
+  # SQL initialization configuration
   sql:
     init:
-      mode: always  # 改为never，避免每次启动都重新初始化
+      mode: always  # Change to "never" to avoid re-initializing on every startup
       schema-locations: classpath:schema.sql
       data-locations: classpath:data.sql
       encoding: UTF-8
       continue-on-error: false
 
-# MyBatis-Plus 配置
+# MyBatis-Plus configuration
 mybatis-plus:
   configuration:
-    # SQL 日志打印
+    # SQL log output
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    # 开启驼峰命名转换：数据库字段 create_date -> Java字段 createDate
+    # Enable camel-case mapping: DB field create_date -> Java field createDate
     map-underscore-to-camel-case: true
   global-config:
     db-config:
-      # 主键策略
+      # Primary key strategy
       id-type: auto
 
 knife4j:
@@ -38,4 +38,4 @@ knife4j:
     enable: false
     username:
     password:
-  production: false # 生产环境建议设置为true
+  production: false # Set to true in production

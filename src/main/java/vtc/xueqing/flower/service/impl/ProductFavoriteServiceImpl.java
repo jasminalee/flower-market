@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 产品收藏服务实现类
+ * Product favorite service implementation.
  */
 @Service
 public class ProductFavoriteServiceImpl implements ProductFavoriteService {
@@ -32,23 +32,23 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ProductFavorite addFavorite(ProductFavorite productFavorite) {
-        // 1. 检查商品是否存在
+        // 1. Check whether the product exists
         Product product = productMapper.selectById(productFavorite.getProdId());
         if (product == null) {
-            throw new RuntimeException("商品不存在");
+            throw new RuntimeException("Product does not exist");
         }
         
-        // 2. 检查是否已收藏
+        // 2. Check whether it is already favorited
         LambdaQueryWrapper<ProductFavorite> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ProductFavorite::getUserId, productFavorite.getUserId())
                 .eq(ProductFavorite::getProdId, productFavorite.getProdId());
         Long count = productFavoriteMapper.selectCount(wrapper);
         
         if (count > 0) {
-            throw new RuntimeException("已收藏该商品");
+            throw new RuntimeException("Product already favorited");
         }
         
-        // 3. 添加收藏
+        // 3. Add favorite record
         productFavoriteMapper.insert(productFavorite);
         return productFavorite;
     }
@@ -62,7 +62,7 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
         
         int deleted = productFavoriteMapper.delete(wrapper);
         if (deleted == 0) {
-            throw new RuntimeException("未找到收藏记录");
+            throw new RuntimeException("Favorite record not found");
         }
     }
     
@@ -82,7 +82,7 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
             .collect(java.util.stream.Collectors.toSet());
         List<Product> products = productMapper.selectBatchIds(prodIds);
 
-        // 补充商家名称
+        // Populate merchant names
         java.util.Set<Long> merchIds = products.stream()
             .map(Product::getMerchId)
             .filter(java.util.Objects::nonNull)
@@ -91,7 +91,7 @@ public class ProductFavoriteServiceImpl implements ProductFavoriteService {
             .collect(java.util.stream.Collectors.toMap(Merchant::getMerchId, Merchant::getName));
         products.forEach(p -> p.setMerchantName(merchMap.get(p.getMerchId())));
 
-        // 保持与收藏顺序一致
+        // Keep ordering consistent with favorites
         java.util.Map<Long, Product> productMap = products.stream()
             .collect(java.util.stream.Collectors.toMap(Product::getProdId, p -> p));
         return favorites.stream()

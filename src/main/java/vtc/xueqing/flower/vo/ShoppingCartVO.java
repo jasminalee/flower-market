@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 购物车视图对象
+ * Shopping cart view object with product details.
  * 包含商品详细信息
  */
 @Data
@@ -15,72 +15,72 @@ public class ShoppingCartVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 购物车ID
+    * Shopping cart ID.
      */
     private Long id;
 
     /**
-     * 用户ID
+    * User ID.
      */
     private Long userId;
 
     /**
-     * 产品ID
+    * Product ID.
      */
     private Long prodId;
 
     /**
-     * 商品数量
+    * Quantity of the product.
      */
     private Integer quantity;
 
     /**
-     * 是否选中：0-未选中，1-已选中
+    * Selected flag: 0-unselected, 1-selected.
      */
     private Integer selected;
 
     /**
-     * 商品名称
+    * Product name.
      */
     private String prodName;
 
     /**
-     * 商品描述
+    * Product description.
      */
     private String prodDesc;
 
     /**
-     * 商品主图
+    * Product main image.
      */
     private String prodImage;
 
     /**
-     * 商品价格
+    * Product price.
      */
     private BigDecimal prodPrice;
 
     /**
-     * 商品库存
+    * Product stock.
      */
     private Integer prodStock;
 
     /**
-     * 商家ID
+    * Merchant ID.
      */
     private Long merchId;
 
     /**
-     * 商家名称
+    * Merchant name.
      */
     private String merchantName;
 
     /**
-     * 添加时间
+    * Created time.
      */
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+    * Updated time.
      */
     private LocalDateTime updateDate;
 }

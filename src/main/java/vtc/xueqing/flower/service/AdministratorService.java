@@ -7,144 +7,144 @@ import vtc.xueqing.flower.entity.Customer;
 import vtc.xueqing.flower.entity.Merchant;
 
 /**
- * 管理员服务接口
+ * Administrator service interface.
  */
 public interface AdministratorService {
     
     /**
-     * 管理员登录
-     * @param email 邮箱
-     * @param password 密码
-     * @return 管理员信息
+     * Administrator login.
+     * @param email email
+     * @param password password
+     * @return admin info
      */
     Administrator login(String email, String password);
     
     /**
-     * 获取顾客列表（分页）
-     * @param page 分页信息
-     * @param level 会员等级（可选）
-     * @return 顾客列表
+     * Get customer list (paginated).
+     * @param page pagination info
+     * @param level membership level (optional)
+     * @return customer list
      */
     IPage<Customer> getCustomerList(Page<Customer> page, String level);
     
     /**
-     * 获取顾客详情
-     * @param userId 用户ID
-     * @return 顾客信息
+     * Get customer detail.
+     * @param userId user ID
+     * @return customer info
      */
     Customer getCustomerById(Long userId);
     
     /**
-     * 获取商家列表（分页）
-     * @param page 分页信息
-     * @param status 商家状态（可选）
-     * @return 商家列表
+     * Get merchant list (paginated).
+     * @param page pagination info
+     * @param status merchant status (optional)
+     * @return merchant list
      */
     IPage<Merchant> getMerchantList(Page<Merchant> page, String status);
     
     /**
-     * 获取商家详情
-     * @param merchId 商家ID
-     * @return 商家信息
+     * Get merchant detail.
+     * @param merchId merchant ID
+     * @return merchant info
      */
     Merchant getMerchantById(Long merchId);
     
     /**
-     * 商家审核
-     * @param merchId 商家ID
-     * @param status 审核状态：ACTIVE-通过，REJECTED-拒绝，SUSPENDED-暂停
-     * @return 更新后的商家信息
+     * Merchant review.
+     * @param merchId merchant ID
+     * @param status status: ACTIVE-approved, REJECTED-rejected, SUSPENDED-suspended
+     * @return updated merchant info
      */
     Merchant verifyMerchant(Long merchId, String status);
     
     /**
-     * 更新顾客会员等级
-     * @param userId 用户ID
-     * @param level 会员等级：NORMAL, VIP, SVIP
-     * @return 更新后的顾客信息
+     * Update customer membership level.
+     * @param userId user ID
+     * @param level membership level: NORMAL, VIP, SVIP
+     * @return updated customer info
      */
     Customer updateCustomerLevel(Long userId, String level);
     
     /**
-     * 获取管理后台仪表板数据
-     * @return 包含统计数据、最近用户、最近商家、订单趋势的Map
+     * Get admin dashboard data.
+     * @return map containing stats, recent users, recent merchants, order trends
      */
     java.util.Map<String, Object> getDashboardData();
     
     /**
-     * 获取所有订单列表（管理员）- 带客户和商家名称
-     * @param page 分页信息
-     * @param status 订单状态（可选）
-     * @param keyword 搜索关键词：订单号或客户名（可选）
-     * @return 订单VO列表
+     * Get all orders (admin) with customer and merchant names.
+     * @param page pagination info
+     * @param status order status (optional)
+     * @param keyword search keyword: order number or customer name (optional)
+     * @return order VO list
      */
     IPage<vtc.xueqing.flower.vo.OrderVO> getAllOrders(Page<vtc.xueqing.flower.vo.OrderVO> page, String status, String keyword);
     
     /**
-     * 获取养护知识列表（管理员）
-     * @param page 分页信息
-     * @param keyword 搜索关键词：标题（可选）
-     * @param category 分类（可选）
-     * @param status 状态（可选）
-     * @return 养护知识列表
+     * Get care knowledge list (admin).
+     * @param page pagination info
+     * @param keyword search keyword: title (optional)
+     * @param category category (optional)
+     * @param status status (optional)
+     * @return care knowledge list
      */
     IPage<vtc.xueqing.flower.entity.CareKnowledge> getKnowledgeList(Page<vtc.xueqing.flower.entity.CareKnowledge> page, String keyword, String category, String status);
     
     /**
-     * 获取养护知识详情（管理员）
-     * @param id 知识ID
-     * @return 养护知识详情
+     * Get care knowledge detail (admin).
+     * @param id knowledge ID
+     * @return care knowledge detail
      */
     vtc.xueqing.flower.entity.CareKnowledge getKnowledgeById(Long id);
     
     /**
-     * 创建养护知识（管理员）
-     * @param knowledge 养护知识信息
-     * @return 创建的养护知识
+     * Create care knowledge (admin).
+     * @param knowledge care knowledge info
+     * @return created care knowledge
      */
     vtc.xueqing.flower.entity.CareKnowledge createKnowledge(vtc.xueqing.flower.entity.CareKnowledge knowledge);
     
     /**
-     * 更新养护知识（管理员）
-     * @param knowledge 养护知识信息
-     * @return 更新后的养护知识
+     * Update care knowledge (admin).
+     * @param knowledge care knowledge info
+     * @return updated care knowledge
      */
     vtc.xueqing.flower.entity.CareKnowledge updateKnowledge(vtc.xueqing.flower.entity.CareKnowledge knowledge);
     
     /**
-     * 更新养护知识状态（管理员）
-     * @param id 知识ID
-     * @param status 状态
-     * @return 更新后的养护知识
+     * Update care knowledge status (admin).
+     * @param id knowledge ID
+     * @param status status
+     * @return updated care knowledge
      */
     vtc.xueqing.flower.entity.CareKnowledge updateKnowledgeStatus(Long id, String status);
     
     /**
-     * 删除养护知识（管理员）
-     * @param id 知识ID
+     * Delete care knowledge (admin).
+     * @param id knowledge ID
      */
     void deleteKnowledge(Long id);
     
     /**
-     * 根据管理员ID获取个人信息
-     * @param adminId 管理员ID
-     * @return 管理员信息
+     * Get admin profile by ID.
+     * @param adminId admin ID
+     * @return admin info
      */
     Administrator getProfileById(Long adminId);
     
     /**
-     * 更新管理员个人信息
-     * @param adminId 管理员ID
-     * @param name 姓名
-     * @return 更新后的管理员信息
+     * Update admin profile.
+     * @param adminId admin ID
+     * @param name name
+     * @return updated admin info
      */
     Administrator updateProfile(Long adminId, String name);
     
     /**
-     * 修改管理员密码
-     * @param adminId 管理员ID
-     * @param oldPassword 原密码
-     * @param newPassword 新密码
+     * Change admin password.
+     * @param adminId admin ID
+     * @param oldPassword old password
+     * @param newPassword new password
      */
     void updatePassword(Long adminId, String oldPassword, String newPassword);
 }

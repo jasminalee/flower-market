@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 import java.time.LocalDateTime;
 
 /**
- * 产品服务实现类
+ * Product service implementation.
  */
 @Slf4j
 @Service
@@ -31,48 +31,48 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product product) {
-        // 1. 设置默认值
+        // 1. Set default values
         product.setSales(0);
         product.setStatus(Constants.PRODUCT_STATUS_ACTIVE);
         product.setStockStatus(getStockStatus(product.getStock()));
         product.setCreateDate(LocalDateTime.now());
         product.setUpdateDate(LocalDateTime.now());
 
-        // 2. 保存到数据库
+        // 2. Persist to database
         int result = productMapper.insert(product);
         if (result == 0) {
-            throw new BusinessException("创建产品失败");
+            throw new BusinessException("Failed to create product");
         }
 
-        log.info("创建产品成功，产品ID：{}, 名称：{}", product.getProdId(), product.getName());
+        log.info("Product created successfully, productId: {}, name: {}", product.getProdId(), product.getName());
         return product;
     }
 
     @Override
     public Product updateProduct(Product product) {
         if (product.getProdId() == null) {
-            throw new BusinessException("产品ID不能为空");
+            throw new BusinessException("Product ID cannot be null");
         }
 
-        // 1. 查询产品是否存在
+        // 1. Check whether the product exists
         Product existProduct = productMapper.selectById(product.getProdId());
         if (existProduct == null) {
-            throw new BusinessException("产品不存在");
+            throw new BusinessException("Product does not exist");
         }
 
-        // 2. 更新产品信息
+        // 2. Update product info
         product.setStockStatus(getStockStatus(product.getStock()));
         product.setUpdateDate(LocalDateTime.now());
 
-        // 3. 保存到数据库
+        // 3. Persist to database
         int result = productMapper.updateById(product);
         if (result == 0) {
-            throw new BusinessException("更新产品失败");
+            throw new BusinessException("Failed to update product");
         }
 
-        log.info("更新产品成功，产品ID：{}", product.getProdId());
+        log.info("Product updated successfully, productId: {}", product.getProdId());
 
-        // 4. 返回更新后的产品信息
+        // 4. Return updated product info
         return getProductById(product.getProdId());
     }
 
@@ -80,15 +80,15 @@ public class ProductServiceImpl implements ProductService {
     public boolean deleteProduct(Long prodId) {
         Product product = productMapper.selectById(prodId);
         if (product == null) {
-            throw new BusinessException("产品不存在");
+            throw new BusinessException("Product does not exist");
         }
 
-        // 逻辑删除：将状态设置为DELETED
+        // Logical delete: set status to DELETED
         product.setStatus(Constants.PRODUCT_STATUS_DELETED);
         product.setUpdateDate(LocalDateTime.now());
 
         int result = productMapper.updateById(product);
-        log.info("删除产品成功，产品ID：{}", prodId);
+        log.info("Product deleted successfully, productId: {}", prodId);
         return result > 0;
     }
 
@@ -96,18 +96,18 @@ public class ProductServiceImpl implements ProductService {
     public Product getProductById(Long prodId) {
         Product product = productMapper.selectById(prodId);
         if (product == null) {
-            throw new BusinessException("产品不存在");
+            throw new BusinessException("Product does not exist");
         }
-        // 补充商家名称
+        // Populate merchant name
         fillMerchantName(java.util.Collections.singletonList(product));
         return product;
     }
 
     @Override
     public Page<Product> getProductPage(Long current, Long size, Long catId, Long merchId, String keyword) {
-        // 1. 构建查询条件
+        // 1. Build query conditions
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
-        wrapper.ne(Product::getStatus, Constants.PRODUCT_STATUS_DELETED); // 排除已删除的
+        wrapper.ne(Product::getStatus, Constants.PRODUCT_STATUS_DELETED); // Exclude deleted items
         
         if (catId != null) {
             wrapper.eq(Product::getCatId, catId);
@@ -121,10 +121,10 @@ public class ProductServiceImpl implements ProductService {
                    .like(Product::getDescription, keyword);
         }
         
-        // 按创建时间倒序
+        // Order by creation time descending
         wrapper.orderByDesc(Product::getCreateDate);
 
-        // 2. 分页查询
+        // 2. Paginate query
         Page<Product> page = new Page<>(current, size);
         Page<Product> resultPage = productMapper.selectPage(page, wrapper);
         fillMerchantName(resultPage.getRecords());
@@ -135,19 +135,19 @@ public class ProductServiceImpl implements ProductService {
     public boolean updateProductStatus(Long prodId, String status) {
         Product product = productMapper.selectById(prodId);
         if (product == null) {
-            throw new BusinessException("产品不存在");
+            throw new BusinessException("Product does not exist");
         }
 
         product.setStatus(status);
         product.setUpdateDate(LocalDateTime.now());
 
         int result = productMapper.updateById(product);
-        log.info("更新产品状态成功，产品ID：{}, 状态：{}", prodId, status);
+        log.info("Product status updated successfully, productId: {}, status: {}", prodId, status);
         return result > 0;
     }
 
     /**
-     * 根据库存数量判断库存状态
+     * Determine stock status based on inventory quantity.
      */
     private String getStockStatus(Integer stock) {
         if (stock == 0) {
@@ -160,7 +160,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * 批量补充商家名称，避免前端再次查询。
+     * Populate merchant names in batch to avoid extra frontend queries.
      */
     private void fillMerchantName(java.util.List<Product> products) {
         if (products == null || products.isEmpty()) {

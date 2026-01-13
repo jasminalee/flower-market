@@ -5,29 +5,29 @@ import vtc.xueqing.flower.entity.CheckIn;
 import java.util.List;
 
 /**
- * 签到服务接口
+ * Check-in service interface.
  */
 public interface CheckInService {
     
     /**
-     * 每日签到
-     * @param userId 用户ID
-     * @return 签到记录
+     * Daily check-in.
+     * @param userId user ID
+     * @return check-in record
      */
     CheckIn dailyCheckIn(Long userId);
     
     /**
-     * 获取用户签到历史
-     * @param userId 用户ID
-     * @param limit 查询数量限制
-     * @return 签到记录列表
+     * Get user check-in history.
+     * @param userId user ID
+     * @param limit record limit
+     * @return check-in records
      */
     List<CheckIn> getCheckInHistory(Long userId, Integer limit);
     
     /**
-     * 获取用户连续签到天数
-     * @param userId 用户ID
-     * @return 连续签到天数
+     * Get user's continuous check-in days.
+     * @param userId user ID
+     * @return continuous days
      */
     Integer getContinuousDays(Long userId);
     
@@ -35,6 +35,10 @@ public interface CheckInService {
      * 检查今日是否已签到
      * @param userId 用户ID
      * @return 是否已签到
+    /**
+     * Check if user has checked in today.
+     * @param userId user ID
+     * @return whether already checked in
      */
     boolean isTodayCheckedIn(Long userId);
 }

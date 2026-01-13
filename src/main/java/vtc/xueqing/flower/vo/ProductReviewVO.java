@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 产品评价VO - 用于管理员查看评价列表
- * 包含关联的用户和产品信息
+ * Product review VO for admin review listings.
+ * Includes associated user and product information.
  */
 @Data
 public class ProductReviewVO implements Serializable {
@@ -15,67 +15,67 @@ public class ProductReviewVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 评价ID
+        * Review ID.
      */
     private Long id;
 
     /**
-     * 用户ID
+        * User ID.
      */
     private Long userId;
 
     /**
-     * 用户名称
+        * Username.
      */
     private String userName;
 
     /**
-     * 产品ID
+        * Product ID.
      */
     private Long prodId;
 
     /**
-     * 产品名称
+        * Product name.
      */
     private String productName;
 
     /**
-     * 产品图片
+        * Product image.
      */
     private String productImage;
 
     /**
-     * 订单ID
+        * Order ID.
      */
     private Long orderId;
 
     /**
-     * 评分：1-5星
+        * Rating: 1-5 stars.
      */
     private Integer rating;
 
     /**
-     * 评价内容
+        * Review content.
      */
     private String content;
 
     /**
-     * 评价图片（JSON数组）
+        * Review images (JSON array).
      */
     private String images;
 
     /**
-     * 是否已购买验证：0-未验证，1-已验证
+        * Verified purchase flag: 0-unverified, 1-verified.
      */
     private Integer verified;
 
     /**
-     * 状态：PENDING-待审核，APPROVED-已通过，REJECTED-已拒绝
+        * Status: PENDING-pending review, APPROVED-approved, REJECTED-rejected.
      */
     private String status;
 
     /**
-     * 创建时间
+     * Created time.
      */
     private LocalDateTime createDate;
 }

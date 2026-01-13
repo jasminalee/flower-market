@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 购物车服务实现类
+ * Shopping cart service implementation.
  */
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService {
@@ -33,44 +33,44 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ShoppingCart addToCart(ShoppingCart shoppingCart) {
-        // 1. 检查商品是否存在
+        // 1. Check whether the product exists
         Product product = productMapper.selectById(shoppingCart.getProdId());
         if (product == null) {
-            throw new RuntimeException("商品不存在");
+            throw new RuntimeException("Product does not exist");
         }
         
-        // 2. 检查商品状态
+        // 2. Check product status
         if (!"ACTIVE".equals(product.getStatus())) {
-            throw new RuntimeException("商品已下架");
+            throw new RuntimeException("Product is unavailable");
         }
         
-        // 3. 检查库存
+        // 3. Check inventory
         if (product.getStock() < shoppingCart.getQuantity()) {
-            throw new RuntimeException("商品库存不足");
+            throw new RuntimeException("Insufficient product stock");
         }
         
-        // 4. 检查购物车中是否已存在该商品
+        // 4. Check whether the product already exists in the cart
         LambdaQueryWrapper<ShoppingCart> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ShoppingCart::getUserId, shoppingCart.getUserId())
                 .eq(ShoppingCart::getProdId, shoppingCart.getProdId());
         ShoppingCart existingCart = shoppingCartMapper.selectOne(wrapper);
         
         if (existingCart != null) {
-            // 如果已存在，增加数量
+            // If present, increase quantity
             int newQuantity = existingCart.getQuantity() + shoppingCart.getQuantity();
             
-            // 检查新数量是否超过库存
+            // Ensure the new quantity does not exceed stock
             if (newQuantity > product.getStock()) {
-                throw new RuntimeException("购物车商品数量超过库存");
+                throw new RuntimeException("Cart quantity exceeds available stock");
             }
             
             existingCart.setQuantity(newQuantity);
             shoppingCartMapper.updateById(existingCart);
             return existingCart;
         } else {
-            // 如果不存在，添加新记录
+            // Otherwise, add a new record
             if (shoppingCart.getSelected() == null) {
-                shoppingCart.setSelected(1); // 默认选中
+                shoppingCart.setSelected(1); // Default to selected
             }
             shoppingCartMapper.insert(shoppingCart);
             return shoppingCart;
@@ -80,27 +80,27 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ShoppingCart updateCartQuantity(Long cartId, Integer quantity) {
-        // 1. 获取购物车项
+        // 1. Get cart item
         ShoppingCart cart = shoppingCartMapper.selectById(cartId);
         if (cart == null) {
-            throw new RuntimeException("购物车项不存在");
+            throw new RuntimeException("Cart item does not exist");
         }
         
-        // 2. 检查商品库存
+        // 2. Check product stock
         Product product = productMapper.selectById(cart.getProdId());
         if (product == null) {
-            throw new RuntimeException("商品不存在");
+            throw new RuntimeException("Product does not exist");
         }
         
         if (quantity > product.getStock()) {
-            throw new RuntimeException("商品库存不足，当前库存：" + product.getStock());
+            throw new RuntimeException("Insufficient stock; current inventory: " + product.getStock());
         }
         
         if (quantity <= 0) {
-            throw new RuntimeException("数量必须大于0");
+            throw new RuntimeException("Quantity must be greater than 0");
         }
         
-        // 3. 更新数量
+        // 3. Update quantity
         cart.setQuantity(quantity);
         shoppingCartMapper.updateById(cart);
         
@@ -112,7 +112,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void deleteCartItem(Long cartId) {
         ShoppingCart cart = shoppingCartMapper.selectById(cartId);
         if (cart == null) {
-            throw new RuntimeException("购物车项不存在");
+            throw new RuntimeException("Cart item does not exist");
         }
         shoppingCartMapper.deleteById(cartId);
     }
@@ -129,7 +129,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Transactional(rollbackFor = Exception.class)
     public void batchDeleteCartItems(List<Long> cartIds) {
         if (cartIds == null || cartIds.isEmpty()) {
-            throw new RuntimeException("购物车ID列表不能为空");
+            throw new RuntimeException("Cart ID list cannot be empty");
         }
         shoppingCartMapper.deleteBatchIds(cartIds);
     }

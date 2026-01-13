@@ -4,11 +4,14 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+    /**
+     * Order placement time.
+     */
 import java.time.LocalDateTime;
 
 /**
- * 订单视图对象 - 用于管理员订单列表展示
- * 包含客户名和商家名的JOIN信息
+ * Order view object for admin order listings.
+ * Includes joined customer and merchant names.
  */
 @Data
 public class OrderVO implements Serializable {
@@ -16,117 +19,117 @@ public class OrderVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 订单ID
+     * Order ID.
      */
     private Long id;
 
     /**
-     * 订单号
+     * Order number.
      */
     private String orderNo;
 
     /**
-     * 用户ID
+     * User ID.
      */
     private Long userId;
 
     /**
-     * 客户名称（JOIN customers表）
+     * Customer name (JOIN customers).
      */
     private String customerName;
 
     /**
-     * 商家ID
+     * Merchant ID.
      */
     private Long merchId;
 
     /**
-     * 商家名称（JOIN merchants表）
+     * Merchant name (JOIN merchants).
      */
     private String merchantName;
 
     /**
-     * 订单总价
+     * Order total price.
      */
     private BigDecimal totalPrice;
 
     /**
-     * 优惠金额
+     * Discount amount.
      */
     private BigDecimal discountAmount;
 
     /**
-     * 实付金额
+     * Actual paid amount.
      */
     private BigDecimal actualPrice;
 
     /**
-     * 收货地址
+     * Shipping address.
      */
     private String address;
 
     /**
-     * 收货人姓名
+     * Recipient name.
      */
     private String receiverName;
 
     /**
-     * 收货人电话
+     * Recipient phone.
      */
     private String receiverPhone;
 
     /**
-     * 支付状态
+     * Payment status.
      */
     private String paymentStatus;
 
     /**
-     * 支付时间
+     * Payment time.
      */
     private LocalDateTime paymentTime;
 
     /**
-     * 支付方式
+     * Payment method.
      */
     private String paymentMethod;
 
     /**
-     * 订单状态
+     * Order status.
      */
     private String status;
 
     /**
-     * 发货时间
+     * Shipment time.
      */
     private LocalDateTime deliveryTime;
 
     /**
-     * 完成时间
+     * Completion time.
      */
     private LocalDateTime completionTime;
 
     /**
-     * 取消原因
+     * Cancellation reason.
      */
     private String cancelReason;
 
     /**
-     * 订单备注
+     * Order remark.
      */
     private String remark;
 
     /**
-     * 下单时间
+     * Order placement time.
      */
     private LocalDateTime orderDate;
 
     /**
-     * 创建时间
+     * Created time.
      */
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Updated time.
      */
     private LocalDateTime updateDate;
 }

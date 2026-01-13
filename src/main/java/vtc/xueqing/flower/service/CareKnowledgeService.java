@@ -5,43 +5,43 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import vtc.xueqing.flower.entity.CareKnowledge;
 
 /**
- * 养护知识服务接口
+ * Care knowledge service interface.
  */
 public interface CareKnowledgeService {
     
     /**
-     * 获取养护知识列表（分页）
-     * @param page 分页信息
-     * @param category 分类（可选）
-     * @param status 状态（可选）
-     * @return 养护知识列表
+     * Get care knowledge list (paginated).
+     * @param page pagination info
+     * @param category category (optional)
+     * @param status status (optional)
+     * @return care knowledge list
      */
     IPage<CareKnowledge> getCareKnowledgePage(Page<CareKnowledge> page, String category, String status);
     
     /**
-     * 根据ID获取养护知识详情
-     * @param id 知识ID
-     * @return 养护知识详情
+     * Get care knowledge detail by ID.
+     * @param id knowledge ID
+     * @return care knowledge detail
      */
     CareKnowledge getCareKnowledgeById(Long id);
     
     /**
-     * 发布养护知识（管理员）
-     * @param careKnowledge 养护知识信息
-     * @return 创建的养护知识
+     * Publish care knowledge (admin).
+     * @param careKnowledge care knowledge info
+     * @return created care knowledge
      */
     CareKnowledge createCareKnowledge(CareKnowledge careKnowledge);
     
     /**
-     * 更新养护知识（管理员）
-     * @param careKnowledge 养护知识信息
-     * @return 更新后的养护知识
+     * Update care knowledge (admin).
+     * @param careKnowledge care knowledge info
+     * @return updated care knowledge
      */
     CareKnowledge updateCareKnowledge(CareKnowledge careKnowledge);
     
     /**
-     * 删除养护知识（管理员）
-     * @param id 知识ID
+     * Delete care knowledge (admin).
+     * @param id knowledge ID
      */
     void deleteCareKnowledge(Long id);
 }

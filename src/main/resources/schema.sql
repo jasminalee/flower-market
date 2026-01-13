@@ -1,18 +1,18 @@
 -- ============================================
--- 鲜花市场数据库初始化脚本
+-- Flower Market database initialization script
 -- ============================================
 
--- 创建数据库
+-- Create database
 CREATE DATABASE IF NOT EXISTS `flower_market` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE `flower_market`;
 
 
-    -- 设置外键检查关闭，确保可以顺利删除表
+  -- Disable foreign key checks to allow dropping tables cleanly
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ============================================
--- 按照外键依赖顺序删除表（从子表到父表）
+-- Drop tables in FK order (child to parent)
 -- ============================================
 DROP TABLE IF EXISTS `customer_coupons`;
 DROP TABLE IF EXISTS `coupon_coupons`;
@@ -34,109 +34,109 @@ DROP TABLE IF EXISTS `system_configuration`;
 
 
 -- ============================================
--- 1. 顾客表 (customers)
+-- 1. Customers table (customers)
 -- ============================================
 DROP TABLE IF EXISTS `customers`;
 CREATE TABLE `customers` (
-  `user_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `name` VARCHAR(50) NOT NULL COMMENT '用户名',
-  `email` VARCHAR(100) NOT NULL COMMENT '邮箱',
-  `phone` VARCHAR(20) COMMENT '手机号',
-  `password` VARCHAR(255) NOT NULL COMMENT '密码（加密）',
-  `balance` DECIMAL(10, 2) DEFAULT 0.00 COMMENT '账户余额',
-  `points` INT DEFAULT 0 COMMENT '会员总积分',
-  `level` VARCHAR(20) DEFAULT 'NORMAL' COMMENT '会员等级：NORMAL-普通，VIP-VIP，SVIP-超级VIP',
-  `gender` VARCHAR(10) COMMENT '性别',
-  `address` VARCHAR(255) COMMENT '默认地址',
-  `email_verified` TINYINT(1) DEFAULT 0 COMMENT '邮箱是否验证：0-未验证，1-已验证',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `user_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'User ID',
+  `name` VARCHAR(50) NOT NULL COMMENT 'Username',
+  `email` VARCHAR(100) NOT NULL COMMENT 'Email',
+  `phone` VARCHAR(20) COMMENT 'Phone number',
+  `password` VARCHAR(255) NOT NULL COMMENT 'Password (encrypted)',
+  `balance` DECIMAL(10, 2) DEFAULT 0.00 COMMENT 'Account balance',
+  `points` INT DEFAULT 0 COMMENT 'Total reward points',
+  `level` VARCHAR(20) DEFAULT 'NORMAL' COMMENT 'Membership level: NORMAL, VIP, SVIP',
+  `gender` VARCHAR(10) COMMENT 'Gender',
+  `address` VARCHAR(255) COMMENT 'Default address',
+  `email_verified` TINYINT(1) DEFAULT 0 COMMENT 'Email verified: 0-no, 1-yes',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `uk_email` (`email`),
   UNIQUE KEY `uk_phone` (`phone`),
   KEY `idx_level` (`level`),
   KEY `idx_create_date` (`create_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='顾客表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Customers table';
 
 -- ============================================
--- 2. 商家表 (merchants)
+-- 2. Merchants table (merchants)
 -- ============================================
 DROP TABLE IF EXISTS `merchants`;
 CREATE TABLE `merchants` (
-  `merch_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '商家ID',
-  `name` VARCHAR(100) NOT NULL COMMENT '商家名称',
-  `email` VARCHAR(100) NOT NULL COMMENT '商家邮箱',
-  `password` VARCHAR(255) NOT NULL COMMENT '密码（加密）',
-  `phone` VARCHAR(20) NOT NULL COMMENT '商家电话',
-  `shop_logo` VARCHAR(255) COMMENT '店铺logo',
-  `qualification` VARCHAR(255) COMMENT '商家资质证明',
-  `address` VARCHAR(255) COMMENT '商家地址',
-  `description` TEXT COMMENT '店铺描述',
-  `status` VARCHAR(20) DEFAULT 'PENDING' COMMENT '商家状态：PENDING-待审核，ACTIVE-正常，SUSPENDED-暂停，REJECTED-已拒绝',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `merch_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Merchant ID',
+  `name` VARCHAR(100) NOT NULL COMMENT 'Merchant name',
+  `email` VARCHAR(100) NOT NULL COMMENT 'Merchant email',
+  `password` VARCHAR(255) NOT NULL COMMENT 'Password (encrypted)',
+  `phone` VARCHAR(20) NOT NULL COMMENT 'Merchant phone',
+  `shop_logo` VARCHAR(255) COMMENT 'Shop logo',
+  `qualification` VARCHAR(255) COMMENT 'Merchant qualification proof',
+  `address` VARCHAR(255) COMMENT 'Merchant address',
+  `description` TEXT COMMENT 'Shop description',
+  `status` VARCHAR(20) DEFAULT 'PENDING' COMMENT 'Merchant status: PENDING-review, ACTIVE-active, SUSPENDED-paused, REJECTED-rejected',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`merch_id`),
   UNIQUE KEY `uk_email` (`email`),
   UNIQUE KEY `uk_phone` (`phone`),
   KEY `idx_status` (`status`),
   KEY `idx_create_date` (`create_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商家表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Merchants table';
 
 -- ============================================
--- 3. 管理员表 (administrators)
+-- 3. Administrators table (administrators)
 -- ============================================
 DROP TABLE IF EXISTS `administrators`;
 CREATE TABLE `administrators` (
-  `admin_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '管理员ID',
-  `name` VARCHAR(50) NOT NULL COMMENT '管理员姓名',
-  `password` VARCHAR(255) NOT NULL COMMENT '密码（加密）',
-  `email` VARCHAR(100) NOT NULL COMMENT '邮箱',
-  `permission` VARCHAR(50) DEFAULT 'ADMIN' COMMENT '权限等级：SUPER_ADMIN-超级管理员，ADMIN-管理员',
-  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE-正常，INACTIVE-禁用',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `admin_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Administrator ID',
+  `name` VARCHAR(50) NOT NULL COMMENT 'Administrator name',
+  `password` VARCHAR(255) NOT NULL COMMENT 'Password (encrypted)',
+  `email` VARCHAR(100) NOT NULL COMMENT 'Email',
+  `permission` VARCHAR(50) DEFAULT 'ADMIN' COMMENT 'Permission level: SUPER_ADMIN or ADMIN',
+  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT 'Status: ACTIVE-enabled, INACTIVE-disabled',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`admin_id`),
   UNIQUE KEY `uk_email` (`email`),
   KEY `idx_permission` (`permission`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Administrators table';
 
 -- ============================================
--- 4. 产品分类表 (product_categories)
+-- 4. Product categories table (product_categories)
 -- ============================================
 DROP TABLE IF EXISTS `product_categories`;
 CREATE TABLE `product_categories` (
-  `cate_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '分类ID',
-  `name` VARCHAR(50) NOT NULL COMMENT '分类名称',
-  `parent_id` BIGINT DEFAULT 0 COMMENT '父分类ID，0表示顶级分类',
-  `sort_order` INT DEFAULT 0 COMMENT '排序顺序',
-  `icon` VARCHAR(255) COMMENT '分类图标',
-  `description` VARCHAR(255) COMMENT '分类描述',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `cate_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Category ID',
+  `name` VARCHAR(50) NOT NULL COMMENT 'Category name',
+  `parent_id` BIGINT DEFAULT 0 COMMENT 'Parent category ID; 0 = top level',
+  `sort_order` INT DEFAULT 0 COMMENT 'Sort order',
+  `icon` VARCHAR(255) COMMENT 'Category icon',
+  `description` VARCHAR(255) COMMENT 'Category description',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`cate_id`),
   KEY `idx_parent_id` (`parent_id`),
   KEY `idx_sort_order` (`sort_order`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='产品分类表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Product categories table';
 
 -- ============================================
--- 5. 产品表 (products)
+-- 5. Products table (products)
 -- ============================================
 DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
-  `prod_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '产品ID',
-  `merch_id` BIGINT NOT NULL COMMENT '商家ID',
-  `cat_id` BIGINT NOT NULL COMMENT '分类ID',
-  `name` VARCHAR(100) NOT NULL COMMENT '产品名称',
-  `price` DECIMAL(10, 2) NOT NULL COMMENT '产品价格',
-  `stock` INT NOT NULL DEFAULT 0 COMMENT '库存数量',
-  `sales` INT DEFAULT 0 COMMENT '销量',
-  `main_image` VARCHAR(255) COMMENT '产品主图',
-  `images` TEXT COMMENT '产品图片集（JSON数组）',
-  `description` TEXT COMMENT '产品描述',
-  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '产品状态：ACTIVE-上架，INACTIVE-下架，DELETED-已删除',
-  `stock_status` VARCHAR(20) DEFAULT 'IN_STOCK' COMMENT '库存状态：IN_STOCK-有货，LOW_STOCK-库存不足，OUT_OF_STOCK-缺货',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `prod_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Product ID',
+  `merch_id` BIGINT NOT NULL COMMENT 'Merchant ID',
+  `cat_id` BIGINT NOT NULL COMMENT 'Category ID',
+  `name` VARCHAR(100) NOT NULL COMMENT 'Product name',
+  `price` DECIMAL(10, 2) NOT NULL COMMENT 'Product price',
+  `stock` INT NOT NULL DEFAULT 0 COMMENT 'Stock quantity',
+  `sales` INT DEFAULT 0 COMMENT 'Sales volume',
+  `main_image` VARCHAR(255) COMMENT 'Primary product image',
+  `images` TEXT COMMENT 'Product image set (JSON array)',
+  `description` TEXT COMMENT 'Product description',
+  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT 'Product status: ACTIVE-listed, INACTIVE-unlisted, DELETED-removed',
+  `stock_status` VARCHAR(20) DEFAULT 'IN_STOCK' COMMENT 'Stock status: IN_STOCK, LOW_STOCK, OUT_OF_STOCK',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`prod_id`),
   KEY `idx_merch_id` (`merch_id`),
   KEY `idx_cat_id` (`cat_id`),
@@ -146,17 +146,17 @@ CREATE TABLE `products` (
   KEY `idx_create_date` (`create_date`),
   CONSTRAINT `fk_products_merchant` FOREIGN KEY (`merch_id`) REFERENCES `merchants` (`merch_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_products_category` FOREIGN KEY (`cat_id`) REFERENCES `product_categories` (`cate_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='产品表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Products table';
 
 -- ============================================
--- 6. 产品收藏表 (product_favorites)
+-- 6. Product favorites table (product_favorites)
 -- ============================================
 DROP TABLE IF EXISTS `product_favorites`;
 CREATE TABLE `product_favorites` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '收藏ID',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `prod_id` BIGINT NOT NULL COMMENT '产品ID',
-  `fav_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '收藏时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Favorite ID',
+  `user_id` BIGINT NOT NULL COMMENT 'User ID',
+  `prod_id` BIGINT NOT NULL COMMENT 'Product ID',
+  `fav_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Favorite time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_prod` (`user_id`, `prod_id`),
   KEY `idx_user_id` (`user_id`),
@@ -164,23 +164,23 @@ CREATE TABLE `product_favorites` (
   KEY `idx_fav_date` (`fav_date`),
   CONSTRAINT `fk_favorites_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_favorites_product` FOREIGN KEY (`prod_id`) REFERENCES `products` (`prod_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='产品收藏表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Product favorites table';
 
 -- ============================================
--- 7. 产品评价表 (product_reviews)
+-- 7. Product reviews table (product_reviews)
 -- ============================================
 DROP TABLE IF EXISTS `product_reviews`;
 CREATE TABLE `product_reviews` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '评价ID',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `prod_id` BIGINT NOT NULL COMMENT '产品ID',
-  `order_id` BIGINT COMMENT '订单ID',
-  `rating` INT NOT NULL COMMENT '评分：1-5星',
-  `content` TEXT COMMENT '评价内容',
-  `images` TEXT COMMENT '评价图片（JSON数组）',
-  `verified` TINYINT(1) DEFAULT 0 COMMENT '是否已购买验证：0-未验证，1-已验证',
-  `status` VARCHAR(20) DEFAULT 'PENDING' COMMENT '状态：PENDING-待审核，APPROVED-已通过，REJECTED-已拒绝',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Review ID',
+  `user_id` BIGINT NOT NULL COMMENT 'User ID',
+  `prod_id` BIGINT NOT NULL COMMENT 'Product ID',
+  `order_id` BIGINT COMMENT 'Order ID',
+  `rating` INT NOT NULL COMMENT 'Rating: 1-5 stars',
+  `content` TEXT COMMENT 'Review content',
+  `images` TEXT COMMENT 'Review images (JSON array)',
+  `verified` TINYINT(1) DEFAULT 0 COMMENT 'Purchase verified: 0-no, 1-yes',
+  `status` VARCHAR(20) DEFAULT 'PENDING' COMMENT 'Status: PENDING-review, APPROVED-approved, REJECTED-rejected',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_prod_id` (`prod_id`),
@@ -189,54 +189,54 @@ CREATE TABLE `product_reviews` (
   KEY `idx_create_date` (`create_date`),
   CONSTRAINT `fk_reviews_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_reviews_product` FOREIGN KEY (`prod_id`) REFERENCES `products` (`prod_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='产品评价表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Product reviews table';
 
 -- ============================================
--- 8. 产品溯源表 (product_trackability)
+-- 8. Product traceability table (product_trackability)
 -- ============================================
 DROP TABLE IF EXISTS `product_trackability`;
 CREATE TABLE `product_trackability` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '溯源ID',
-  `prod_id` BIGINT NOT NULL COMMENT '产品ID',
-  `origin` VARCHAR(100) COMMENT '产地',
-  `planting_method` VARCHAR(100) COMMENT '种植方式',
-  `picking_date` DATE COMMENT '采摘日期',
-  `proc_date` DATE COMMENT '加工日期',
-  `certification` VARCHAR(255) COMMENT '认证信息',
-  `description` TEXT COMMENT '溯源描述',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Traceability ID',
+  `prod_id` BIGINT NOT NULL COMMENT 'Product ID',
+  `origin` VARCHAR(100) COMMENT 'Origin',
+  `planting_method` VARCHAR(100) COMMENT 'Planting method',
+  `picking_date` DATE COMMENT 'Picking date',
+  `proc_date` DATE COMMENT 'Processing date',
+  `certification` VARCHAR(255) COMMENT 'Certification info',
+  `description` TEXT COMMENT 'Traceability description',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_prod_id` (`prod_id`),
   CONSTRAINT `fk_trackability_product` FOREIGN KEY (`prod_id`) REFERENCES `products` (`prod_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='产品溯源表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Product traceability table';
 
 -- ============================================
--- 9. 订单表 (orders)
+-- 9. Orders table (orders)
 -- ============================================
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单ID',
-  `order_no` VARCHAR(50) NOT NULL COMMENT '订单号',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `merch_id` BIGINT NOT NULL COMMENT '商家ID',
-  `order_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '下单时间',
-  `total_price` DECIMAL(10, 2) NOT NULL COMMENT '订单总价',
-  `discount_amount` DECIMAL(10, 2) DEFAULT 0.00 COMMENT '优惠金额',
-  `actual_price` DECIMAL(10, 2) NOT NULL COMMENT '实付金额',
-  `address` VARCHAR(255) NOT NULL COMMENT '收货地址',
-  `receiver_name` VARCHAR(50) NOT NULL COMMENT '收货人姓名',
-  `receiver_phone` VARCHAR(20) NOT NULL COMMENT '收货人电话',
-  `payment_status` VARCHAR(20) DEFAULT 'UNPAID' COMMENT '支付状态：UNPAID-未支付，PAID-已支付，REFUNDED-已退款',
-  `payment_time` DATETIME COMMENT '支付时间',
-  `payment_method` VARCHAR(20) COMMENT '支付方式：ALIPAY-支付宝，WECHAT-微信，BALANCE-余额',
-  `status` VARCHAR(20) DEFAULT 'PENDING' COMMENT '订单状态：PENDING-待支付，PROCESSING-处理中，SHIPPED-已发货，COMPLETED-已完成，CANCELLED-已取消',
-  `delivery_time` DATETIME COMMENT '发货时间',
-  `completion_time` DATETIME COMMENT '完成时间',
-  `cancel_reason` VARCHAR(255) COMMENT '取消原因',
-  `remark` VARCHAR(255) COMMENT '订单备注',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Order ID',
+  `order_no` VARCHAR(50) NOT NULL COMMENT 'Order number',
+  `user_id` BIGINT NOT NULL COMMENT 'User ID',
+  `merch_id` BIGINT NOT NULL COMMENT 'Merchant ID',
+  `order_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Order time',
+  `total_price` DECIMAL(10, 2) NOT NULL COMMENT 'Order total',
+  `discount_amount` DECIMAL(10, 2) DEFAULT 0.00 COMMENT 'Discount amount',
+  `actual_price` DECIMAL(10, 2) NOT NULL COMMENT 'Amount paid',
+  `address` VARCHAR(255) NOT NULL COMMENT 'Shipping address',
+  `receiver_name` VARCHAR(50) NOT NULL COMMENT 'Receiver name',
+  `receiver_phone` VARCHAR(20) NOT NULL COMMENT 'Receiver phone',
+  `payment_status` VARCHAR(20) DEFAULT 'UNPAID' COMMENT 'Payment status: UNPAID, PAID, REFUNDED',
+  `payment_time` DATETIME COMMENT 'Payment time',
+  `payment_method` VARCHAR(20) COMMENT 'Payment method: ALIPAY, WECHAT, BALANCE',
+  `status` VARCHAR(20) DEFAULT 'PENDING' COMMENT 'Order status: PENDING, PROCESSING, SHIPPED, COMPLETED, CANCELLED',
+  `delivery_time` DATETIME COMMENT 'Delivery time',
+  `completion_time` DATETIME COMMENT 'Completion time',
+  `cancel_reason` VARCHAR(255) COMMENT 'Cancellation reason',
+  `remark` VARCHAR(255) COMMENT 'Order remark',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_order_no` (`order_no`),
   KEY `idx_user_id` (`user_id`),
@@ -246,109 +246,109 @@ CREATE TABLE `orders` (
   KEY `idx_order_date` (`order_date`),
   CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`),
   CONSTRAINT `fk_orders_merchant` FOREIGN KEY (`merch_id`) REFERENCES `merchants` (`merch_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Orders table';
 
 -- ============================================
--- 10. 订单项表 (order_items)
+-- 10. Order items table (order_items)
 -- ============================================
 DROP TABLE IF EXISTS `order_items`;
 CREATE TABLE `order_items` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单项ID',
-  `order_id` BIGINT NOT NULL COMMENT '订单ID',
-  `prod_id` BIGINT NOT NULL COMMENT '产品ID',
-  `name` VARCHAR(100) NOT NULL COMMENT '产品名称',
-  `main_image` VARCHAR(255) COMMENT '产品图片',
-  `quantity` INT NOT NULL COMMENT '购买数量',
-  `unit_price` DECIMAL(10, 2) NOT NULL COMMENT '单价',
-  `total_price` DECIMAL(10, 2) NOT NULL COMMENT '小计',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Order item ID',
+  `order_id` BIGINT NOT NULL COMMENT 'Order ID',
+  `prod_id` BIGINT NOT NULL COMMENT 'Product ID',
+  `name` VARCHAR(100) NOT NULL COMMENT 'Product name',
+  `main_image` VARCHAR(255) COMMENT 'Product image',
+  `quantity` INT NOT NULL COMMENT 'Quantity',
+  `unit_price` DECIMAL(10, 2) NOT NULL COMMENT 'Unit price',
+  `total_price` DECIMAL(10, 2) NOT NULL COMMENT 'Subtotal',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
   PRIMARY KEY (`id`),
   KEY `idx_order_id` (`order_id`),
   KEY `idx_prod_id` (`prod_id`),
   CONSTRAINT `fk_order_items_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_order_items_product` FOREIGN KEY (`prod_id`) REFERENCES `products` (`prod_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单项表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Order items table';
 
 -- ============================================
--- 11. 购物车表 (shopping_cart)
+-- 11. Shopping cart table (shopping_cart)
 -- ============================================
 DROP TABLE IF EXISTS `shopping_cart`;
 CREATE TABLE `shopping_cart` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '购物车ID',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `prod_id` BIGINT NOT NULL COMMENT '产品ID',
-  `quantity` INT NOT NULL DEFAULT 1 COMMENT '商品数量',
-  `selected` TINYINT(1) DEFAULT 1 COMMENT '是否选中：0-未选中，1-已选中',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '添加时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Cart ID',
+  `user_id` BIGINT NOT NULL COMMENT 'User ID',
+  `prod_id` BIGINT NOT NULL COMMENT 'Product ID',
+  `quantity` INT NOT NULL DEFAULT 1 COMMENT 'Quantity',
+  `selected` TINYINT(1) DEFAULT 1 COMMENT 'Selected: 0-no, 1-yes',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Added at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_prod` (`user_id`, `prod_id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_prod_id` (`prod_id`),
   CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_cart_product` FOREIGN KEY (`prod_id`) REFERENCES `products` (`prod_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='购物车表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Shopping cart table';
 
 -- ============================================
--- 12. 优惠券表 (coupons)
+-- 12. Coupons table (coupons)
 -- ============================================
 DROP TABLE IF EXISTS `coupons`;
 CREATE TABLE `coupons` (
-  `coupon_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '优惠券ID',
-  `merch_id` BIGINT COMMENT '商家ID，NULL表示平台优惠券',
-  `name` VARCHAR(100) NOT NULL COMMENT '优惠券名称',
-  `type` VARCHAR(20) NOT NULL COMMENT '优惠券类型：DISCOUNT-折扣券，FULL_REDUCTION-满减券，FIXED_AMOUNT-固定金额券',
-  `value` DECIMAL(10, 2) NOT NULL COMMENT '优惠值（折扣比例或金额）',
-  `min_price` DECIMAL(10, 2) DEFAULT 0.00 COMMENT '最低消费金额',
-  `total_quantity` INT NOT NULL COMMENT '发放总数量',
-  `received_quantity` INT DEFAULT 0 COMMENT '已领取数量',
-  `start_date` DATETIME NOT NULL COMMENT '有效期开始',
-  `end_date` DATETIME NOT NULL COMMENT '有效期结束',
-  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT '状态：ACTIVE-激活，INACTIVE-未激活，EXPIRED-已过期',
-  `description` VARCHAR(255) COMMENT '优惠券描述',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `coupon_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Coupon ID',
+  `merch_id` BIGINT COMMENT 'Merchant ID; NULL indicates platform coupon',
+  `name` VARCHAR(100) NOT NULL COMMENT 'Coupon name',
+  `type` VARCHAR(20) NOT NULL COMMENT 'Coupon type: DISCOUNT, FULL_REDUCTION, FIXED_AMOUNT',
+  `value` DECIMAL(10, 2) NOT NULL COMMENT 'Discount value (percentage or amount)',
+  `min_price` DECIMAL(10, 2) DEFAULT 0.00 COMMENT 'Minimum spend',
+  `total_quantity` INT NOT NULL COMMENT 'Total quantity issued',
+  `received_quantity` INT DEFAULT 0 COMMENT 'Quantity received',
+  `start_date` DATETIME NOT NULL COMMENT 'Valid from',
+  `end_date` DATETIME NOT NULL COMMENT 'Valid to',
+  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT 'Status: ACTIVE, INACTIVE, EXPIRED',
+  `description` VARCHAR(255) COMMENT 'Coupon description',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`coupon_id`),
   KEY `idx_merch_id` (`merch_id`),
   KEY `idx_type` (`type`),
   KEY `idx_status` (`status`),
   KEY `idx_date_range` (`start_date`, `end_date`),
   CONSTRAINT `fk_coupons_merchant` FOREIGN KEY (`merch_id`) REFERENCES `merchants` (`merch_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='优惠券表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Coupons table';
 
 -- ============================================
--- 13. 优惠券券码表 (coupon_coupons)
+-- 13. Coupon codes table (coupon_coupons)
 -- ============================================
 DROP TABLE IF EXISTS `coupon_coupons`;
 CREATE TABLE `coupon_coupons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `coupon_id` BIGINT NOT NULL COMMENT '优惠券ID',
-  `code` VARCHAR(50) NOT NULL COMMENT '券码',
-  `user_id` BIGINT COMMENT '使用用户ID',
-  `used` TINYINT(1) DEFAULT 0 COMMENT '是否已使用：0-未使用，1-已使用',
-  `used_date` DATETIME COMMENT '使用时间',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `coupon_id` BIGINT NOT NULL COMMENT 'Coupon ID',
+  `code` VARCHAR(50) NOT NULL COMMENT 'Coupon code',
+  `user_id` BIGINT COMMENT 'Redeeming user ID',
+  `used` TINYINT(1) DEFAULT 0 COMMENT 'Used: 0-no, 1-yes',
+  `used_date` DATETIME COMMENT 'Used at',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_code` (`code`),
   KEY `idx_coupon_id` (`coupon_id`),
   KEY `idx_user_id` (`user_id`),
   CONSTRAINT `fk_coupon_codes_coupon` FOREIGN KEY (`coupon_id`) REFERENCES `coupons` (`coupon_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_coupon_codes_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='优惠券券码表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Coupon codes table';
 
 -- ============================================
--- 14. 用户优惠券表 (customer_coupons)
+-- 14. Customer coupons table (customer_coupons)
 -- ============================================
 DROP TABLE IF EXISTS `customer_coupons`;
 CREATE TABLE `customer_coupons` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `coupon_id` BIGINT NOT NULL COMMENT '优惠券ID',
-  `code` VARCHAR(50) COMMENT '券码',
-  `status` VARCHAR(20) DEFAULT 'UNUSED' COMMENT '状态：UNUSED-未使用，USED-已使用，EXPIRED-已过期',
-  `receive_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '领取时间',
-  `used_date` DATETIME COMMENT '使用时间',
-  `order_id` BIGINT COMMENT '使用的订单ID',
+  `user_id` BIGINT NOT NULL COMMENT 'User ID',
+  `coupon_id` BIGINT NOT NULL COMMENT 'Coupon ID',
+  `code` VARCHAR(50) COMMENT 'Coupon code',
+  `status` VARCHAR(20) DEFAULT 'UNUSED' COMMENT 'Status: UNUSED, USED, EXPIRED',
+  `receive_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Received at',
+  `used_date` DATETIME COMMENT 'Used at',
+  `order_id` BIGINT COMMENT 'Order ID where used',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_coupon_id` (`coupon_id`),
@@ -356,73 +356,73 @@ CREATE TABLE `customer_coupons` (
   CONSTRAINT `fk_customer_coupons_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_customer_coupons_coupon` FOREIGN KEY (`coupon_id`) REFERENCES `coupons` (`coupon_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_customer_coupons_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户优惠券表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Customer coupons table';
 
 -- ============================================
--- 15. 签到表 (check_ins)
+-- 15. Check-in table (check_ins)
 -- ============================================
 DROP TABLE IF EXISTS `check_ins`;
 CREATE TABLE `check_ins` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '签到ID',
-  `user_id` BIGINT NOT NULL COMMENT '用户ID',
-  `check_date` DATE NOT NULL COMMENT '签到日期',
-  `continuous_days` INT DEFAULT 1 COMMENT '连续签到天数',
-  `reward_points` INT DEFAULT 0 COMMENT '奖励积分',
-  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '签到时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Check-in ID',
+  `user_id` BIGINT NOT NULL COMMENT 'User ID',
+  `check_date` DATE NOT NULL COMMENT 'Check-in date',
+  `continuous_days` INT DEFAULT 1 COMMENT 'Consecutive check-in days',
+  `reward_points` INT DEFAULT 0 COMMENT 'Reward points',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Check-in timestamp',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_date` (`user_id`, `check_date`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_check_date` (`check_date`),
   CONSTRAINT `fk_checkins_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='签到表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Check-ins table';
 
 -- ============================================
--- 16. 养护知识表 (care_knowledge)
+-- 16. Care knowledge table (care_knowledge)
 -- ============================================
 DROP TABLE IF EXISTS `care_knowledge`;
 CREATE TABLE `care_knowledge` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '知识ID',
-  `title` VARCHAR(100) NOT NULL COMMENT '标题',
-  `content` TEXT NOT NULL COMMENT '内容',
-  `keywords` VARCHAR(255) COMMENT '关键词',
-  `cover_image` VARCHAR(255) COMMENT '封面图片',
-  `category` VARCHAR(50) COMMENT '分类',
-  `author` VARCHAR(50) COMMENT '作者',
-  `view_count` INT DEFAULT 0 COMMENT '浏览次数',
-  `status` VARCHAR(20) DEFAULT 'PUBLISHED' COMMENT '状态：DRAFT-草稿，PUBLISHED-已发布',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Article ID',
+  `title` VARCHAR(100) NOT NULL COMMENT 'Title',
+  `content` TEXT NOT NULL COMMENT 'Content',
+  `keywords` VARCHAR(255) COMMENT 'Keywords',
+  `cover_image` VARCHAR(255) COMMENT 'Cover image',
+  `category` VARCHAR(50) COMMENT 'Category',
+  `author` VARCHAR(50) COMMENT 'Author',
+  `view_count` INT DEFAULT 0 COMMENT 'View count',
+  `status` VARCHAR(20) DEFAULT 'PUBLISHED' COMMENT 'Status: DRAFT or PUBLISHED',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`id`),
   KEY `idx_category` (`category`),
   KEY `idx_status` (`status`),
   KEY `idx_create_date` (`create_date`),
   FULLTEXT KEY `ft_keywords` (`keywords`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='养护知识表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Care knowledge table';
 
 -- ============================================
--- 17. 系统配置表 (system_configuration)
+-- 17. System configuration table (system_configuration)
 -- ============================================
 DROP TABLE IF EXISTS `system_configuration`;
 CREATE TABLE `system_configuration` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '配置ID',
-  `config_key` VARCHAR(100) NOT NULL COMMENT '配置键',
-  `config_value` TEXT NOT NULL COMMENT '配置值',
-  `description` VARCHAR(255) COMMENT '配置描述',
-  `category` VARCHAR(50) COMMENT '配置分类',
-  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Config ID',
+  `config_key` VARCHAR(100) NOT NULL COMMENT 'Config key',
+  `config_value` TEXT NOT NULL COMMENT 'Config value',
+  `description` VARCHAR(255) COMMENT 'Config description',
+  `category` VARCHAR(50) COMMENT 'Config category',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_config_key` (`config_key`),
   KEY `idx_category` (`category`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='System configuration table';
 
 
 
 -- ============================================
--- 创建视图（可选）
+-- Create views (optional)
 -- ============================================
 
--- 产品统计视图
+-- Product statistics view
 CREATE OR REPLACE VIEW `v_product_statistics` AS
 SELECT 
     p.prod_id,
@@ -438,7 +438,7 @@ LEFT JOIN product_favorites pf ON p.prod_id = pf.prod_id
 LEFT JOIN product_reviews pr ON p.prod_id = pr.prod_id AND pr.status = 'APPROVED'
 GROUP BY p.prod_id;
 
--- 商家销售统计视图
+-- Merchant sales statistics view
 CREATE OR REPLACE VIEW `v_merchant_sales_statistics` AS
 SELECT 
     m.merch_id,
@@ -452,17 +452,17 @@ LEFT JOIN products p ON m.merch_id = p.merch_id AND p.status = 'ACTIVE'
 GROUP BY m.merch_id;
 
 -- ============================================
--- 创建索引优化（额外的复合索引）
+-- Create additional compound indexes for optimization
 -- ============================================
 
--- 订单查询优化
+-- Order query optimization
 CREATE INDEX idx_orders_user_status ON orders(user_id, status);
 CREATE INDEX idx_orders_merch_status ON orders(merch_id, status);
 
--- 产品查询优化
+-- Product query optimization
 CREATE INDEX idx_products_cat_status ON products(cat_id, status);
 CREATE INDEX idx_products_status_sales ON products(status, sales DESC);
 
 -- ============================================
--- 完成
+-- Done
 -- ============================================

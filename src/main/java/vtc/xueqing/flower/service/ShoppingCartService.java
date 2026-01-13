@@ -8,47 +8,47 @@ import vtc.xueqing.flower.vo.ShoppingCartVO;
 import java.util.List;
 
 /**
- * 购物车服务接口
+ * Shopping cart service interface.
  */
 public interface ShoppingCartService {
     
     /**
-     * 获取用户的购物车列表（包含商品信息）
-     * @param userId 用户ID
-     * @return 购物车列表
+     * Get user's shopping cart list (including product info).
+     * @param userId user ID
+     * @return shopping cart list
      */
     List<ShoppingCartVO> getCartByUserId(Long userId);
     
     /**
-     * 添加商品到购物车（如果已存在则增加数量）
-     * @param shoppingCart 购物车信息
-     * @return 购物车项
+     * Add product to cart (increase quantity if exists).
+     * @param shoppingCart cart info
+     * @return cart item
      */
     ShoppingCart addToCart(ShoppingCart shoppingCart);
     
     /**
-     * 更新购物车商品数量
-     * @param cartId 购物车ID
-     * @param quantity 新数量
-     * @return 更新后的购物车项
+     * Update quantity of a cart item.
+     * @param cartId cart ID
+     * @param quantity new quantity
+     * @return updated cart item
      */
     ShoppingCart updateCartQuantity(Long cartId, Integer quantity);
     
     /**
-     * 删除购物车商品
-     * @param cartId 购物车ID
+     * Delete a cart item.
+     * @param cartId cart ID
      */
     void deleteCartItem(Long cartId);
     
     /**
-     * 清空用户购物车
-     * @param userId 用户ID
+     * Clear a user's cart.
+     * @param userId user ID
      */
     void clearCart(Long userId);
     
     /**
-     * 批量删除购物车商品
-     * @param cartIds 购物车ID列表
+     * Batch delete cart items.
+     * @param cartIds cart ID list
      */
     void batchDeleteCartItems(List<Long> cartIds);
 }

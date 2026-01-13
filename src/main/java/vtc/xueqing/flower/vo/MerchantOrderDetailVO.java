@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 商家端订单详情视图
+ * Merchant-side order detail view.
  */
 @Data
 public class MerchantOrderDetailVO implements Serializable {

@@ -12,7 +12,7 @@ import vtc.xueqing.flower.service.ProductTrackabilityService;
 import javax.annotation.Resource;
 
 /**
- * 产品溯源服务实现类
+ * Product traceability service implementation.
  */
 @Service
 public class ProductTrackabilityServiceImpl implements ProductTrackabilityService {
@@ -30,7 +30,7 @@ public class ProductTrackabilityServiceImpl implements ProductTrackabilityServic
         
         ProductTrackability trackability = productTrackabilityMapper.selectOne(wrapper);
         if (trackability == null) {
-            throw new RuntimeException("该产品暂无溯源信息");
+            throw new RuntimeException("No traceability information available for this product");
         }
         
         return trackability;
@@ -39,23 +39,23 @@ public class ProductTrackabilityServiceImpl implements ProductTrackabilityServic
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ProductTrackability saveOrUpdate(ProductTrackability productTrackability) {
-        // 1. 检查产品是否存在
+        // 1. Check whether the product exists
         Product product = productMapper.selectById(productTrackability.getProdId());
         if (product == null) {
-            throw new RuntimeException("产品不存在");
+            throw new RuntimeException("Product does not exist");
         }
         
-        // 2. 检查是否已存在溯源信息
+        // 2. Check whether traceability info already exists
         LambdaQueryWrapper<ProductTrackability> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(ProductTrackability::getProdId, productTrackability.getProdId());
         ProductTrackability existing = productTrackabilityMapper.selectOne(wrapper);
         
         if (existing != null) {
-            // 更新
+            // Update existing record
             productTrackability.setId(existing.getId());
             productTrackabilityMapper.updateById(productTrackability);
         } else {
-            // 新增
+            // Insert new record
             productTrackabilityMapper.insert(productTrackability);
         }
         
@@ -70,7 +70,7 @@ public class ProductTrackabilityServiceImpl implements ProductTrackabilityServic
         
         int deleted = productTrackabilityMapper.delete(wrapper);
         if (deleted == 0) {
-            throw new RuntimeException("溯源信息不存在");
+            throw new RuntimeException("Traceability record does not exist");
         }
     }
 }
