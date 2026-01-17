@@ -17,9 +17,9 @@ import vtc.xueqing.flower.vo.ParentOrderCreateResult;
 import javax.annotation.Resource;
 
 /**
- * 订单控制器
+ * Order Controller
  */
-@Api(tags = "订单管理")
+@Api(tags = "Order Management")
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -27,7 +27,7 @@ public class OrderController {
     @Resource
     private OrderService orderService;
     
-    @ApiOperation("创建订单")
+    @ApiOperation("Create Order")
     @PostMapping
     public Result<ParentOrderCreateResult> createOrder(@RequestBody OrderCreateRequest request) {
         try {
@@ -38,14 +38,14 @@ public class OrderController {
         }
     }
     
-    @ApiOperation("获取订单列表（分页）")
+    @ApiOperation("Get Order List (Pagination)")
     @GetMapping
     public Result<IPage<OrderVO>> getOrderList(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("用户ID") @RequestParam(required = false) Long userId,
-            @ApiParam("商家ID") @RequestParam(required = false) Long merchId,
-            @ApiParam("订单状态") @RequestParam(required = false) String status
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("User ID") @RequestParam(required = false) Long userId,
+            @ApiParam("Merchant ID") @RequestParam(required = false) Long merchId,
+            @ApiParam("Order Status") @RequestParam(required = false) String status
     ) {
         try {
             Page<Order> page = new Page<>(current, size);
@@ -56,7 +56,7 @@ public class OrderController {
         }
     }
     
-    @ApiOperation("获取订单详情")
+    @ApiOperation("Get Order Details")
     @GetMapping("/{id}")
     public Result<OrderDetailVO> getOrderById(@PathVariable("id") Long id) {
         try {
@@ -67,11 +67,11 @@ public class OrderController {
         }
     }
     
-    @ApiOperation("支付订单")
+    @ApiOperation("Pay Order")
     @PutMapping("/{id}/pay")
     public Result<Order> payOrder(
             @PathVariable("id") Long id,
-            @ApiParam("支付方式：ALIPAY-支付宝，WECHAT-微信，BALANCE-余额") @RequestParam String paymentMethod
+            @ApiParam("Payment Method: ALIPAY-Alipay, WECHAT-WeChat, BALANCE-Balance") @RequestParam String paymentMethod
     ) {
         try {
             Order order = orderService.payOrder(id, paymentMethod);
@@ -81,11 +81,11 @@ public class OrderController {
         }
     }
     
-    @ApiOperation("取消订单")
+    @ApiOperation("Cancel Order")
     @PutMapping("/{id}/cancel")
     public Result<Order> cancelOrder(
             @PathVariable("id") Long id,
-            @ApiParam("取消原因") @RequestParam(required = false) String cancelReason
+            @ApiParam("Cancellation Reason") @RequestParam(required = false) String cancelReason
     ) {
         try {
             Order order = orderService.cancelOrder(id, cancelReason);
@@ -95,7 +95,7 @@ public class OrderController {
         }
     }
     
-    @ApiOperation("确认收货")
+    @ApiOperation("Confirm Receipt")
     @PutMapping("/{id}/confirm")
     public Result<Order> confirmOrder(@PathVariable("id") Long id) {
         try {
@@ -106,7 +106,7 @@ public class OrderController {
         }
     }
     
-    @ApiOperation("商家发货")
+    @ApiOperation("Merchant Ship Order")
     @PutMapping("/{id}/ship")
     public Result<Order> shipOrder(@PathVariable("id") Long id) {
         try {

@@ -58,11 +58,11 @@ public class ProductController {
     @ApiOperation("Query Product List with Pagination")
     @GetMapping
     public Result<Page<Product>> getProductPage(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Long current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Long size,
-            @ApiParam("分类ID") @RequestParam(required = false) Long catId,
-            @ApiParam("商家ID") @RequestParam(required = false) Long merchId,
-            @ApiParam("关键词") @RequestParam(required = false) String keyword
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Long current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Long size,
+            @ApiParam("Category ID") @RequestParam(required = false) Long catId,
+            @ApiParam("Merchant ID") @RequestParam(required = false) Long merchId,
+            @ApiParam("Keyword") @RequestParam(required = false) String keyword
     ) {
         Page<Product> page = productService.getProductPage(current, size, catId, merchId, keyword);
         return Result.success(page);

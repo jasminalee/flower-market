@@ -12,10 +12,10 @@ import vtc.xueqing.flower.service.CustomerService;
 import javax.annotation.Resource;
 
 /**
- * 顾客Controller
+ * Customer Controller
  */
 @Slf4j
-@Api(tags = "顾客管理接口")
+@Api(tags = "Customer Management Interface")
 @RestController
 @RequestMapping("/api/customer")
 public class CustomerController {
@@ -23,39 +23,39 @@ public class CustomerController {
     @Resource
     private CustomerService customerService;
 
-    @ApiOperation("顾客注册")
+    @ApiOperation("Customer Registration")
     @PostMapping("/register")
     public Result<Customer> register(@Validated @RequestBody Customer customer) {
         Customer result = customerService.register(customer);
-        return Result.success("注册成功", result);
+        return Result.success("Registration Successful", result);
     }
 
-    @ApiOperation("顾客登录")
+    @ApiOperation("Customer Login")
     @PostMapping("/login")
     public Result<Customer> login(@Validated @RequestBody Customer login) {
         Customer customer = customerService.login(login);
-        return Result.success("登录成功", customer);
+        return Result.success("Login Successful", customer);
     }
 
-    @ApiOperation("获取个人信息")
+    @ApiOperation("Get Personal Profile")
     @GetMapping("/profile/{userId}")
     public Result<Customer> getProfile(@PathVariable Long userId) {
         Customer customer = customerService.getCustomerById(userId);
         return Result.success(customer);
     }
     
-    @ApiOperation("更新个人信息")
+    @ApiOperation("Update Personal Profile")
     @PutMapping("/profile")
     public Result<Customer> updateProfile(@RequestBody Customer customer) {
         try {
             Customer updated = customerService.updateCustomer(customer);
-            return Result.success("更新成功", updated);
+            return Result.success("Update Successful", updated);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
     
-    @ApiOperation("查询余额")
+    @ApiOperation("Query Balance")
     @GetMapping("/balance")
     public Result<java.math.BigDecimal> getBalance(@RequestParam Long userId) {
         try {
@@ -66,7 +66,7 @@ public class CustomerController {
         }
     }
     
-    @ApiOperation("余额充值")
+    @ApiOperation("Balance Recharge")
     @PostMapping("/balance/recharge")
     public Result<java.util.Map<String, Object>> recharge(@RequestBody java.util.Map<String, Object> params) {
         try {
@@ -79,13 +79,13 @@ public class CustomerController {
             java.util.Map<String, Object> result = new java.util.HashMap<>();
             result.put("balance", newBalance);
             
-            return Result.success("充值成功", result);
+            return Result.success("Recharge Successful", result);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
     
-    @ApiOperation("查询余额明细")
+    @ApiOperation("Query Balance Details")
     @GetMapping("/balance/history")
     public Result<com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>>> getBalanceHistory(
             @RequestParam Long userId,

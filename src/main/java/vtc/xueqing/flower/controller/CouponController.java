@@ -15,9 +15,9 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 优惠券控制器
+ * Coupon Controller
  */
-@Api(tags = "优惠券管理")
+@Api(tags = "Coupon Management")
 @RestController
 @RequestMapping("/api/coupons")
 public class CouponController {
@@ -25,12 +25,12 @@ public class CouponController {
     @Resource
     private CouponService couponService;
     
-    @ApiOperation("获取可用优惠券列表（分页）")
+    @ApiOperation("Get Available Coupons List (Pagination)")
     @GetMapping
     public Result<IPage<Coupon>> getAvailableCoupons(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("商家ID") @RequestParam(required = false) Long merchId
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Merchant ID") @RequestParam(required = false) Long merchId
     ) {
         try {
             Page<Coupon> page = new Page<>(current, size);
@@ -41,7 +41,7 @@ public class CouponController {
         }
     }
     
-    @ApiOperation("用户领取优惠券")
+    @ApiOperation("User Receives Coupon")
     @PostMapping("/{id}/receive")
     public Result<CustomerCoupon> receiveCoupon(
             @PathVariable("id") Long id,
@@ -55,11 +55,11 @@ public class CouponController {
         }
     }
     
-    @ApiOperation("获取用户的优惠券列表")
+    @ApiOperation("Get User's Coupons List")
     @GetMapping("/my")
     public Result<List<vtc.xueqing.flower.vo.CustomerCouponVO>> getUserCoupons(
             @ApiParam("用户ID") @RequestParam Long userId,
-            @ApiParam("状态：UNUSED-未使用，USED-已使用，EXPIRED-已过期") @RequestParam(required = false) String status
+            @ApiParam("Status: UNUSED-unused, USED-used, EXPIRED-expired") @RequestParam(required = false) String status
     ) {
         try {
             List<vtc.xueqing.flower.vo.CustomerCouponVO> customerCoupons = couponService.getUserCoupons(userId, status);
@@ -69,7 +69,7 @@ public class CouponController {
         }
     }
     
-    @ApiOperation("创建优惠券（商家/管理员）")
+    @ApiOperation("Create Coupon (Merchant/Admin)")
     @PostMapping
     public Result<Coupon> createCoupon(@RequestBody Coupon coupon) {
         try {

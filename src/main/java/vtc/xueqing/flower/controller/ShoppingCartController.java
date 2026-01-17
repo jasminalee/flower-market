@@ -13,9 +13,9 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 购物车控制器
+ * Shopping Cart Controller
  */
-@Api(tags = "购物车管理")
+@Api(tags = "Shopping Cart Management")
 @RestController
 @RequestMapping("/api/cart")
 public class ShoppingCartController {
@@ -23,9 +23,9 @@ public class ShoppingCartController {
     @Resource
     private ShoppingCartService shoppingCartService;
     
-    @ApiOperation("获取用户购物车列表")
+    @ApiOperation("Get User Shopping Cart List")
     @GetMapping
-    public Result<List<ShoppingCartVO>> getCart(@ApiParam("用户ID") @RequestParam Long userId) {
+    public Result<List<ShoppingCartVO>> getCart(@ApiParam("User ID") @RequestParam Long userId) {
         try {
             List<ShoppingCartVO> cartList = shoppingCartService.getCartByUserId(userId);
             return Result.success(cartList);
@@ -34,7 +34,7 @@ public class ShoppingCartController {
         }
     }
     
-    @ApiOperation("添加商品到购物车")
+    @ApiOperation("Add Item to Shopping Cart")
     @PostMapping("/items")
     public Result<ShoppingCart> addToCart(@RequestBody ShoppingCart shoppingCart) {
         try {
@@ -45,11 +45,11 @@ public class ShoppingCartController {
         }
     }
     
-    @ApiOperation("更新购物车商品数量")
+    @ApiOperation("Update Shopping Cart Item Quantity")
     @PutMapping("/items/{id}")
     public Result<ShoppingCart> updateCartQuantity(
             @PathVariable("id") Long id,
-            @ApiParam("新数量") @RequestParam Integer quantity
+            @ApiParam("New Quantity") @RequestParam Integer quantity
     ) {
         try {
             ShoppingCart cart = shoppingCartService.updateCartQuantity(id, quantity);
@@ -59,7 +59,7 @@ public class ShoppingCartController {
         }
     }
     
-    @ApiOperation("删除购物车商品")
+    @ApiOperation("Delete Shopping Cart Item")
     @DeleteMapping("/items/{id}")
     public Result<Void> deleteCartItem(@PathVariable("id") Long id) {
         try {
@@ -70,9 +70,9 @@ public class ShoppingCartController {
         }
     }
     
-    @ApiOperation("清空购物车")
+    @ApiOperation("Clear Shopping Cart")
     @DeleteMapping
-    public Result<Void> clearCart(@ApiParam("用户ID") @RequestParam Long userId) {
+    public Result<Void> clearCart(@ApiParam("User ID") @RequestParam Long userId) {
         try {
             shoppingCartService.clearCart(userId);
             return Result.success(null);
@@ -81,7 +81,7 @@ public class ShoppingCartController {
         }
     }
     
-    @ApiOperation("批量删除购物车商品")
+    @ApiOperation("Batch Delete Shopping Cart Items")
     @DeleteMapping("/items/batch")
     public Result<Void> batchDeleteCartItems(@RequestBody List<Long> cartIds) {
         try {
