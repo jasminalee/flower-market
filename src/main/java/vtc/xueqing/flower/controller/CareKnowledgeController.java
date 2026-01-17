@@ -13,9 +13,9 @@ import vtc.xueqing.flower.service.CareKnowledgeService;
 import javax.annotation.Resource;
 
 /**
- * 养护知识控制器
+ * Care Knowledge Controller
  */
-@Api(tags = "养护知识管理")
+@Api(tags = "Care Knowledge Management")
 @RestController
 @RequestMapping("/api/care-knowledge")
 public class CareKnowledgeController {
@@ -23,13 +23,13 @@ public class CareKnowledgeController {
     @Resource
     private CareKnowledgeService careKnowledgeService;
     
-    @ApiOperation("获取养护知识列表（分页）")
+    @ApiOperation("Get Care Knowledge List (Pagination)")
     @GetMapping
     public Result<IPage<CareKnowledge>> getCareKnowledgeList(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("分类") @RequestParam(required = false) String category,
-            @ApiParam("状态") @RequestParam(required = false) String status
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Category") @RequestParam(required = false) String category,
+            @ApiParam("Status") @RequestParam(required = false) String status
     ) {
         try {
             Page<CareKnowledge> page = new Page<>(current, size);
@@ -40,7 +40,7 @@ public class CareKnowledgeController {
         }
     }
     
-    @ApiOperation("获取养护知识详情")
+    @ApiOperation("Get Care Knowledge Details")
     @GetMapping("/{id}")
     public Result<CareKnowledge> getCareKnowledgeById(@PathVariable("id") Long id) {
         try {
@@ -51,7 +51,7 @@ public class CareKnowledgeController {
         }
     }
     
-    @ApiOperation("发布养护知识（管理员）")
+    @ApiOperation("Publish Care Knowledge (Admin)")
     @PostMapping
     public Result<CareKnowledge> createCareKnowledge(@RequestBody CareKnowledge careKnowledge) {
         try {
@@ -62,7 +62,7 @@ public class CareKnowledgeController {
         }
     }
     
-    @ApiOperation("更新养护知识（管理员）")
+    @ApiOperation("Update Care Knowledge (Admin)")
     @PutMapping("/{id}")
     public Result<CareKnowledge> updateCareKnowledge(
             @PathVariable("id") Long id,
@@ -77,7 +77,7 @@ public class CareKnowledgeController {
         }
     }
     
-    @ApiOperation("删除养护知识（管理员）")
+    @ApiOperation("Delete Care Knowledge (Admin)")
     @DeleteMapping("/{id}")
     public Result<Void> deleteCareKnowledge(@PathVariable("id") Long id) {
         try {

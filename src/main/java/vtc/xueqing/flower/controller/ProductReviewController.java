@@ -13,9 +13,9 @@ import vtc.xueqing.flower.service.ProductReviewService;
 import javax.annotation.Resource;
 
 /**
- * 产品评价控制器
+ * Product Review Controller
  */
-@Api(tags = "产品评价管理")
+@Api(tags = "Product Review Management")
 @RestController
 @RequestMapping("/api/products")
 public class ProductReviewController {
@@ -23,7 +23,7 @@ public class ProductReviewController {
     @Resource
     private ProductReviewService productReviewService;
     
-    @ApiOperation("发布评价")
+    @ApiOperation("Submit Review")
     @PostMapping("/{id}/review")
     public Result<ProductReview> addReview(
             @PathVariable("id") Long prodId,
@@ -38,13 +38,13 @@ public class ProductReviewController {
         }
     }
     
-    @ApiOperation("获取商品评价列表（分页）")
+    @ApiOperation("Get Product Reviews List (Pagination)")
     @GetMapping("/{id}/reviews")
     public Result<IPage<ProductReview>> getProductReviews(
             @PathVariable("id") Long prodId,
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("评分筛选") @RequestParam(required = false) Integer rating
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Rating Filter") @RequestParam(required = false) Integer rating
     ) {
         try {
             Page<ProductReview> page = new Page<>(current, size);
@@ -55,11 +55,11 @@ public class ProductReviewController {
         }
     }
     
-    @ApiOperation("审核评价（管理员）")
+    @ApiOperation("Review Approval (Admin)")
     @PutMapping("/reviews/{id}/approval")
     public Result<ProductReview> reviewApproval(
             @PathVariable("id") Long reviewId,
-            @ApiParam("审核状态：APPROVED-已通过，REJECTED-已拒绝") @RequestParam String status
+            @ApiParam("Review Status: APPROVED-approved, REJECTED-rejected") @RequestParam String status
     ) {
         try {
             ProductReview review = productReviewService.reviewApproval(reviewId, status);

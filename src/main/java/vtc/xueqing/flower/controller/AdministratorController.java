@@ -20,9 +20,9 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 /**
- * 管理员控制器
+ * Administrator Controller
  */
-@Api(tags = "管理员管理")
+@Api(tags = "Administrator Management")
 @RestController
 @RequestMapping("/api/admin")
 public class AdministratorController {
@@ -33,7 +33,7 @@ public class AdministratorController {
     @Resource
     private ProductReviewService productReviewService;
     
-    @ApiOperation("管理员登录")
+    @ApiOperation("Administrator Login")
     @PostMapping("/login")
     public Result<Administrator> login(@RequestBody Map<String, String> loginData) {
         try {
@@ -41,11 +41,11 @@ public class AdministratorController {
             String password = loginData.get("password");
             
             if (email == null || email.isEmpty()) {
-                return Result.error("邮箱不能为空");
+                return Result.error("Email cannot be empty");
             }
             
             if (password == null || password.isEmpty()) {
-                return Result.error("密码不能为空");
+                return Result.error("Password cannot be empty");
             }
             
             Administrator admin = administratorService.login(email, password);
@@ -55,7 +55,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取管理后台仪表板数据")
+    @ApiOperation("Get Admin Dashboard Data")
     @GetMapping("/dashboard")
     public Result<Map<String, Object>> getDashboardData() {
         try {
@@ -66,12 +66,12 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取顾客列表（分页）")
+    @ApiOperation("Get Customer List (Pagination)")
     @GetMapping("/customers")
     public Result<IPage<Customer>> getCustomerList(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("会员等级") @RequestParam(required = false) String level
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Membership Level") @RequestParam(required = false) String level
     ) {
         try {
             Page<Customer> page = new Page<>(current, size);
@@ -82,7 +82,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取顾客详情")
+    @ApiOperation("Get Customer Details")
     @GetMapping("/customers/{id}")
     public Result<Customer> getCustomerById(@PathVariable("id") Long userId) {
         try {
@@ -93,12 +93,12 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取商家列表（分页）")
+    @ApiOperation("Get Merchant List (Pagination)")
     @GetMapping("/merchants")
     public Result<IPage<Merchant>> getMerchantList(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("商家状态") @RequestParam(required = false) String status
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Merchant Status") @RequestParam(required = false) String status
     ) {
         try {
             Page<Merchant> page = new Page<>(current, size);
@@ -109,7 +109,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取商家详情")
+    @ApiOperation("Get Merchant Details")
     @GetMapping("/merchants/{id}")
     public Result<Merchant> getMerchantById(@PathVariable("id") Long merchId) {
         try {
@@ -120,11 +120,11 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("商家审核")
+    @ApiOperation("Merchant Verification")
     @PutMapping({"/merchants/{id}/verify", "/merchants/{id}/audit"})
     public Result<Merchant> verifyMerchant(
             @PathVariable("id") Long merchId,
-            @ApiParam("审核状态：ACTIVE-通过，REJECTED-拒绝，SUSPENDED-暂停") @RequestParam String status
+            @ApiParam("Verification Status: ACTIVE-approved, REJECTED-rejected, SUSPENDED-suspended") @RequestParam String status
     ) {
         try {
             Merchant merchant = administratorService.verifyMerchant(merchId, status);
@@ -134,11 +134,11 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("更新顾客会员等级")
+    @ApiOperation("Update Customer Membership Level")
     @PutMapping("/customers/{id}/level")
     public Result<Customer> updateCustomerLevel(
             @PathVariable("id") Long userId,
-            @ApiParam("会员等级：NORMAL, VIP, SVIP") @RequestParam String level
+            @ApiParam("Membership Level: NORMAL, VIP, SVIP") @RequestParam String level
     ) {
         try {
             Customer customer = administratorService.updateCustomerLevel(userId, level);
@@ -148,12 +148,12 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取所有评价列表（管理员）")
+    @ApiOperation("Get All Reviews List (Admin)")
     @GetMapping("/reviews")
     public Result<IPage<ProductReviewVO>> getAllReviews(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("审核状态") @RequestParam(required = false) String status
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Review Status") @RequestParam(required = false) String status
     ) {
         try {
             Page<ProductReviewVO> page = new Page<>(current, size);
@@ -164,13 +164,13 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取所有订单列表（管理员）")
+    @ApiOperation("Get All Orders List (Admin)")
     @GetMapping("/orders")
     public Result<IPage<vtc.xueqing.flower.vo.OrderVO>> getAllOrders(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("订单状态") @RequestParam(required = false) String status,
-            @ApiParam("搜索关键词") @RequestParam(required = false) String keyword
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Order Status") @RequestParam(required = false) String status,
+            @ApiParam("Search Keyword") @RequestParam(required = false) String keyword
     ) {
         try {
             Page<vtc.xueqing.flower.vo.OrderVO> page = new Page<>(current, size);
@@ -181,14 +181,14 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取养护知识列表（管理员）")
+    @ApiOperation("Get Care Knowledge List (Admin)")
     @GetMapping("/knowledge")
     public Result<IPage<vtc.xueqing.flower.entity.CareKnowledge>> getKnowledgeList(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Integer current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Integer size,
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
             @ApiParam("搜索关键词") @RequestParam(required = false) String keyword,
-            @ApiParam("分类") @RequestParam(required = false) String category,
-            @ApiParam("状态") @RequestParam(required = false) String status
+            @ApiParam("Category") @RequestParam(required = false) String category,
+            @ApiParam("Status") @RequestParam(required = false) String status
     ) {
         try {
             Page<vtc.xueqing.flower.entity.CareKnowledge> page = new Page<>(current, size);
@@ -199,7 +199,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取养护知识详情（管理员）")
+    @ApiOperation("Get Care Knowledge Details (Admin)")
     @GetMapping("/knowledge/{id}")
     public Result<vtc.xueqing.flower.entity.CareKnowledge> getKnowledgeById(@PathVariable("id") Long id) {
         try {
@@ -210,7 +210,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("创建养护知识（管理员）")
+    @ApiOperation("Create Care Knowledge (Admin)")
     @PostMapping("/knowledge")
     public Result<vtc.xueqing.flower.entity.CareKnowledge> createKnowledge(@RequestBody vtc.xueqing.flower.entity.CareKnowledge knowledge) {
         try {
@@ -221,7 +221,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("更新养护知识（管理员）")
+    @ApiOperation("Update Care Knowledge (Admin)")
     @PutMapping("/knowledge/{id}")
     public Result<vtc.xueqing.flower.entity.CareKnowledge> updateKnowledge(
             @PathVariable("id") Long id,
@@ -236,11 +236,11 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("更新养护知识状态（管理员）")
+    @ApiOperation("Update Care Knowledge Status (Admin)")
     @PutMapping("/knowledge/{id}/status")
     public Result<vtc.xueqing.flower.entity.CareKnowledge> updateKnowledgeStatus(
             @PathVariable("id") Long id,
-            @ApiParam("状态：PUBLISHED-已发布，DRAFT-草稿") @RequestParam String status
+            @ApiParam("Status: PUBLISHED-published, DRAFT-draft") @RequestParam String status
     ) {
         try {
             vtc.xueqing.flower.entity.CareKnowledge updated = administratorService.updateKnowledgeStatus(id, status);
@@ -250,7 +250,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("删除养护知识（管理员）")
+    @ApiOperation("Delete Care Knowledge (Admin)")
     @DeleteMapping("/knowledge/{id}")
     public Result<Void> deleteKnowledge(@PathVariable("id") Long id) {
         try {
@@ -261,7 +261,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("获取管理员个人信息")
+    @ApiOperation("Get Administrator Profile")
     @GetMapping("/profile")
     public Result<Administrator> getProfile(@RequestParam Long adminId) {
         try {
@@ -272,7 +272,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("更新管理员个人信息")
+    @ApiOperation("Update Administrator Profile")
     @PutMapping("/profile")
     public Result<Administrator> updateProfile(@RequestBody Map<String, Object> profileData) {
         try {
@@ -286,7 +286,7 @@ public class AdministratorController {
         }
     }
     
-    @ApiOperation("修改管理员密码")
+    @ApiOperation("Change Administrator Password")
     @PutMapping("/password")
     public Result<Void> updatePassword(@RequestBody Map<String, String> passwordData) {
         try {
@@ -295,15 +295,15 @@ public class AdministratorController {
             String newPassword = passwordData.get("newPassword");
             
             if (oldPassword == null || oldPassword.isEmpty()) {
-                return Result.error("原密码不能为空");
+                return Result.error("Old password cannot be empty");
             }
             
             if (newPassword == null || newPassword.isEmpty()) {
-                return Result.error("新密码不能为空");
+                return Result.error("New password cannot be empty");
             }
             
             if (newPassword.length() < 6) {
-                return Result.error("新密码长度不能少于6位");
+                return Result.error("New password length cannot be less than 6 characters");
             }
             
             administratorService.updatePassword(adminId, oldPassword, newPassword);

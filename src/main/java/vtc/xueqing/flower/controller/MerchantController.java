@@ -14,10 +14,10 @@ import vtc.xueqing.flower.service.OrderService;
 import javax.annotation.Resource;
 
 /**
- * 商家Controller
+ * Merchant Controller
  */
 @Slf4j
-@Api(tags = "商家管理接口")
+@Api(tags = "Merchant Management Interface")
 @RestController
 @RequestMapping("/api/merchant")
 public class MerchantController {
@@ -28,28 +28,28 @@ public class MerchantController {
     @Resource
     private OrderService orderService;
 
-    @ApiOperation("商家注册")
+    @ApiOperation("Merchant Registration")
     @PostMapping("/register")
     public Result<Merchant> register(@Validated @RequestBody Merchant merchant) {
         Merchant result = merchantService.register(merchant);
-        return Result.success("注册成功，请等待管理员审核", result);
+        return Result.success("Registration Successful, Please Wait for Admin Approval", result);
     }
 
-    @ApiOperation("商家登录")
+    @ApiOperation("Merchant Login")
     @PostMapping("/login")
     public Result<Merchant> login(@Validated @RequestBody Merchant login) {
         Merchant merchant = merchantService.login(login);
-        return Result.success("登录成功", merchant);
+        return Result.success("Login Successful", merchant);
     }
 
-    @ApiOperation("获取商家信息")
+    @ApiOperation("Get Merchant Information")
     @GetMapping("/profile/{merchId}")
     public Result<Merchant> getProfile(@PathVariable Long merchId) {
         Merchant merchant = merchantService.getMerchantById(merchId);
         return Result.success(merchant);
     }
     
-    @ApiOperation("更新商家信息")
+    @ApiOperation("Update Merchant Information")
     @PutMapping("/profile")
     public Result<Merchant> updateProfile(@RequestBody Merchant merchant) {
         try {
@@ -60,7 +60,7 @@ public class MerchantController {
         }
     }
     
-    @ApiOperation("获取商家工作台数据")
+    @ApiOperation("Get Merchant Dashboard Data")
     @GetMapping("/dashboard")
     public Result<java.util.Map<String, Object>> getDashboardData(@RequestParam Long merchId) {
         try {
@@ -71,7 +71,7 @@ public class MerchantController {
         }
     }
     
-    @ApiOperation("获取商家商品列表")
+    @ApiOperation("Get Merchant Product List")
     @GetMapping("/products")
     public Result<com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product>> getMerchantProducts(
             @RequestParam(required = false) Long merchId,
@@ -90,12 +90,12 @@ public class MerchantController {
             
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> page;
             
-            // 如果有name、catId、status等筛选条件，使用详细筛选方法
+            // If there are filter conditions such as name, catId, status, use detailed filtering method
             if (name != null || catId != null || status != null) {
                 page = ((vtc.xueqing.flower.service.impl.MerchantServiceImpl) merchantService)
                     .getMerchantProductsWithFilter(merchId, current, size, name, catId, status);
             } else {
-                // 否则使用简单的关键词搜索
+                // Otherwise use simple keyword search
                 page = merchantService.getMerchantProducts(merchId, current, size, keyword);
             }
             
@@ -105,7 +105,7 @@ public class MerchantController {
         }
     }
     
-    @ApiOperation("获取商家订单列表")
+    @ApiOperation("Get Merchant Order List")
     @GetMapping("/orders")
     public Result<com.baomidou.mybatisplus.core.metadata.IPage<vtc.xueqing.flower.entity.Order>> getMerchantOrders(
             @RequestParam(required = false) Long merchId,
@@ -130,13 +130,13 @@ public class MerchantController {
         }
     }
 
-    @ApiOperation("获取商家订单详情")
+    @ApiOperation("Get Merchant Order Details")
     @GetMapping("/orders/{id}")
     public Result<vtc.xueqing.flower.vo.MerchantOrderDetailVO> getMerchantOrderDetail(@PathVariable Long id) {
         try {
             vtc.xueqing.flower.vo.OrderDetailVO detail = orderService.getOrderDetailById(id);
             if (detail == null) {
-                return Result.error("订单不存在");
+                return Result.error("Order does not exist");
             }
             vtc.xueqing.flower.vo.MerchantOrderDetailVO vo = buildMerchantOrderDetail(detail);
             return Result.success(vo);
@@ -145,7 +145,7 @@ public class MerchantController {
         }
     }
     
-    @ApiOperation("获取商家优惠券列表")
+    @ApiOperation("Get Merchant Coupon List")
     @GetMapping("/coupons")
     public Result<com.baomidou.mybatisplus.core.metadata.IPage<vtc.xueqing.flower.entity.Coupon>> getMerchantCoupons(
             @RequestParam(required = false) Long merchId,
@@ -169,7 +169,7 @@ public class MerchantController {
         }
     }
 
-    @ApiOperation("商家发货")
+    @ApiOperation("Merchant Ship Order")
     @PutMapping("/orders/{id}/ship")
     public Result<Order> shipMerchantOrder(@PathVariable Long id) {
         try {
@@ -180,13 +180,13 @@ public class MerchantController {
         }
     }
     
-    @ApiOperation("获取商家优惠券详情")
+    @ApiOperation("Get Merchant Coupon Details")
     @GetMapping("/coupons/{id}")
     public Result<vtc.xueqing.flower.entity.Coupon> getMerchantCoupon(@PathVariable Long id) {
         try {
             vtc.xueqing.flower.entity.Coupon coupon = merchantService.getMerchantCouponById(id);
             if (coupon == null) {
-                return Result.error("优惠券不存在");
+                return Result.error("Coupon does not exist");
             }
             return Result.success(coupon);
         } catch (Exception e) {
@@ -194,18 +194,18 @@ public class MerchantController {
         }
     }
     
-    @ApiOperation("创建商家优惠券")
+    @ApiOperation("Create Merchant Coupon")
     @PostMapping("/coupons")
     public Result<vtc.xueqing.flower.entity.Coupon> createMerchantCoupon(@RequestBody vtc.xueqing.flower.entity.Coupon coupon) {
         try {
             vtc.xueqing.flower.entity.Coupon created = merchantService.createMerchantCoupon(coupon);
-            return Result.success("创建成功", created);
+            return Result.success("Creation Successful", created);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
     
-    @ApiOperation("更新商家优惠券")
+    @ApiOperation("Update Merchant Coupon")
     @PutMapping("/coupons/{id}")
     public Result<vtc.xueqing.flower.entity.Coupon> updateMerchantCoupon(
             @PathVariable Long id,
@@ -219,7 +219,7 @@ public class MerchantController {
         }
     }
     
-    @ApiOperation("删除商家优惠券")
+    @ApiOperation("Delete Merchant Coupon")
     @DeleteMapping("/coupons/{id}")
     public Result<Void> deleteMerchantCoupon(@PathVariable Long id) {
         try {

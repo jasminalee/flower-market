@@ -45,7 +45,7 @@ public class CouponController {
     @PostMapping("/{id}/receive")
     public Result<CustomerCoupon> receiveCoupon(
             @PathVariable("id") Long id,
-            @ApiParam("用户ID") @RequestParam Long userId
+            @ApiParam("User ID") @RequestParam Long userId
     ) {
         try {
             CustomerCoupon customerCoupon = couponService.receiveCoupon(userId, id);
@@ -58,7 +58,7 @@ public class CouponController {
     @ApiOperation("Get User's Coupons List")
     @GetMapping("/my")
     public Result<List<vtc.xueqing.flower.vo.CustomerCouponVO>> getUserCoupons(
-            @ApiParam("用户ID") @RequestParam Long userId,
+            @ApiParam("User ID") @RequestParam Long userId,
             @ApiParam("Status: UNUSED-unused, USED-used, EXPIRED-expired") @RequestParam(required = false) String status
     ) {
         try {

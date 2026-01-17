@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 签到控制器
+ * Check-in Controller
  */
-@Api(tags = "签到管理")
+@Api(tags = "Check-in Management")
 @RestController
 @RequestMapping("/api/customer/checkin")
 public class CheckInController {
@@ -24,9 +24,9 @@ public class CheckInController {
     @Resource
     private CheckInService checkInService;
     
-    @ApiOperation("每日签到")
+    @ApiOperation("Daily Check-in")
     @PostMapping
-    public Result<CheckIn> dailyCheckIn(@ApiParam("用户ID") @RequestParam Long userId) {
+    public Result<CheckIn> dailyCheckIn(@ApiParam("User ID") @RequestParam Long userId) {
         try {
             CheckIn checkIn = checkInService.dailyCheckIn(userId);
             return Result.success(checkIn);
@@ -35,11 +35,11 @@ public class CheckInController {
         }
     }
     
-    @ApiOperation("获取签到历史")
+    @ApiOperation("Get Check-in History")
     @GetMapping("/history")
     public Result<List<CheckIn>> getCheckInHistory(
-            @ApiParam("用户ID") @RequestParam Long userId,
-            @ApiParam("查询数量限制") @RequestParam(defaultValue = "30") Integer limit
+            @ApiParam("User ID") @RequestParam Long userId,
+            @ApiParam("Query Limit") @RequestParam(defaultValue = "30") Integer limit
     ) {
         try {
             List<CheckIn> history = checkInService.getCheckInHistory(userId, limit);
@@ -49,7 +49,7 @@ public class CheckInController {
         }
     }
     
-    @ApiOperation("获取签到统计信息")
+    @ApiOperation("Get Check-in Statistics")
     @GetMapping("/stats")
     public Result<Map<String, Object>> getCheckInStats(@ApiParam("用户ID") @RequestParam Long userId) {
         try {
