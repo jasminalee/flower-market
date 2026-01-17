@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 产品评价实体类
- * 对应数据库表：product_reviews
+ * Product review entity class
+ * Corresponds to database table: product_reviews
  */
 @Data
 @TableName("product_reviews")
@@ -20,61 +20,61 @@ public class ProductReview implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 评价ID
+     * Review ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户ID
+     * User ID
      */
     @TableField("user_id")
     private Long userId;
 
     /**
-     * 产品ID
+     * Product ID
      */
     @TableField("prod_id")
     private Long prodId;
 
     /**
-     * 订单ID
+     * Order item ID
      */
     @TableField("order_id")
     private Long orderId;
 
     /**
-     * 评分：1-5星
+     * Rating (1-5)
      */
     @TableField("rating")
     private Integer rating;
 
     /**
-     * 评价内容
+     * Review content
      */
     @TableField("content")
     private String content;
 
     /**
-     * 评价图片（JSON数组）
+     * Review images (JSON array)
      */
     @TableField("images")
     private String images;
 
     /**
-     * 是否已购买验证：0-未验证，1-已验证
+     * Purchase verification: 0-not verified, 1-verified
      */
     @TableField("verified")
     private Integer verified;
 
     /**
-     * 状态：PENDING-待审核，APPROVED-已通过，REJECTED-已拒绝
+     * Status: PENDING-pending, APPROVED-approved, REJECTED-rejected
      */
     @TableField("status")
     private String status;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;

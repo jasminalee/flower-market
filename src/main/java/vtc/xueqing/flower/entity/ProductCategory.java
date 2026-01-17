@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 产品分类实体类
- * 对应数据库表：product_categories
+ * Product category entity class
+ * Corresponds to database table: product_categories
  */
 @Data
 @TableName("product_categories")
@@ -20,49 +20,49 @@ public class ProductCategory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 分类ID
+     * Category ID
      */
     @TableId(value = "cate_id", type = IdType.AUTO)
     private Long cateId;
 
     /**
-     * 分类名称
+     * Category name
      */
     @TableField("name")
     private String name;
 
     /**
-     * 父分类ID，0表示顶级分类
+     * Parent category ID, 0 means top-level category
      */
     @TableField("parent_id")
     private Long parentId;
 
     /**
-     * 排序顺序
+     * Sort order
      */
     @TableField("sort_order")
     private Integer sortOrder;
 
     /**
-     * 分类图标
+     * Category icon
      */
     @TableField("icon")
     private String icon;
 
     /**
-     * 分类描述
+     * Category description
      */
     @TableField("description")
     private String description;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

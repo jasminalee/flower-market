@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 产品收藏实体类
- * 对应数据库表：product_favorites
+ * Product favorite entity class
+ * Corresponds to database table: product_favorites
  */
 @Data
 @TableName("product_favorites")
@@ -20,25 +20,25 @@ public class ProductFavorite implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 收藏ID
+     * Favorite ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户ID
+     * User ID
      */
     @TableField("user_id")
     private Long userId;
 
     /**
-     * 产品ID
+     * Product ID
      */
     @TableField("prod_id")
     private Long prodId;
 
     /**
-     * 收藏时间
+     * Favorite time
      */
     @TableField("fav_date")
     private LocalDateTime favDate;

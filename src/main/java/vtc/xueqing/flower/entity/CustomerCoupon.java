@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 用户优惠券实体类
- * 对应数据库表：customer_coupons
+ * Customer coupon entity class
+ * Corresponds to database table: customer_coupons
  */
 @Data
 @TableName("customer_coupons")
@@ -20,49 +20,49 @@ public class CustomerCoupon implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * ID
+     * Customer coupon ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户ID
+     * User ID
      */
     @TableField("user_id")
     private Long userId;
 
     /**
-     * 优惠券ID
+     * Coupon ID
      */
     @TableField("coupon_id")
     private Long couponId;
 
     /**
-     * 券码
+     * Code
      */
     @TableField("code")
     private String code;
 
     /**
-     * 状态：UNUSED-未使用，USED-已使用，EXPIRED-已过期
+     * Status: UNUSED-unused, USED-used, EXPIRED-expired
      */
     @TableField("status")
     private String status;
 
     /**
-     * 领取时间
+     * Receipt time
      */
     @TableField("receive_date")
     private LocalDateTime receiveDate;
 
     /**
-     * 使用时间
+     * Usage time
      */
     @TableField("used_date")
     private LocalDateTime usedDate;
 
     /**
-     * 使用的订单ID
+     * Used order ID
      */
     @TableField("order_id")
     private Long orderId;

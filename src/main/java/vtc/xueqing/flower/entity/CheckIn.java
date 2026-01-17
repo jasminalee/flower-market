@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * 签到实体类
- * 对应数据库表：check_ins
+ * Check-in entity class
+ * Corresponds to database table: check_ins
  */
 @Data
 @TableName("check_ins")
@@ -21,37 +21,37 @@ public class CheckIn implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 签到ID
+     * Check-in ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户ID
+     * User ID
      */
     @TableField("user_id")
     private Long userId;
 
     /**
-     * 签到日期
+     * Check-in date
      */
     @TableField("check_date")
     private LocalDate checkDate;
 
     /**
-     * 连续签到天数
+     * Consecutive check-in days
      */
     @TableField("continuous_days")
     private Integer continuousDays;
 
     /**
-     * 奖励积分
+     * Reward points
      */
     @TableField("reward_points")
     private Integer rewardPoints;
 
     /**
-     * 签到时间
+     * Check-in time
      */
     @TableField("create_time")
     private LocalDateTime createTime;

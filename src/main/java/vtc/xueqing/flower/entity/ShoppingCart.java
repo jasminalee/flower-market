@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 购物车实体类
- * 对应数据库表：shopping_cart
+ * Shopping cart entity class
+ * Corresponds to database table: shopping_cart
  */
 @Data
 @TableName("shopping_cart")
@@ -20,43 +20,43 @@ public class ShoppingCart implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 购物车ID
+     * Shopping cart ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户ID
+     * User ID
      */
     @TableField("user_id")
     private Long userId;
 
     /**
-     * 产品ID
+     * Product ID
      */
     @TableField("prod_id")
     private Long prodId;
 
     /**
-     * 商品数量
+     * Quantity
      */
     @TableField("quantity")
     private Integer quantity;
 
     /**
-     * 是否选中：0-未选中，1-已选中
+     * Selected: 0-not selected, 1-selected
      */
     @TableField("selected")
     private Integer selected;
 
     /**
-     * 添加时间
+     * Add time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

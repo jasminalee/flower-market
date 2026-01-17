@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 系统配置实体类
- * 对应数据库表：system_configuration
+ * System configuration entity class
+ * Corresponds to database table: system_configuration
  */
 @Data
 @TableName("system_configuration")
@@ -20,43 +20,43 @@ public class SystemConfiguration implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 配置ID
+     * Configuration ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 配置键
+     * Configuration key
      */
     @TableField("config_key")
     private String configKey;
 
     /**
-     * 配置值
+     * Configuration value
      */
     @TableField("config_value")
     private String configValue;
 
     /**
-     * 配置描述
+     * Configuration description
      */
     @TableField("description")
     private String description;
 
     /**
-     * 配置分类
+     * Configuration category
      */
     @TableField("category")
     private String category;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

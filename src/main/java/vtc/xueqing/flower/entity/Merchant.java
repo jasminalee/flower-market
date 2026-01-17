@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 商家实体类
- * 对应数据库表：merchants
+ * Merchant entity class
+ * Corresponds to database table: merchants
  */
 @Data
 @TableName("merchants")
@@ -20,73 +20,73 @@ public class Merchant implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 商家ID
+     * Merchant ID
      */
     @TableId(value = "merch_id", type = IdType.AUTO)
     private Long merchId;
 
     /**
-     * 商家名称
+     * Merchant name
      */
     @TableField("name")
     private String name;
 
     /**
-     * 商家邮箱
+     * Merchant email
      */
     @TableField("email")
     private String email;
 
     /**
-     * 密码（加密）
+     * Password (encrypted)
      */
     @TableField("password")
     private String password;
 
     /**
-     * 商家电话
+     * Merchant phone
      */
     @TableField("phone")
     private String phone;
 
     /**
-     * 店铺logo
+     * Shop logo
      */
     @TableField("shop_logo")
     private String shopLogo;
 
     /**
-     * 商家资质证明
+     * Merchant qualification certificate
      */
     @TableField("qualification")
     private String qualification;
 
     /**
-     * 商家地址
+     * Merchant address
      */
     @TableField("address")
     private String address;
 
     /**
-     * 店铺描述
+     * Shop description
      */
     @TableField("description")
     private String description;
 
     /**
-     * 商家状态：PENDING-待审核，ACTIVE-正常，SUSPENDED-暂停，REJECTED-已拒绝
+     * Merchant status: PENDING-pending review, ACTIVE-active, SUSPENDED-suspended, REJECTED-rejected
      */
     @TableField("status")
     private String status;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

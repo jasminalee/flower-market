@@ -15,10 +15,10 @@ import vtc.xueqing.flower.service.ProductService;
 import javax.annotation.Resource;
 
 /**
- * 产品Controller
+ * Product Controller
  */
 @Slf4j
-@Api(tags = "产品管理接口")
+@Api(tags = "Product Management Interface")
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
@@ -26,36 +26,36 @@ public class ProductController {
     @Resource
     private ProductService productService;
 
-    @ApiOperation("创建产品")
+    @ApiOperation("Create Product")
     @PostMapping
     public Result<Product> createProduct(@Validated @RequestBody Product product) {
         Product result = productService.createProduct(product);
-        return Result.success("创建成功", result);
+        return Result.success("Creation Successful", result);
     }
 
-    @ApiOperation("更新产品")
+    @ApiOperation("Update Product")
     @PutMapping("/{id}")
     public Result<Product> updateProduct(@PathVariable Long id, @Validated @RequestBody Product product) {
         product.setProdId(id);
         Product result = productService.updateProduct(product);
-        return Result.success("更新成功", result);
+        return Result.success("Update Successful", result);
     }
 
-    @ApiOperation("删除产品")
+    @ApiOperation("Delete Product")
     @DeleteMapping("/{id}")
     public Result<String> deleteProduct(@PathVariable Long id) {
         boolean result = productService.deleteProduct(id);
-        return result ? Result.success("删除成功") : Result.error("删除失败");
+        return result ? Result.success("Deletion Successful") : Result.error("Deletion Failed");
     }
 
-    @ApiOperation("获取产品详情")
+    @ApiOperation("Get Product Details")
     @GetMapping("/{id}")
     public Result<Product> getProduct(@PathVariable Long id) {
         Product product = productService.getProductById(id);
         return Result.success(product);
     }
 
-    @ApiOperation("分页查询产品列表")
+    @ApiOperation("Query Product List with Pagination")
     @GetMapping
     public Result<Page<Product>> getProductPage(
             @ApiParam("当前页") @RequestParam(defaultValue = "1") Long current,
@@ -68,17 +68,17 @@ public class ProductController {
         return Result.success(page);
     }
 
-    @ApiOperation("上架产品")
+    @ApiOperation("Publish Product")
     @PutMapping("/{id}/publish")
     public Result<String> publishProduct(@PathVariable Long id) {
         boolean result = productService.updateProductStatus(id, Constants.PRODUCT_STATUS_ACTIVE);
-        return result ? Result.success("上架成功") : Result.error("上架失败");
+        return result ? Result.success("Listing Successful") : Result.error("Listing Failed");
     }
 
-    @ApiOperation("下架产品")
+    @ApiOperation("Unpublish Product")
     @PutMapping("/{id}/unpublish")
     public Result<String> unpublishProduct(@PathVariable Long id) {
         boolean result = productService.updateProductStatus(id, Constants.PRODUCT_STATUS_INACTIVE);
-        return result ? Result.success("下架成功") : Result.error("下架失败");
+        return result ? Result.success("Delisting Successful") : Result.error("Delisting Failed");
     }
 }

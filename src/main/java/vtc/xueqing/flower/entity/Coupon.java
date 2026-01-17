@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 优惠券实体类
- * 对应数据库表：coupons
+ * Coupon entity class
+ * Corresponds to database table: coupons
  */
 @Data
 @TableName("coupons")
@@ -21,85 +21,85 @@ public class Coupon implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 优惠券ID
+     * Coupon ID
      */
     @TableId(value = "coupon_id", type = IdType.AUTO)
     private Long couponId;
 
     /**
-     * 商家ID，NULL表示平台优惠券
+     * Merchant ID, NULL means platform coupon
      */
     @TableField("merch_id")
     private Long merchId;
 
     /**
-     * 优惠券名称
+     * Coupon name
      */
     @TableField("name")
     private String name;
 
     /**
-     * 优惠券类型：DISCOUNT-折扣券，FULL_REDUCTION-满减券，FIXED_AMOUNT-固定金额券
+     * Coupon type: DISCOUNT-discount coupon, FULL_REDUCTION-full reduction coupon, FIXED_AMOUNT-fixed amount coupon
      */
     @TableField("type")
     private String type;
 
     /**
-     * 优惠值（折扣比例或金额）
+     * Benefit value (discount percentage or amount)
      */
     @TableField("value")
     private BigDecimal value;
 
     /**
-     * 最低消费金额
+     * Minimum spending amount
      */
     @TableField("min_price")
     private BigDecimal minPrice;
 
     /**
-     * 发放总数量
+     * Total issuance quantity
      */
     @TableField("total_quantity")
     private Integer totalQuantity;
 
     /**
-     * 已领取数量
+     * Quantity claimed
      */
     @TableField("received_quantity")
     private Integer receivedQuantity;
 
     /**
-     * 有效期开始
+     * Validity period start
      */
     @TableField("start_date")
     private LocalDateTime startDate;
 
     /**
-     * 有效期结束
+     * Validity period end
      */
     @TableField("end_date")
     private LocalDateTime endDate;
 
     /**
-     * 状态：ACTIVE-激活，INACTIVE-未激活，EXPIRED-已过期
+     * Status: ACTIVE-active, INACTIVE-inactive, EXPIRED-expired
      */
     @TableField("status")
     private String status;
 
     /**
-     * 优惠券描述
+     * Coupon description
      */
     @TableField("description")
     private String description;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

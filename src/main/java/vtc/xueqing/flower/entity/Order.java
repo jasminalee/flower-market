@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 订单实体类
- * 对应数据库表：orders
+ * Order entity class
+ * Corresponds to database table: orders
  */
 @Data
 @TableName("orders")
@@ -21,127 +21,127 @@ public class Order implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 订单ID
+     * Order ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 订单号
+     * Order number
      */
     @TableField("order_no")
     private String orderNo;
 
     /**
-     * 用户ID
+     * User ID
      */
     @TableField("user_id")
     private Long userId;
 
     /**
-     * 商家ID
+     * Merchant ID
      */
     @TableField("merch_id")
     private Long merchId;
 
     /**
-     * 下单时间
+     * Order time
      */
     @TableField("order_date")
     private LocalDateTime orderDate;
 
     /**
-     * 订单总价
+     * Total order price
      */
     @TableField("total_price")
     private BigDecimal totalPrice;
 
     /**
-     * 优惠金额
+     * Discount amount
      */
     @TableField("discount_amount")
     private BigDecimal discountAmount;
 
     /**
-     * 实付金额
+     * Actual payment amount
      */
     @TableField("actual_price")
     private BigDecimal actualPrice;
 
     /**
-     * 收货地址
+     * Shipping address
      */
     @TableField("address")
     private String address;
 
     /**
-     * 收货人姓名
+     * Recipient name
      */
     @TableField("receiver_name")
     private String receiverName;
 
     /**
-     * 收货人电话
+     * Recipient phone
      */
     @TableField("receiver_phone")
     private String receiverPhone;
 
     /**
-     * 支付状态：UNPAID-未支付，PAID-已支付，REFUNDED-已退款
+     * Payment status: UNPAID-unpaid, PAID-paid, REFUNDED-refunded
      */
     @TableField("payment_status")
     private String paymentStatus;
 
     /**
-     * 支付时间
+     * Payment time
      */
     @TableField("payment_time")
     private LocalDateTime paymentTime;
 
     /**
-     * 支付方式：ALIPAY-支付宝，WECHAT-微信，BALANCE-余额
+     * Payment method: ALIPAY-Alipay, WECHAT-WeChat, BALANCE-balance
      */
     @TableField("payment_method")
     private String paymentMethod;
 
     /**
-     * 订单状态：SUBMITTED-提交订单/待支付，PAID-已支付/待发货，SHIPPED-已发货/待收货，COMPLETED-交易完成，CANCELLED-已取消
+     * Order status: SUBMITTED-order submitted/pending payment, PAID-paid/pending shipment, SHIPPED-shipped/pending receipt, COMPLETED-transaction completed, CANCELLED-cancelled
      */
     @TableField("status")
     private String status;
 
     /**
-     * 发货时间
+     * Delivery time
      */
     @TableField("delivery_time")
     private LocalDateTime deliveryTime;
 
     /**
-     * 完成时间
+     * Completion time
      */
     @TableField("completion_time")
     private LocalDateTime completionTime;
 
     /**
-     * 取消原因
+     * Cancellation reason
      */
     @TableField("cancel_reason")
     private String cancelReason;
 
     /**
-     * 订单备注
+     * Order remarks
      */
     @TableField("remark")
     private String remark;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

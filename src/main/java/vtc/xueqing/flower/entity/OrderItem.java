@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 订单项实体类
- * 对应数据库表：order_items
+ * Order item entity class
+ * Corresponds to database table: order_items
  */
 @Data
 @TableName("order_items")
@@ -21,55 +21,55 @@ public class OrderItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 订单项ID
+     * Order item ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 订单ID
+     * Order ID
      */
     @TableField("order_id")
     private Long orderId;
 
     /**
-     * 产品ID
+     * Product ID
      */
     @TableField("prod_id")
     private Long prodId;
 
     /**
-     * 产品名称
+     * Product name
      */
     @TableField("name")
     private String name;
 
     /**
-     * 产品图片
+     * Product image
      */
     @TableField("main_image")
     private String mainImage;
 
     /**
-     * 购买数量
+     * Quantity purchased
      */
     @TableField("quantity")
     private Integer quantity;
 
     /**
-     * 单价
+     * Unit price
      */
     @TableField("unit_price")
     private BigDecimal unitPrice;
 
     /**
-     * 小计
+     * Subtotal
      */
     @TableField("total_price")
     private BigDecimal totalPrice;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;

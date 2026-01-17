@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * 产品溯源实体类
- * 对应数据库表：product_trackability
+ * Product traceability entity class
+ * Corresponds to database table: product_trackability
  */
 @Data
 @TableName("product_trackability")
@@ -21,61 +21,61 @@ public class ProductTrackability implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 溯源ID
+     * Traceability ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 产品ID
+     * Product ID
      */
     @TableField("prod_id")
     private Long prodId;
 
     /**
-     * 产地
+     * Origin
      */
     @TableField("origin")
     private String origin;
 
     /**
-     * 种植方式
+     * Planting method
      */
     @TableField("planting_method")
     private String plantingMethod;
 
     /**
-     * 采摘日期
+     * Picking date
      */
     @TableField("picking_date")
     private LocalDate pickingDate;
 
     /**
-     * 加工日期
+     * Processing date
      */
     @TableField("proc_date")
     private LocalDate procDate;
 
     /**
-     * 认证信息
+     * Certification information
      */
     @TableField("certification")
     private String certification;
 
     /**
-     * 溯源描述
+     * Traceability description
      */
     @TableField("description")
     private String description;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 管理员实体类
- * 对应数据库表：administrators
+ * Administrator entity class
+ * Corresponds to database table: administrators
  */
 @Data
 @TableName("administrators")
@@ -20,49 +20,49 @@ public class Administrator implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 管理员ID
+     * Administrator ID
      */
     @TableId(value = "admin_id", type = IdType.AUTO)
     private Long adminId;
 
     /**
-     * 管理员姓名
+     * Administrator name
      */
     @TableField("name")
     private String name;
 
     /**
-     * 密码（加密）
+     * Password (encrypted)
      */
     @TableField("password")
     private String password;
 
     /**
-     * 邮箱
+     * Email
      */
     @TableField("email")
     private String email;
 
     /**
-     * 权限等级：SUPER_ADMIN-超级管理员，ADMIN-管理员
+     * Permission level: SUPER_ADMIN-super administrator, ADMIN-administrator
      */
     @TableField("permission")
     private String permission;
 
     /**
-     * 状态：ACTIVE-正常，INACTIVE-禁用
+     * Status: ACTIVE-active, INACTIVE-disabled
      */
     @TableField("status")
     private String status;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

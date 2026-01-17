@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 产品实体类
- * 对应数据库表：products
+ * Product entity class
+ * Corresponds to database table: products
  */
 @Data
 @TableName("products")
@@ -21,91 +21,91 @@ public class Product implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 产品ID
+     * Product ID
      */
     @TableId(value = "prod_id", type = IdType.AUTO)
     private Long prodId;
 
     /**
-     * 商家ID
+     * Merchant ID
      */
     @TableField("merch_id")
     private Long merchId;
 
     /**
-     * 商家名称（关联查询填充）
+     * Merchant name (filled by association query)
      */
     @TableField(exist = false)
     private String merchantName;
 
     /**
-     * 分类ID
+     * Category ID
      */
     @TableField("cat_id")
     private Long catId;
 
     /**
-     * 产品名称
+     * Product name
      */
     @TableField("name")
     private String name;
 
     /**
-     * 产品价格
+     * Product price
      */
     @TableField("price")
     private BigDecimal price;
 
     /**
-     * 库存数量
+     * Stock quantity
      */
     @TableField("stock")
     private Integer stock;
 
     /**
-     * 销量
+     * Sales volume
      */
     @TableField("sales")
     private Integer sales;
 
     /**
-     * 产品主图
+     * Product main image
      */
     @TableField("main_image")
     private String mainImage;
 
     /**
-     * 产品图片集（JSON数组）
+     * Product image collection (JSON array)
      */
     @TableField("images")
     private String images;
 
     /**
-     * 产品描述
+     * Product description
      */
     @TableField("description")
     private String description;
 
     /**
-     * 产品状态：ACTIVE-上架，INACTIVE-下架，DELETED-已删除
+     * Product status: ACTIVE-listed, INACTIVE-unlisted, DELETED-deleted
      */
     @TableField("status")
     private String status;
 
     /**
-     * 库存状态：IN_STOCK-有货，LOW_STOCK-库存不足，OUT_OF_STOCK-缺货
+     * Stock status: IN_STOCK-in stock, LOW_STOCK-low stock, OUT_OF_STOCK-out of stock
      */
     @TableField("stock_status")
     private String stockStatus;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;

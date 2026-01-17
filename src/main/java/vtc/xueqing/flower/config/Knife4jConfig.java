@@ -12,7 +12,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 
 /**
- * Knife4j配置类
+ * Knife4j configuration.
  */
 @Configuration
 @EnableSwagger2WebMvc
@@ -30,8 +30,8 @@ public class Knife4jConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("鲜花市场后端系统API文档")
-                .description("鲜花市场电商平台后端接口文档")
+                .title("Flower Market Backend API Documentation")
+                .description("Flower Market e-commerce platform backend API")
                 .contact(new Contact("VTC", "", ""))
                 .version("1.0.0")
                 .build();

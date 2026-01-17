@@ -7,7 +7,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 /**
- * 跨域配置
+ * CORS configuration.
  */
 @Configuration
 public class CorsConfig {
@@ -16,22 +16,22 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         
-        // 允许所有来源（开发环境）
+        // Allow all origins (development only).
         config.addAllowedOriginPattern("*");
         
-        // 允许所有请求头
+        // Allow all request headers.
         config.addAllowedHeader("*");
         
-        // 允许所有请求方法
+        // Allow all HTTP methods.
         config.addAllowedMethod("*");
         
-        // 允许携带凭证
+        // Allow credentials.
         config.setAllowCredentials(true);
         
-        // 暴露的响应头
+        // Exposed response headers.
         config.addExposedHeader("Authorization");
         
-        // 预检请求的有效期，单位为秒
+        // Preflight cache duration in seconds.
         config.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

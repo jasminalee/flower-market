@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 顾客实体类
- * 对应数据库表：customers
+ * Customer entity class
+ * Corresponds to database table: customers
  */
 @Data
 @TableName("customers")
@@ -23,87 +23,87 @@ public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户ID
+     * User ID
      */
     @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
 
     /**
-     * 用户名
+     * Username
      */
     @TableField("name")
     private String name;
 
     /**
-     * 邮箱
+     * Email
      */
     @TableField("email")
     private String email;
 
     /**
-     * 手机号
+     * Phone number
      */
     @TableField("phone")
     private String phone;
 
     /**
-     * 密码（加密）
+     * Password (encrypted)
      */
     @TableField("password")
     private String password;
 
     /**
-     * 账户余额
+     * Account balance
      */
     @TableField("balance")
     private BigDecimal balance;
 
     /**
-     * 会员总积分
+     * Total membership points
      */
     @TableField("points")
     private Integer points;
 
     /**
-     * 会员等级：NORMAL-普通，VIP-VIP，SVIP-超级VIP
+     * Membership level: NORMAL-normal, VIP-VIP, SVIP-Super VIP
      */
     @TableField("level")
     private String level;
 
     /**
-     * 性别
+     * Gender
      */
     @TableField("gender")
     private String gender;
 
     /**
-     * 默认地址
+     * Default address
      */
     @TableField("address")
     private String address;
 
     /**
-     * 邮箱是否验证：0-未验证，1-已验证
+     * Email verification: 0-not verified, 1-verified
      */
     @TableField("email_verified")
     private Integer emailVerified;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;
 
-    // 为前端提供字段别名的getter方法
+    // Getter methods to provide field aliases for frontend
     
     /**
-     * 获取用户名（前端字段：username）
+     * Get username (frontend field: username)
      */
     @JsonProperty("username")
     public String getUsername() {
@@ -111,7 +111,7 @@ public class Customer implements Serializable {
     }
 
     /**
-     * 获取会员等级（前端字段：memberLevel）
+     * Get membership level (frontend field: memberLevel)
      */
     @JsonProperty("memberLevel")
     public String getMemberLevel() {
@@ -119,7 +119,7 @@ public class Customer implements Serializable {
     }
 
     /**
-     * 获取创建时间（前端字段：createTime）
+     * Get creation time (frontend field: createTime)
      */
     @JsonProperty("createTime")
     public LocalDateTime getCreateTime() {

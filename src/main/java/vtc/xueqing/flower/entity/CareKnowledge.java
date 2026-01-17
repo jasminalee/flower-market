@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 养护知识实体类
- * 对应数据库表：care_knowledge
+ * Care knowledge entity class
+ * Corresponds to database table: care_knowledge
  */
 @Data
 @TableName("care_knowledge")
@@ -20,67 +20,67 @@ public class CareKnowledge implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 知识ID
+     * Care knowledge ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 标题
+     * Title
      */
     @TableField("title")
     private String title;
 
     /**
-     * 内容
+     * Content
      */
     @TableField("content")
     private String content;
 
     /**
-     * 关键词
+     * Keywords
      */
     @TableField("keywords")
     private String keywords;
 
     /**
-     * 封面图片
+     * Cover image
      */
     @TableField("cover_image")
     private String coverImage;
 
     /**
-     * 分类
+     * Category
      */
     @TableField("category")
     private String category;
 
     /**
-     * 作者
+     * Author
      */
     @TableField("author")
     private String author;
 
     /**
-     * 浏览次数
+     * View count
      */
     @TableField("view_count")
     private Integer viewCount;
 
     /**
-     * 状态：DRAFT-草稿，PUBLISHED-已发布
+     * Status: DRAFT-draft, PUBLISHED-published
      */
     @TableField("status")
     private String status;
 
     /**
-     * 创建时间
+     * Creation time
      */
     @TableField("create_date")
     private LocalDateTime createDate;
 
     /**
-     * 更新时间
+     * Update time
      */
     @TableField("update_date")
     private LocalDateTime updateDate;
