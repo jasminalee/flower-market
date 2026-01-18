@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.Customer;
 
 /**
- * 顾客Mapper接口
+ * Customer Mapper Interface
  */
 public interface CustomerMapper extends BaseMapper<Customer> {
 }

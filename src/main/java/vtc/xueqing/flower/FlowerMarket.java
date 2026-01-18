@@ -19,7 +19,7 @@ public class FlowerMarket  implements ApplicationRunner {
     private String port;
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.info("启动成功,地址：http://localhost:{}/doc.html", port);
+        log.info("Started Successfully, Address: http://localhost:{}/doc.html", port);
     }
     public static void main(String[] args) {
         SpringApplication.run(FlowerMarket.class, args);

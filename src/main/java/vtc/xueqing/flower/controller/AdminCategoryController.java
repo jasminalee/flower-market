@@ -13,10 +13,10 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 管理员-分类管理Controller
+ * Administrator - Category Management Controller
  */
 @Slf4j
-@Api(tags = "管理员-分类管理接口")
+@Api(tags = "Administrator - Category Management Interface")
 @RestController
 @RequestMapping("/api/admin/categories")
 public class AdminCategoryController {
@@ -24,51 +24,51 @@ public class AdminCategoryController {
     @Resource
     private ProductCategoryService productCategoryService;
 
-    @ApiOperation("获取所有分类列表")
+    @ApiOperation("Get All Categories List")
     @GetMapping
     public Result<List<ProductCategory>> getAllCategories() {
-        log.info("管理员获取所有分类列表");
+        log.info("Administrator getting all categories list");
         List<ProductCategory> categories = productCategoryService.getAllCategories();
         return Result.success(categories);
     }
 
-    @ApiOperation("根据ID获取分类详情")
+    @ApiOperation("Get Category Details by ID")
     @GetMapping("/{id}")
     public Result<ProductCategory> getCategoryById(
-            @ApiParam("分类ID") @PathVariable Long id
+            @ApiParam("Category ID") @PathVariable Long id
     ) {
-        log.info("管理员获取分类详情: {}", id);
+        log.info("Administrator getting category details: {}", id);
         ProductCategory category = productCategoryService.getCategoryById(id);
         return Result.success(category);
     }
 
-    @ApiOperation("创建分类")
+    @ApiOperation("Create Category")
     @PostMapping
     public Result<ProductCategory> createCategory(
-            @ApiParam("分类信息") @RequestBody ProductCategory category
+            @ApiParam("Category Information") @RequestBody ProductCategory category
     ) {
-        log.info("管理员创建分类: {}", category);
+        log.info("Administrator creating category: {}", category);
         ProductCategory created = productCategoryService.createCategory(category);
         return Result.success(created);
     }
 
-    @ApiOperation("更新分类")
+    @ApiOperation("Update Category")
     @PutMapping("/{id}")
     public Result<ProductCategory> updateCategory(
-            @ApiParam("分类ID") @PathVariable Long id,
-            @ApiParam("分类信息") @RequestBody ProductCategory category
+            @ApiParam("Category ID") @PathVariable Long id,
+            @ApiParam("Category Information") @RequestBody ProductCategory category
     ) {
-        log.info("管理员更新分类: {} - {}", id, category);
+        log.info("Administrator updating category: {} - {}", id, category);
         ProductCategory updated = productCategoryService.updateCategory(id, category);
         return Result.success(updated);
     }
 
-    @ApiOperation("删除分类（级联删除子分类）")
+    @ApiOperation("Delete Category (Cascade Delete Subcategories)")
     @DeleteMapping("/{id}")
     public Result<Void> deleteCategory(
-            @ApiParam("分类ID") @PathVariable Long id
+            @ApiParam("Category ID") @PathVariable Long id
     ) {
-        log.info("管理员删除分类: {}", id);
+        log.info("Administrator deleting category: {}", id);
         productCategoryService.deleteCategory(id);
         return Result.success(null);
     }

@@ -10,9 +10,9 @@ import vtc.xueqing.flower.service.ProductTrackabilityService;
 import javax.annotation.Resource;
 
 /**
- * 产品溯源控制器
+ * Product Trackability Controller
  */
-@Api(tags = "产品溯源管理")
+@Api(tags = "Product Trackability Management")
 @RestController
 @RequestMapping("/api/products/trackability")
 public class ProductTrackabilityController {
@@ -20,7 +20,7 @@ public class ProductTrackabilityController {
     @Resource
     private ProductTrackabilityService productTrackabilityService;
     
-    @ApiOperation("获取产品溯源信息")
+    @ApiOperation("Get Product Trackability Information")
     @GetMapping("/{prodId}")
     public Result<ProductTrackability> getByProductId(@PathVariable("prodId") Long prodId) {
         try {
@@ -31,7 +31,7 @@ public class ProductTrackabilityController {
         }
     }
     
-    @ApiOperation("创建或更新产品溯源信息（商家）")
+    @ApiOperation("Create or Update Product Trackability Information (Merchant)")
     @PostMapping
     public Result<ProductTrackability> saveOrUpdate(@RequestBody ProductTrackability productTrackability) {
         try {
@@ -42,7 +42,7 @@ public class ProductTrackabilityController {
         }
     }
     
-    @ApiOperation("删除产品溯源信息")
+    @ApiOperation("Delete Product Trackability Information")
     @DeleteMapping("/{prodId}")
     public Result<Void> deleteByProductId(@PathVariable("prodId") Long prodId) {
         try {

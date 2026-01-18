@@ -6,27 +6,27 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vtc.xueqing.flower.common.Result;
 
 /**
- * 全局异常处理器
+ * Global Exception Handler
  */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * 处理业务异常
+     * Handle Business Exception
      */
     @ExceptionHandler(BusinessException.class)
     public Result<String> handleBusinessException(BusinessException e) {
-        log.error("业务异常：{}", e.getMessage());
+        log.error("Business Exception: {}", e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
     }
 
     /**
-     * 处理其他异常
+     * Handle Other Exceptions
      */
     @ExceptionHandler(Exception.class)
     public Result<String> handleException(Exception e) {
-        log.error("系统异常：", e);
-        return Result.error("系统异常，请联系管理员");
+        log.error("System Exception: ", e);
+        return Result.error("System Exception, Please Contact Administrator");
     }
 }

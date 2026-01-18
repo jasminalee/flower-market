@@ -12,9 +12,9 @@ import vtc.xueqing.flower.service.SystemConfigurationService;
 import java.util.List;
 
 /**
- * 系统配置控制器
+ * System Configuration Controller
  */
-@Api(tags = "系统配置管理")
+@Api(tags = "System Configuration Management")
 @RestController
 @RequestMapping("/api/admin/config")
 public class SystemConfigurationController {
@@ -22,7 +22,7 @@ public class SystemConfigurationController {
     @Autowired
     private SystemConfigurationService systemConfigurationService;
     
-    @ApiOperation("获取系统配置列表（分页）")
+    @ApiOperation("Get System Configuration List (Pagination)")
     @GetMapping
     public Result<Page<SystemConfiguration>> getConfigList(
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -32,71 +32,71 @@ public class SystemConfigurationController {
         return Result.success(page);
     }
     
-    @ApiOperation("根据配置键获取配置")
+    @ApiOperation("Get Configuration by Key")
     @GetMapping("/key/{configKey}")
     public Result<SystemConfiguration> getByKey(@PathVariable String configKey) {
         SystemConfiguration config = systemConfigurationService.getByKey(configKey);
         if (config == null) {
-            return Result.error("配置不存在");
+            return Result.error("Configuration does not exist");
         }
         return Result.success(config);
     }
     
-    @ApiOperation("根据分类获取配置列表")
+    @ApiOperation("Get Configuration List by Category")
     @GetMapping("/category/{category}")
     public Result<List<SystemConfiguration>> getByCategory(@PathVariable String category) {
         List<SystemConfiguration> configs = systemConfigurationService.getByCategory(category);
         return Result.success(configs);
     }
     
-    @ApiOperation("创建系统配置")
+    @ApiOperation("Create System Configuration")
     @PostMapping
     public Result<String> createConfig(@RequestBody SystemConfiguration config) {
         try {
             boolean success = systemConfigurationService.createConfig(config);
             if (success) {
-                return Result.success("创建成功");
+                return Result.success("Creation Successful");
             }
-            return Result.error("创建失败");
+            return Result.error("Creation Failed");
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
     
-    @ApiOperation("更新系统配置")
+    @ApiOperation("Update System Configuration")
     @PutMapping("/{id}")
     public Result<String> updateConfig(@PathVariable Long id, @RequestBody SystemConfiguration config) {
         try {
             config.setId(id);
             boolean success = systemConfigurationService.updateConfig(config);
             if (success) {
-                return Result.success("更新成功");
+                return Result.success("Update Successful");
             }
-            return Result.error("更新失败");
+            return Result.error("Update Failed");
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
     }
     
-    @ApiOperation("删除系统配置")
+    @ApiOperation("Delete System Configuration")
     @DeleteMapping("/{id}")
     public Result<String> deleteConfig(@PathVariable Long id) {
         boolean success = systemConfigurationService.deleteConfig(id);
         if (success) {
-            return Result.success("删除成功");
+            return Result.success("Deletion Successful");
         }
-        return Result.error("删除失败");
+        return Result.error("Deletion Failed");
     }
     
-    @ApiOperation("批量更新系统配置")
+    @ApiOperation("Batch Update System Configuration")
     @PutMapping("/batch")
     public Result<String> batchUpdateConfigs(@RequestBody List<SystemConfiguration> configs) {
         try {
             boolean success = systemConfigurationService.batchUpdateConfigs(configs);
             if (success) {
-                return Result.success("批量更新成功");
+                return Result.success("Batch Update Successful");
             }
-            return Result.error("批量更新失败");
+            return Result.error("Batch Update Failed");
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

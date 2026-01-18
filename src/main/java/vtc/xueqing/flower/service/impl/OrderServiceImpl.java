@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 订单服务实现类
+ * Order Service Implementation Class
  */
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -50,25 +50,25 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class)
     public ParentOrderCreateResult createOrder(OrderCreateRequest request) {
         if (request == null || CollectionUtils.isEmpty(request.getItems())) {
-            throw new RuntimeException("订单商品不能为空");
+            throw new RuntimeException("Order items cannot be empty");
         }
 
-        // 查询商品信息，以数据库价格为准
+        // Query product information, using database prices as reference
         Set<Long> prodIds = request.getItems().stream()
                 .map(OrderCreateRequest.OrderItemRequest::getProdId)
                 .collect(Collectors.toSet());
         List<Product> products = productMapper.selectBatchIds(prodIds);
         if (products.size() != prodIds.size()) {
-            throw new RuntimeException("部分商品不存在或已下架");
+            throw new RuntimeException("Some products do not exist or have been delisted");
         }
 
-        // 以商品所在商家分组，执行拆单
+        // Group by merchant where products belong, perform order splitting
         Map<Long, List<OrderCreateRequest.OrderItemRequest>> merchItems = request.getItems().stream()
                 .collect(Collectors.groupingBy(item -> {
                     Product product = products.stream()
                             .filter(p -> p.getProdId().equals(item.getProdId()))
                             .findFirst()
-                            .orElseThrow(() -> new RuntimeException("商品不存在"));
+                            .orElseThrow(() -> new RuntimeException("Product does not exist"));
                     return product.getMerchId();
                 }));
 
@@ -158,7 +158,7 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status) {
-        // 仅分页参数从外部 Page<Order> 透传，查询返回 OrderVO（含商家名）
+        // Only pagination parameters are passed through from external Page<Order>, query returns OrderVO (includes merchant name)
         Page<OrderVO> voPage = new Page<>(page.getCurrent(), page.getSize());
         return orderMapper.selectOrdersWithMerchant(voPage, userId, merchId, status);
     }
@@ -167,29 +167,29 @@ public class OrderServiceImpl implements OrderService {
     public Order getOrderById(Long orderId) {
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new RuntimeException("订单不存在");
+            throw new RuntimeException("Order does not exist");
         }
         
-        // 查询订单项
+        // Query order items
         LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OrderItem::getOrderId, orderId);
         List<OrderItem> orderItems = orderItemMapper.selectList(wrapper);
         
-        // 注意：这里需要在Order实体中添加transient字段来存储订单项
-        // 或者创建OrderVO来包含订单项信息
+        // Note: Need to add transient field to Order entity to store order items
+        // Or create OrderVO to include order item information
         
         return order;
     }
     
     @Override
     public OrderDetailVO getOrderDetailById(Long orderId) {
-        // 1. 查询订单基本信息（带客户和商家名称）
+        // 1. Query basic order information (with customer and merchant names)
         OrderDetailVO orderDetail = orderMapper.selectOrderDetailById(orderId);
         if (orderDetail == null) {
-            throw new RuntimeException("订单不存在");
+            throw new RuntimeException("Order does not exist");
         }
         
-        // 2. 查询订单项
+        // 2. Query order items
         LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OrderItem::getOrderId, orderId);
         List<OrderItem> orderItems = orderItemMapper.selectList(wrapper);
@@ -201,51 +201,51 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order payOrder(Long orderId, String paymentMethod) {
-        // 1. 获取订单
+        // 1. Get order
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new RuntimeException("订单不存在");
+            throw new RuntimeException("Order does not exist");
         }
         
-        // 2. 检查订单状态
+        // 2. Check order status
         if (!Constants.ORDER_STATUS_SUBMITTED.equals(order.getStatus())) {
-            throw new RuntimeException("订单状态不正确，无法支付");
+            throw new RuntimeException("Order status is incorrect, payment cannot be processed");
         }
         
         if (Constants.PAYMENT_STATUS_PAID.equals(order.getPaymentStatus())) {
-            throw new RuntimeException("订单已支付");
+            throw new RuntimeException("Order already paid");
         }
         
-        // 3. 根据支付方式处理（课程项目模拟实现）
+        // 3. Process according to payment method (course project simulation implementation)
         if (Constants.PAYMENT_METHOD_BALANCE.equals(paymentMethod)) {
-            // 余额支付：扣除用户余额
+            // Balance payment: deduct user balance
             Customer customer = customerMapper.selectById(order.getUserId());
             if (customer == null) {
-                throw new RuntimeException("用户不存在");
+                throw new RuntimeException("User does not exist");
             }
             
             if (customer.getBalance().compareTo(order.getActualPrice()) < 0) {
-                throw new RuntimeException("余额不足");
+                throw new RuntimeException("Insufficient balance");
             }
             
-            // 扣除余额
+            // Deduct balance
             customer.setBalance(customer.getBalance().subtract(order.getActualPrice()));
             customerMapper.updateById(customer);
         } else if (Constants.PAYMENT_METHOD_ALIPAY.equals(paymentMethod) || Constants.PAYMENT_METHOD_WECHAT.equals(paymentMethod)) {
-            // 支付宝/微信支付：模拟实现，直接标记为已支付
-            // 实际项目中需要对接第三方支付接口
-            System.out.println("模拟" + paymentMethod + "支付成功");
+            // Alipay/WeChat payment: simulation implementation, directly marked as paid
+            // In actual projects, need to integrate with third-party payment interfaces
+            System.out.println("Simulating " + paymentMethod + " payment success");
         } else {
-            throw new RuntimeException("不支持的支付方式");
+            throw new RuntimeException("Unsupported payment method");
         }
         
-        // 4. 更新订单状态
+        // 4. Update order status
         order.setPaymentStatus(Constants.PAYMENT_STATUS_PAID);
         order.setPaymentMethod(paymentMethod);
         order.setPaymentTime(LocalDateTime.now());
         order.setStatus(Constants.ORDER_STATUS_PAID);
         
-        // 5. 扣减商品库存
+        // 5. Reduce product inventory
         LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OrderItem::getOrderId, orderId);
         List<OrderItem> orderItems = orderItemMapper.selectList(wrapper);
@@ -255,12 +255,12 @@ public class OrderServiceImpl implements OrderService {
             if (product != null) {
                 int newStock = product.getStock() - item.getQuantity();
                 if (newStock < 0) {
-                    throw new RuntimeException("商品库存不足：" + product.getName());
+                    throw new RuntimeException("Insufficient product inventory: " + product.getName());
                 }
                 product.setStock(newStock);
                 product.setSales(product.getSales() + item.getQuantity());
                 
-                // 更新库存状态
+                // Update inventory status
                 if (newStock == 0) {
                     product.setStockStatus("OUT_OF_STOCK");
                 } else if (newStock < 10) {
@@ -280,40 +280,40 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order cancelOrder(Long orderId, String cancelReason) {
-        // 1. 获取订单
+        // 1. Get order
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new RuntimeException("订单不存在");
+            throw new RuntimeException("Order does not exist");
         }
         
-        // 2. 检查订单状态（只有待支付和处理中的订单可以取消）
+        // 2. Check order status (only pending payment and processing orders can be cancelled)
         if (Constants.ORDER_STATUS_CANCELLED.equals(order.getStatus())) {
-            throw new RuntimeException("订单已取消");
+            throw new RuntimeException("Order already cancelled");
         }
         
         if (Constants.ORDER_STATUS_COMPLETED.equals(order.getStatus())) {
-            throw new RuntimeException("订单已完成，无法取消");
+            throw new RuntimeException("Order completed, cannot be cancelled");
         }
         
         if (Constants.ORDER_STATUS_SHIPPED.equals(order.getStatus())) {
-            throw new RuntimeException("订单已发货，无法取消");
+            throw new RuntimeException("Order shipped, cannot be cancelled");
         }
         
-        // 3. 如果已支付，需要退款
+        // 3. If paid, refund is needed
         if (Constants.PAYMENT_STATUS_PAID.equals(order.getPaymentStatus())) {
             if (Constants.PAYMENT_METHOD_BALANCE.equals(order.getPaymentMethod())) {
-                // 余额支付：退回余额
+                // Balance payment: refund balance
                 Customer customer = customerMapper.selectById(order.getUserId());
                 if (customer != null) {
                     customer.setBalance(customer.getBalance().add(order.getActualPrice()));
                     customerMapper.updateById(customer);
                 }
             }
-            // 其他支付方式模拟退款
+            // Other payment methods simulate refund
             order.setPaymentStatus(Constants.PAYMENT_STATUS_REFUNDED);
         }
         
-        // 4. 恢复商品库存（如果已支付）
+        // 4. Restore product inventory (if paid)
         if (Constants.PAYMENT_STATUS_PAID.equals(order.getPaymentStatus())) {
             LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(OrderItem::getOrderId, orderId);
@@ -325,7 +325,7 @@ public class OrderServiceImpl implements OrderService {
                     product.setStock(product.getStock() + item.getQuantity());
                     product.setSales(Math.max(0, product.getSales() - item.getQuantity()));
                     
-                    // 更新库存状态
+                    // Update inventory status
                     if (product.getStock() > 10) {
                         product.setStockStatus("IN_STOCK");
                     } else if (product.getStock() > 0) {
@@ -337,7 +337,7 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         
-        // 5. 更新订单状态
+        // 5. Update order status
         order.setStatus(Constants.ORDER_STATUS_CANCELLED);
         order.setCancelReason(cancelReason);
         orderMapper.updateById(order);
@@ -348,26 +348,26 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order confirmOrder(Long orderId) {
-        // 1. 获取订单
+        // 1. Get order
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new RuntimeException("订单不存在");
+            throw new RuntimeException("Order does not exist");
         }
         
-        // 2. 检查订单状态（只有已发货的订单可以确认收货）
+        // 2. Check order status (only shipped orders can be confirmed received)
         if (!Constants.ORDER_STATUS_SHIPPED.equals(order.getStatus())) {
-            throw new RuntimeException("订单状态不正确，无法确认收货");
+            throw new RuntimeException("Order status is incorrect, cannot confirm receipt");
         }
         
-        // 3. 更新订单状态
+        // 3. Update order status
         order.setStatus(Constants.ORDER_STATUS_COMPLETED);
         order.setCompletionTime(LocalDateTime.now());
         orderMapper.updateById(order);
         
-        // 4. 给用户增加消费积分（1元=1积分）
+        // 4. Give user consumption points (1 yuan = 1 point)
         Customer customer = customerMapper.selectById(order.getUserId());
         if (customer != null && order.getTotalPrice() != null) {
-            int earnedPoints = order.getTotalPrice().intValue(); // 消费金额取整作为积分
+            int earnedPoints = order.getTotalPrice().intValue(); // Consumption amount rounded down as points
             Integer currentPoints = customer.getPoints() == null ? 0 : customer.getPoints();
             customer.setPoints(currentPoints + earnedPoints);
             customerMapper.updateById(customer);
@@ -379,18 +379,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order shipOrder(Long orderId) {
-        // 1. 获取订单
+        // 1. Get order
         Order order = orderMapper.selectById(orderId);
         if (order == null) {
-            throw new RuntimeException("订单不存在");
+            throw new RuntimeException("Order does not exist");
         }
         
-        // 2. 检查订单状态（只有处理中的订单可以发货）
+        // 2. Check order status (only processing orders can be shipped)
         if (!Constants.ORDER_STATUS_PAID.equals(order.getStatus())) {
-            throw new RuntimeException("订单状态不正确，无法发货");
+            throw new RuntimeException("Order status is incorrect, cannot ship");
         }
         
-        // 3. 更新订单状态
+        // 3. Update order status
         order.setStatus(Constants.ORDER_STATUS_SHIPPED);
         order.setDeliveryTime(LocalDateTime.now());
         orderMapper.updateById(order);
@@ -399,12 +399,12 @@ public class OrderServiceImpl implements OrderService {
     }
     
     /**
-     * 生成订单号
-     * 格式：yyyyMMddHHmmss + 6位随机数
+     * Generate order number
+     * Format: yyyyMMddHHmmss + 6-digit random number
      */
     private String generateOrderNo() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        int randomNum = new Random().nextInt(900000) + 100000; // 6位随机数
+        int randomNum = new Random().nextInt(900000) + 100000; // 6-digit random number
         return timestamp + randomNum;
     }
 

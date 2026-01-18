@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.ProductCategory;
 
 /**
- * 产品分类Mapper接口
+ * Product Category Mapper Interface
  */
 public interface ProductCategoryMapper extends BaseMapper<ProductCategory> {
 }

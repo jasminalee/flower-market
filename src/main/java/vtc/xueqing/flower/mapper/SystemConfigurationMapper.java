@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.SystemConfiguration;
 
 /**
- * 系统配置Mapper接口
+ * System Configuration Mapper Interface
  */
 public interface SystemConfigurationMapper extends BaseMapper<SystemConfiguration> {
 }

@@ -1,7 +1,7 @@
 package vtc.xueqing.flower.exception;
 
 /**
- * 业务异常类
+ * Business Exception Class
  */
 public class BusinessException extends RuntimeException {
 

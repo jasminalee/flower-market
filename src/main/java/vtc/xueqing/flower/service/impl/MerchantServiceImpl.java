@@ -26,7 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 商家服务实现类
+ * Merchant Service Implementation Class
  */
 @Slf4j
 @Service
@@ -52,43 +52,43 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public Merchant register(Merchant merchant) {
-        // 1. 检查邮箱是否已存在
+        // 1. Check if email already exists
         LambdaQueryWrapper<Merchant> emailWrapper = new LambdaQueryWrapper<>();
         emailWrapper.eq(Merchant::getEmail, merchant.getEmail());
         if (merchantMapper.selectCount(emailWrapper) > 0) {
-            throw new BusinessException("该邮箱已被注册");
+            throw new BusinessException("This email has already been registered");
         }
 
-        // 2. 检查手机号是否已存在
+        // 2. Check if phone number already exists
         LambdaQueryWrapper<Merchant> phoneWrapper = new LambdaQueryWrapper<>();
         phoneWrapper.eq(Merchant::getPhone, merchant.getPhone());
         if (merchantMapper.selectCount(phoneWrapper) > 0) {
-            throw new BusinessException("该手机号已被注册");
+            throw new BusinessException("This phone number has already been registered");
         }
 
-        // 3. 使用MD5加密密码
+        // 3. Encrypt password using MD5
         merchant.setPassword(SecureUtil.md5(merchant.getPassword()));
-        // 商家注册后默认为待审核状态
+        // Merchant defaults to pending review status after registration
         merchant.setStatus(Constants.MERCHANT_STATUS_PENDING);
         merchant.setCreateDate(LocalDateTime.now());
         merchant.setUpdateDate(LocalDateTime.now());
 
-        // 4. 保存到数据库
+        // 4. Save to database
         int result = merchantMapper.insert(merchant);
         if (result == 0) {
-            throw new BusinessException("注册失败");
+            throw new BusinessException("Registration failed");
         }
 
-        log.info("商家注册成功，邮箱：{}, 状态：待审核", merchant.getEmail());
+        log.info("Merchant registration successful, email: {}, status: Pending Review", merchant.getEmail());
 
-        // 5. 返回密码置空的merchant对象
+        // 5. Return merchant object with password cleared
         merchant.setPassword(null);
         return merchant;
     }
 
     @Override
     public Merchant login(Merchant login) {
-        // 1. 根据邮箱或手机号查询商家
+        // 1. Query merchant by email or phone number
         LambdaQueryWrapper<Merchant> wrapper = new LambdaQueryWrapper<>();
         wrapper.and(w -> w.eq(Merchant::getEmail, login.getEmail())
                 .or()
@@ -96,29 +96,29 @@ public class MerchantServiceImpl implements MerchantService {
 
         Merchant merchant = merchantMapper.selectOne(wrapper);
         if (merchant == null) {
-            throw new BusinessException("账号不存在");
+            throw new BusinessException("Account does not exist");
         }
 
-        // 2. 验证密码（MD5加密后比较）
+        // 2. Verify password (compare after MD5 encryption)
         String encryptedPassword = SecureUtil.md5(login.getPassword());
         if (!encryptedPassword.equals(merchant.getPassword())) {
-            throw new BusinessException("密码错误");
+            throw new BusinessException("Incorrect password");
         }
 
-        // 3. 检查商家状态
+        // 3. Check merchant status
         if (Constants.MERCHANT_STATUS_PENDING.equals(merchant.getStatus())) {
-            throw new BusinessException("您的商家账号正在审核中，请耐心等待");
+            throw new BusinessException("Your merchant account is under review, please wait patiently");
         }
         if (Constants.MERCHANT_STATUS_REJECTED.equals(merchant.getStatus())) {
-            throw new BusinessException("您的商家账号审核未通过");
+            throw new BusinessException("Your merchant account review was not approved");
         }
         if (Constants.MERCHANT_STATUS_SUSPENDED.equals(merchant.getStatus())) {
-            throw new BusinessException("您的商家账号已被暂停");
+            throw new BusinessException("Your merchant account has been suspended");
         }
 
-        log.info("商家登录成功，ID：{}, 邮箱：{}", merchant.getMerchId(), merchant.getEmail());
+        log.info("Merchant login successful, ID: {}, Email: {}", merchant.getMerchId(), merchant.getEmail());
 
-        // 4. 返回密码置空的merchant对象
+        // 4. Return merchant object with password cleared
         merchant.setPassword(null);
         return merchant;
     }
@@ -127,9 +127,9 @@ public class MerchantServiceImpl implements MerchantService {
     public Merchant getMerchantById(Long merchId) {
         Merchant merchant = merchantMapper.selectById(merchId);
         if (merchant == null) {
-            throw new BusinessException("商家不存在");
+            throw new BusinessException("Merchant does not exist");
         }
-        // 密码置空
+        // Clear password
         merchant.setPassword(null);
         return merchant;
     }
@@ -137,25 +137,25 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Merchant updateMerchant(Merchant merchant) {
-        // 1. 检查商家是否存在
+        // 1. Check if merchant exists
         Merchant existing = merchantMapper.selectById(merchant.getMerchId());
         if (existing == null) {
-            throw new BusinessException("商家不存在");
+            throw new BusinessException("Merchant does not exist");
         }
         
-        // 2. 如果更新密码，需要加密
+        // 2. If updating password, need to encrypt
         if (merchant.getPassword() != null && !merchant.getPassword().isEmpty()) {
             merchant.setPassword(SecureUtil.md5(merchant.getPassword()));
         } else {
-            // 不更新密码
+            // Do not update password
             merchant.setPassword(null);
         }
         
-        // 3. 更新
+        // 3. Update
         merchant.setUpdateDate(LocalDateTime.now());
         merchantMapper.updateById(merchant);
         
-        // 4. 返回更新后的信息（密码置空）
+        // 4. Return updated information (password cleared)
         Merchant updated = merchantMapper.selectById(merchant.getMerchId());
         updated.setPassword(null);
         return updated;
@@ -169,31 +169,31 @@ public class MerchantServiceImpl implements MerchantService {
         LocalDateTime weekStart = now.minusDays(7);
         LocalDateTime monthStart = now.minusDays(30);
         
-        // 1. 统计数据
+        // 1. Statistical data
         Map<String, Object> stats = new HashMap<>();
         
-        // 今日订单数
+        // Today's order count
         LambdaQueryWrapper<Order> todayWrapper = new LambdaQueryWrapper<>();
         todayWrapper.eq(Order::getMerchId, merchId)
                    .ge(Order::getOrderDate, todayStart);
         long todayOrders = orderMapper.selectCount(todayWrapper);
         stats.put("todayOrders", todayOrders);
         
-        // 今日销售额
+        // Today's sales amount
         List<Order> todayOrderList = orderMapper.selectList(todayWrapper);
         BigDecimal todaySales = todayOrderList.stream()
             .map(Order::getTotalPrice)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
         stats.put("todaySales", todaySales.doubleValue());
         
-        // 本周订单数
+        // This week's order count
         LambdaQueryWrapper<Order> weekWrapper = new LambdaQueryWrapper<>();
         weekWrapper.eq(Order::getMerchId, merchId)
                    .ge(Order::getOrderDate, weekStart);
         long weekOrders = orderMapper.selectCount(weekWrapper);
         stats.put("weekOrders", weekOrders);
         
-        // 本月销售额
+        // This month's sales amount
         LambdaQueryWrapper<Order> monthWrapper = new LambdaQueryWrapper<>();
         monthWrapper.eq(Order::getMerchId, merchId)
                    .ge(Order::getOrderDate, monthStart);
@@ -205,7 +205,7 @@ public class MerchantServiceImpl implements MerchantService {
         
         result.put("stats", stats);
         
-        // 2. 近期订单（最近5条）
+        // 2. Recent orders (latest 5)
         List<Map<String, Object>> recentOrders = new ArrayList<>();
         LambdaQueryWrapper<Order> recentWrapper = new LambdaQueryWrapper<>();
         recentWrapper.eq(Order::getMerchId, merchId)
@@ -220,18 +220,18 @@ public class MerchantServiceImpl implements MerchantService {
             orderMap.put("status", order.getStatus());
             orderMap.put("statusText", getStatusText(order.getStatus()));
             
-            // 获取客户名称
+            // Get customer name
             Customer customer = customerMapper.selectById(order.getUserId());
-            orderMap.put("customerName", customer != null ? customer.getName() : "未知");
+            orderMap.put("customerName", customer != null ? customer.getName() : "Unknown");
             
             recentOrders.add(orderMap);
         }
         result.put("recentOrders", recentOrders);
         
-        // 3. 热销商品（按销量统计，前5名）
+        // 3. Best-selling products (top 5 by sales volume)
         List<Map<String, Object>> topProducts = new ArrayList<>();
         
-        // 获取该商家所有已完成订单的订单ID
+        // Get all order IDs for completed orders of this merchant
         LambdaQueryWrapper<Order> completedWrapper = new LambdaQueryWrapper<>();
         completedWrapper.eq(Order::getMerchId, merchId)
                    .eq(Order::getStatus, Constants.ORDER_STATUS_COMPLETED);
@@ -242,12 +242,12 @@ public class MerchantServiceImpl implements MerchantService {
                 .map(Order::getId)
                 .collect(Collectors.toList());
             
-            // 统计各商品的销量和销售额
+            // Count sales volume and sales amount for each product
             LambdaQueryWrapper<OrderItem> itemWrapper = new LambdaQueryWrapper<>();
             itemWrapper.in(OrderItem::getOrderId, orderIds);
             List<OrderItem> items = orderItemMapper.selectList(itemWrapper);
             
-            // 按商品ID分组统计
+            // Group and count by product ID
             Map<Long, Map<String, Object>> productStats = new HashMap<>();
             for (OrderItem item : items) {
                 Long prodId = item.getProdId();
@@ -258,13 +258,13 @@ public class MerchantServiceImpl implements MerchantService {
                 int sales = (int) stat.getOrDefault("sales", 0) + item.getQuantity();
                 stat.put("sales", sales);
                 
-                // 使用Double类型避免类型转换错误
+                // Use Double type to avoid type conversion errors
                 double revenue = (double) stat.getOrDefault("revenue", 0.0);
                 revenue += item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())).doubleValue();
                 stat.put("revenue", revenue);
             }
             
-            // 按销量排序，取前5
+            // Sort by sales volume, take top 5
             topProducts = productStats.values().stream()
                 .sorted((a, b) -> Integer.compare((int)b.get("sales"), (int)a.get("sales")))
                 .limit(5)
@@ -272,7 +272,7 @@ public class MerchantServiceImpl implements MerchantService {
         }
         result.put("topProducts", topProducts);
         
-        // 4. 销售趋势（近7天）
+        // 4. Sales trend (last 7 days)
         List<Map<String, Object>> salesTrend = new ArrayList<>();
         for (int i = 6; i >= 0; i--) {
             LocalDate date = LocalDate.now().minusDays(i);
@@ -301,11 +301,11 @@ public class MerchantServiceImpl implements MerchantService {
     
     private String getStatusText(String status) {
         switch (status) {
-            case Constants.ORDER_STATUS_SUBMITTED: return "待支付";
-            case Constants.ORDER_STATUS_PAID: return "已支付";
-            case Constants.ORDER_STATUS_SHIPPED: return "已发货";
-            case Constants.ORDER_STATUS_COMPLETED: return "已完成";
-            case Constants.ORDER_STATUS_CANCELLED: return "已取消";
+            case Constants.ORDER_STATUS_SUBMITTED: return "Pending Payment";
+            case Constants.ORDER_STATUS_PAID: return "Paid";
+            case Constants.ORDER_STATUS_SHIPPED: return "Shipped";
+            case Constants.ORDER_STATUS_COMPLETED: return "Completed";
+            case Constants.ORDER_STATUS_CANCELLED: return "Cancelled";
             default: return status;
         }
     }
@@ -320,7 +320,7 @@ public class MerchantServiceImpl implements MerchantService {
             new LambdaQueryWrapper<>();
         wrapper.eq(vtc.xueqing.flower.entity.Product::getMerchId, merchId);
         
-        // 关键词搜索（搜索商品名称和描述）
+        // Keyword search (search product name and description)
         if (keyword != null && !keyword.trim().isEmpty()) {
             wrapper.and(w -> w.like(vtc.xueqing.flower.entity.Product::getName, keyword)
                              .or()
@@ -333,7 +333,7 @@ public class MerchantServiceImpl implements MerchantService {
     }
     
     /**
-     * 获取商家商品列表（支持更多筛选条件）
+     * Get merchant product list (supports more filter conditions)
      */
     public com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> getMerchantProductsWithFilter(
             Long merchId, Long current, Long size, String name, Long catId, String status) {
@@ -344,17 +344,17 @@ public class MerchantServiceImpl implements MerchantService {
             new LambdaQueryWrapper<>();
         wrapper.eq(vtc.xueqing.flower.entity.Product::getMerchId, merchId);
         
-        // 商品名称搜索
+        // Product name search
         if (name != null && !name.trim().isEmpty()) {
             wrapper.like(vtc.xueqing.flower.entity.Product::getName, name);
         }
         
-        // 分类筛选
+        // Category filter
         if (catId != null) {
             wrapper.eq(vtc.xueqing.flower.entity.Product::getCatId, catId);
         }
         
-        // 状态筛选
+        // Status filter
         if (status != null && !status.trim().isEmpty()) {
             wrapper.eq(vtc.xueqing.flower.entity.Product::getStatus, status);
         }
@@ -372,7 +372,7 @@ public class MerchantServiceImpl implements MerchantService {
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Order::getMerchId, merchId);
         
-        // 状态筛选
+        // Status filter
         if (status != null && !status.trim().isEmpty()) {
             wrapper.eq(Order::getStatus, status);
         }
@@ -390,7 +390,7 @@ public class MerchantServiceImpl implements MerchantService {
         LambdaQueryWrapper<vtc.xueqing.flower.entity.Coupon> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(vtc.xueqing.flower.entity.Coupon::getMerchId, merchId);
         
-        // 状态筛选
+        // Status filter
         if (status != null && !status.trim().isEmpty()) {
             wrapper.eq(vtc.xueqing.flower.entity.Coupon::getStatus, status);
         }

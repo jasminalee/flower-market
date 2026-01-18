@@ -9,12 +9,12 @@ import vtc.xueqing.flower.vo.CustomerCouponVO;
 import java.util.List;
 
 /**
- * 用户优惠券Mapper接口
+ * Customer Coupon Mapper Interface
  */
 public interface CustomerCouponMapper extends BaseMapper<CustomerCoupon> {
     
     /**
-     * 获取用户优惠券列表（包含优惠券详细信息）
+     * Get customer coupon list (includes coupon details)
      */
     @Select("<script>" +
             "SELECT cc.id, cc.user_id, cc.coupon_id, cc.code, cc.status, " +

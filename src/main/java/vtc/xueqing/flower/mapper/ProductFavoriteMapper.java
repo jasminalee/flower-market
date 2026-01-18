@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.ProductFavorite;
 
 /**
- * 产品收藏Mapper接口
+ * Product Favorite Mapper Interface
  */
 public interface ProductFavoriteMapper extends BaseMapper<ProductFavorite> {
 }

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.ProductTrackability;
 
 /**
- * 产品溯源Mapper接口
+ * Product Traceability Mapper Interface
  */
 public interface ProductTrackabilityMapper extends BaseMapper<ProductTrackability> {
 }

@@ -186,7 +186,7 @@ public class AdministratorController {
     public Result<IPage<vtc.xueqing.flower.entity.CareKnowledge>> getKnowledgeList(
             @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
             @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("搜索关键词") @RequestParam(required = false) String keyword,
+            @ApiParam("Search Keywords") @RequestParam(required = false) String keyword,
             @ApiParam("Category") @RequestParam(required = false) String category,
             @ApiParam("Status") @RequestParam(required = false) String status
     ) {

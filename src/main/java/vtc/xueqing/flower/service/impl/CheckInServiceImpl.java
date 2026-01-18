@@ -15,7 +15,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
- * 签到服务实现类
+ * Check-in Service Implementation Class
  */
 @Service
 public class CheckInServiceImpl implements CheckInService {
@@ -26,35 +26,35 @@ public class CheckInServiceImpl implements CheckInService {
     @Resource
     private CustomerMapper customerMapper;
     
-    // 签到奖励配置
-    private static final int NORMAL_REWARD = 10;  // 普通签到奖励积分
-    private static final int CONTINUOUS_REWARD = 5;  // 连续签到额外奖励积分
+    // Check-in reward configuration
+    private static final int NORMAL_REWARD = 10;  // Normal check-in reward points
+    private static final int CONTINUOUS_REWARD = 5;  // Continuous check-in bonus points
     
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CheckIn dailyCheckIn(Long userId) {
-        // 1. 检查用户是否存在
+        // 1. Check if user exists
         Customer customer = customerMapper.selectById(userId);
         if (customer == null) {
-            throw new RuntimeException("用户不存在");
+            throw new RuntimeException("User does not exist");
         }
         
-        // 2. 检查今日是否已签到
+        // 2. Check if checked in today
         LocalDate today = LocalDate.now();
         if (isTodayCheckedIn(userId)) {
-            throw new RuntimeException("今日已签到");
+            throw new RuntimeException("Already checked in today");
         }
         
-        // 3. 计算连续签到天数
+        // 3. Calculate consecutive check-in days
         int continuousDays = calculateContinuousDays(userId);
         
-        // 4. 计算奖励积分
+        // 4. Calculate reward points
         int rewardPoints = NORMAL_REWARD;
         if (continuousDays > 0) {
-            rewardPoints += CONTINUOUS_REWARD;  // 连续签到额外奖励
+            rewardPoints += CONTINUOUS_REWARD;  // Continuous check-in bonus
         }
         
-        // 5. 创建签到记录
+        // 5. Create check-in record
         CheckIn checkIn = new CheckIn();
         checkIn.setUserId(userId);
         checkIn.setCheckDate(today);
@@ -62,13 +62,13 @@ public class CheckInServiceImpl implements CheckInService {
         checkIn.setRewardPoints(rewardPoints);
         checkInMapper.insert(checkIn);
         
-        // 6. 更新用户积分和余额
-        // 更新总积分
+        // 6. Update user points and balance
+        // Update total points
         Integer currentPoints = customer.getPoints() == null ? 0 : customer.getPoints();
         customer.setPoints(currentPoints + rewardPoints);
         
-        // 更新余额（积分可以转换为余额，这里简化处理）
-        // 1积分 = 0.1元
+        // Update balance (points can be converted to balance, simplified here)
+        // 1 point = 0.1 yuan
         customer.setBalance(customer.getBalance().add(
             java.math.BigDecimal.valueOf(rewardPoints * 0.1)
         ));
@@ -93,7 +93,7 @@ public class CheckInServiceImpl implements CheckInService {
     
     @Override
     public Integer getContinuousDays(Long userId) {
-        // 获取最近的签到记录
+        // Get most recent check-in record
         LambdaQueryWrapper<CheckIn> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(CheckIn::getUserId, userId)
                 .orderByDesc(CheckIn::getCheckDate)
@@ -105,17 +105,17 @@ public class CheckInServiceImpl implements CheckInService {
             return 0;
         }
         
-        // 检查最近签到是否是昨天或今天
+        // Check if the most recent check-in was yesterday or today
         LocalDate today = LocalDate.now();
         LocalDate lastCheckDate = lastCheckIn.getCheckDate();
         
         long daysBetween = ChronoUnit.DAYS.between(lastCheckDate, today);
         
         if (daysBetween <= 1) {
-            // 昨天或今天签到过，返回连续天数
+            // Checked in yesterday or today, return consecutive days
             return lastCheckIn.getContinuousDays();
         } else {
-            // 中断了，返回0
+            // Interrupted, return 0
             return 0;
         }
     }
@@ -133,10 +133,10 @@ public class CheckInServiceImpl implements CheckInService {
     }
     
     /**
-     * 计算连续签到天数（不包括今天）
+     * Calculate consecutive check-in days (excluding today)
      */
     private int calculateContinuousDays(Long userId) {
-        // 获取最近的签到记录
+        // Get most recent check-in record
         LambdaQueryWrapper<CheckIn> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(CheckIn::getUserId, userId)
                 .orderByDesc(CheckIn::getCheckDate)
@@ -145,19 +145,19 @@ public class CheckInServiceImpl implements CheckInService {
         CheckIn lastCheckIn = checkInMapper.selectOne(wrapper);
         
         if (lastCheckIn == null) {
-            return 0;  // 首次签到
+            return 0;  // First check-in
         }
         
-        // 检查最近签到是否是昨天
+        // Check if the most recent check-in was yesterday
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
         LocalDate lastCheckDate = lastCheckIn.getCheckDate();
         
         if (lastCheckDate.equals(yesterday)) {
-            // 昨天签到过，连续
+            // Checked in yesterday, consecutive
             return lastCheckIn.getContinuousDays();
         } else {
-            // 中断了，重新开始
+            // Interrupted, restart
             return 0;
         }
     }

@@ -32,10 +32,6 @@ public interface CheckInService {
     Integer getContinuousDays(Long userId);
     
     /**
-     * 检查今日是否已签到
-     * @param userId 用户ID
-     * @return 是否已签到
-    /**
      * Check if user has checked in today.
      * @param userId user ID
      * @return whether already checked in

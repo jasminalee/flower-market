@@ -14,10 +14,10 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 产品分类Controller
+ * Product Category Controller
  */
 @Slf4j
-@Api(tags = "产品分类接口")
+@Api(tags = "Product Category Interface")
 @RestController
 @RequestMapping("/api/products/categories")
 public class ProductCategoryController {
@@ -25,34 +25,34 @@ public class ProductCategoryController {
     @Resource
     private ProductCategoryService productCategoryService;
 
-    @ApiOperation("分页获取分类列表")
+    @ApiOperation("Get Category List with Pagination")
     @GetMapping
     public Result<Page<ProductCategory>> getCategoryPage(
-            @ApiParam("当前页") @RequestParam(defaultValue = "1") Long current,
-            @ApiParam("每页大小") @RequestParam(defaultValue = "10") Long size,
-            @ApiParam("父分类ID，可选") @RequestParam(required = false) Long parentId
+            @ApiParam("Current Page") @RequestParam(defaultValue = "1") Long current,
+            @ApiParam("Page Size") @RequestParam(defaultValue = "10") Long size,
+            @ApiParam("Parent Category ID, Optional") @RequestParam(required = false) Long parentId
     ) {
         Page<ProductCategory> page = productCategoryService.getCategoryPage(current, size, parentId);
         return Result.success(page);
     }
 
-    @ApiOperation("根据父分类ID获取子分类")
+    @ApiOperation("Get Child Categories by Parent Category ID")
     @GetMapping("/parent/{parentId}")
     public Result<List<ProductCategory>> getCategoriesByParentId(
-            @ApiParam("父分类ID") @PathVariable Long parentId
+            @ApiParam("Parent Category ID") @PathVariable Long parentId
     ) {
         List<ProductCategory> categories = productCategoryService.getCategoriesByParentId(parentId);
         return Result.success(categories);
     }
 
-    @ApiOperation("获取分类详情")
+    @ApiOperation("Get Category Details")
     @GetMapping("/{id}")
     public Result<ProductCategory> getCategoryById(@PathVariable Long id) {
         ProductCategory category = productCategoryService.getCategoryById(id);
         return Result.success(category);
     }
     
-    @ApiOperation("获取所有分类列表")
+    @ApiOperation("Get All Categories List")
     @GetMapping("/all")
     public Result<List<ProductCategory>> getAllCategories() {
         List<ProductCategory> categories = productCategoryService.getAllCategories();

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.Coupon;
 
 /**
- * 优惠券Mapper接口
+ * Coupon Mapper Interface
  */
 public interface CouponMapper extends BaseMapper<Coupon> {
 }

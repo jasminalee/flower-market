@@ -12,7 +12,7 @@ import vtc.xueqing.flower.service.CareKnowledgeService;
 import javax.annotation.Resource;
 
 /**
- * 养护知识服务实现类
+ * Care Knowledge Service Implementation Class
  */
 @Service
 public class CareKnowledgeServiceImpl implements CareKnowledgeService {
@@ -24,7 +24,7 @@ public class CareKnowledgeServiceImpl implements CareKnowledgeService {
     public IPage<CareKnowledge> getCareKnowledgePage(Page<CareKnowledge> page, String category, String status) {
         LambdaQueryWrapper<CareKnowledge> wrapper = new LambdaQueryWrapper<>();
         
-        // 筛选条件
+        // Filter conditions
         wrapper.eq(category != null && !category.isEmpty(), CareKnowledge::getCategory, category)
                 .eq(status != null && !status.isEmpty(), CareKnowledge::getStatus, status)
                 .orderByDesc(CareKnowledge::getCreateDate);
@@ -37,10 +37,10 @@ public class CareKnowledgeServiceImpl implements CareKnowledgeService {
     public CareKnowledge getCareKnowledgeById(Long id) {
         CareKnowledge careKnowledge = careKnowledgeMapper.selectById(id);
         if (careKnowledge == null) {
-            throw new RuntimeException("养护知识不存在");
+            throw new RuntimeException("Care knowledge does not exist");
         }
         
-        // 增加浏览次数
+        // Increase view count
         careKnowledge.setViewCount(careKnowledge.getViewCount() + 1);
         careKnowledgeMapper.updateById(careKnowledge);
         
@@ -50,23 +50,23 @@ public class CareKnowledgeServiceImpl implements CareKnowledgeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CareKnowledge createCareKnowledge(CareKnowledge careKnowledge) {
-        // 设置默认状态
+        // Set default status
         if (careKnowledge.getStatus() == null || careKnowledge.getStatus().isEmpty()) {
             careKnowledge.setStatus("PUBLISHED");
         }
         
-        // 初始化浏览次数
+        // Initialize view count
         if (careKnowledge.getViewCount() == null) {
             careKnowledge.setViewCount(0);
         }
         
-        // 验证必填字段
+        // Validate required fields
         if (careKnowledge.getTitle() == null || careKnowledge.getTitle().isEmpty()) {
-            throw new RuntimeException("标题不能为空");
+            throw new RuntimeException("Title cannot be empty");
         }
         
         if (careKnowledge.getContent() == null || careKnowledge.getContent().isEmpty()) {
-            throw new RuntimeException("内容不能为空");
+            throw new RuntimeException("Content cannot be empty");
         }
         
         careKnowledgeMapper.insert(careKnowledge);
@@ -76,19 +76,19 @@ public class CareKnowledgeServiceImpl implements CareKnowledgeService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CareKnowledge updateCareKnowledge(CareKnowledge careKnowledge) {
-        // 检查是否存在
+        // Check if exists
         CareKnowledge existing = careKnowledgeMapper.selectById(careKnowledge.getId());
         if (existing == null) {
-            throw new RuntimeException("养护知识不存在");
+            throw new RuntimeException("Care knowledge does not exist");
         }
         
-        // 验证必填字段
+        // Validate required fields
         if (careKnowledge.getTitle() != null && careKnowledge.getTitle().isEmpty()) {
-            throw new RuntimeException("标题不能为空");
+            throw new RuntimeException("Title cannot be empty");
         }
         
         if (careKnowledge.getContent() != null && careKnowledge.getContent().isEmpty()) {
-            throw new RuntimeException("内容不能为空");
+            throw new RuntimeException("Content cannot be empty");
         }
         
         careKnowledgeMapper.updateById(careKnowledge);
@@ -100,7 +100,7 @@ public class CareKnowledgeServiceImpl implements CareKnowledgeService {
     public void deleteCareKnowledge(Long id) {
         CareKnowledge careKnowledge = careKnowledgeMapper.selectById(id);
         if (careKnowledge == null) {
-            throw new RuntimeException("养护知识不存在");
+            throw new RuntimeException("Care knowledge does not exist");
         }
         
         careKnowledgeMapper.deleteById(id);

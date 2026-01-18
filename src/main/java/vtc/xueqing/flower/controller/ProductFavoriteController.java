@@ -12,9 +12,9 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 产品收藏控制器
+ * Product Favorite Controller
  */
-@Api(tags = "产品收藏管理")
+@Api(tags = "Product Favorite Management")
 @RestController
 @RequestMapping("/api/products")
 public class ProductFavoriteController {
@@ -22,11 +22,11 @@ public class ProductFavoriteController {
     @Resource
     private ProductFavoriteService productFavoriteService;
     
-    @ApiOperation("添加收藏")
+    @ApiOperation("Add Favorite")
     @PostMapping("/{id}/favorite")
     public Result<ProductFavorite> addFavorite(
             @PathVariable("id") Long prodId,
-            @ApiParam("用户ID") @RequestParam Long userId
+            @ApiParam("User ID") @RequestParam Long userId
     ) {
         try {
             ProductFavorite productFavorite = new ProductFavorite();
@@ -40,11 +40,11 @@ public class ProductFavoriteController {
         }
     }
     
-    @ApiOperation("取消收藏")
+    @ApiOperation("Remove Favorite")
     @DeleteMapping("/{id}/favorite")
     public Result<Void> removeFavorite(
             @PathVariable("id") Long prodId,
-            @ApiParam("用户ID") @RequestParam Long userId
+            @ApiParam("User ID") @RequestParam Long userId
     ) {
         try {
             productFavoriteService.removeFavorite(userId, prodId);
@@ -54,10 +54,10 @@ public class ProductFavoriteController {
         }
     }
     
-    @ApiOperation("获取用户收藏列表")
+    @ApiOperation("Get User Favorites List")
     @GetMapping("/favorites")
     public Result<List<vtc.xueqing.flower.entity.Product>> getUserFavorites(
-            @ApiParam("用户ID") @RequestParam Long userId
+            @ApiParam("User ID") @RequestParam Long userId
     ) {
         try {
             List<vtc.xueqing.flower.entity.Product> favorites = productFavoriteService.getUserFavorites(userId);
@@ -67,11 +67,11 @@ public class ProductFavoriteController {
         }
     }
     
-    @ApiOperation("检查是否已收藏")
+    @ApiOperation("Check if Favorited")
     @GetMapping("/{id}/favorite/check")
     public Result<Boolean> checkFavorite(
             @PathVariable("id") Long prodId,
-            @ApiParam("用户ID") @RequestParam Long userId
+            @ApiParam("User ID") @RequestParam Long userId
     ) {
         try {
             boolean isFavorited = productFavoriteService.isFavorited(userId, prodId);

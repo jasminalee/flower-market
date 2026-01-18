@@ -6,14 +6,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 创建订单请求模型，兼容前端字段命名
+ * Create Order Request Model, Compatible with Frontend Field Naming
  */
 @Data
 public class OrderCreateRequest {
 
     private Long userId;
     /**
-     * 商家ID，可不传，后端将从商品信息中识别
+     * Merchant ID, Optional, Backend Will Identify From Product Information
      */
     private Long merchId;
 
@@ -23,27 +23,27 @@ public class OrderCreateRequest {
     private String remark;
 
     /**
-     * 优惠金额，缺省视为0
+     * Discount Amount, Default Value is 0
      */
     private BigDecimal discountAmount;
 
     /**
-     * 前端传入的展示金额（不作为最终依据，仅为兼容字段）
+     * Display Amount Passed by Frontend (Not Used as Final Basis, Only for Compatibility)
      */
     private BigDecimal totalAmount;
 
     /**
-     * 前端传入的应付金额（不作为最终依据，仅为兼容字段）
+     * Payable Amount Passed by Frontend (Not Used as Final Basis, Only for Compatibility)
      */
     private BigDecimal finalAmount;
 
     /**
-     * 使用的用户优惠券ID（可选）
+     * User Coupon ID Used (Optional)
      */
     private Long customerCouponId;
 
     /**
-     * 订单项列表
+     * Order Item List
      */
     private List<OrderItemRequest> items;
 
@@ -52,7 +52,7 @@ public class OrderCreateRequest {
         private Long prodId;
         private Integer quantity;
         /**
-         * 前端传入的单价（后端会以数据库价格为准）
+         * Unit Price Passed by Frontend (Backend Will Use Database Price)
          */
         private BigDecimal price;
     }

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.OrderItem;
 
 /**
- * 订单项Mapper接口
+ * Order Item Mapper Interface
  */
 public interface OrderItemMapper extends BaseMapper<OrderItem> {
 }

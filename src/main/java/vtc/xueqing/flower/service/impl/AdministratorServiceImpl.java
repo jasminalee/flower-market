@@ -21,7 +21,7 @@ import vtc.xueqing.flower.vo.OrderVO;
 import javax.annotation.Resource;
 
 /**
- * 管理员服务实现类
+ * Administrator Service Implementation Class
  */
 @Service
 public class AdministratorServiceImpl implements AdministratorService {
@@ -43,24 +43,24 @@ public class AdministratorServiceImpl implements AdministratorService {
     
     @Override
     public Administrator login(String email, String password) {
-        // 1. 根据邮箱查询管理员
+        // 1. Query administrator by email
         LambdaQueryWrapper<Administrator> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Administrator::getEmail, email);
         Administrator admin = administratorMapper.selectOne(wrapper);
         
         if (admin == null) {
-            throw new RuntimeException("管理员不存在");
+            throw new RuntimeException("Administrator does not exist");
         }
         
-        // 2. 检查状态
+        // 2. Check status
         if (!"ACTIVE".equals(admin.getStatus())) {
-            throw new RuntimeException("管理员账号已被禁用");
+            throw new RuntimeException("Administrator account has been disabled");
         }
         
-        // 3. 验证密码（MD5）
+        // 3. Verify password (MD5)
         String encryptedPassword = SecureUtil.md5(password);
         if (!encryptedPassword.equals(admin.getPassword())) {
-            throw new RuntimeException("密码错误");
+            throw new RuntimeException("Incorrect password");
         }
         
         // 4. 返回时密码置空
@@ -76,7 +76,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         
         IPage<Customer> customerPage = customerMapper.selectPage(page, wrapper);
         
-        // 密码置空
+        // Set password to null
         customerPage.getRecords().forEach(customer -> customer.setPassword(null));
         
         return customerPage;
@@ -86,9 +86,9 @@ public class AdministratorServiceImpl implements AdministratorService {
     public Customer getCustomerById(Long userId) {
         Customer customer = customerMapper.selectById(userId);
         if (customer == null) {
-            throw new RuntimeException("用户不存在");
+            throw new RuntimeException("User does not exist");
         }
-        // 密码置空
+        // Set password to null
         customer.setPassword(null);
         return customer;
     }
@@ -97,9 +97,9 @@ public class AdministratorServiceImpl implements AdministratorService {
     public Merchant getMerchantById(Long merchId) {
         Merchant merchant = merchantMapper.selectById(merchId);
         if (merchant == null) {
-            throw new RuntimeException("商家不存在");
+            throw new RuntimeException("Merchant does not exist");
         }
-        // 密码置空
+        // Set password to null
         merchant.setPassword(null);
         return merchant;
     }
@@ -112,7 +112,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         
         IPage<Merchant> merchantPage = merchantMapper.selectPage(page, wrapper);
         
-        // 密码置空
+        // Set password to null
         merchantPage.getRecords().forEach(merchant -> merchant.setPassword(null));
         
         return merchantPage;
@@ -121,18 +121,18 @@ public class AdministratorServiceImpl implements AdministratorService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Merchant verifyMerchant(Long merchId, String status) {
-        // 1. 获取商家信息
+        // 1. Get merchant information
         Merchant merchant = merchantMapper.selectById(merchId);
         if (merchant == null) {
-            throw new RuntimeException("商家不存在");
+            throw new RuntimeException("Merchant does not exist");
         }
         
-        // 2. 验证状态
+        // 2. Validate status
         if (!"ACTIVE".equals(status) && !"REJECTED".equals(status) && !"SUSPENDED".equals(status)) {
-            throw new RuntimeException("状态只能是ACTIVE、REJECTED或SUSPENDED");
+            throw new RuntimeException("Status can only be ACTIVE, REJECTED, or SUSPENDED");
         }
         
-        // 3. 更新状态
+        // 3. Update status
         merchant.setStatus(status);
         merchantMapper.updateById(merchant);
         
@@ -144,18 +144,18 @@ public class AdministratorServiceImpl implements AdministratorService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Customer updateCustomerLevel(Long userId, String level) {
-        // 1. 获取顾客信息
+        // 1. Get customer information
         Customer customer = customerMapper.selectById(userId);
         if (customer == null) {
-            throw new RuntimeException("顾客不存在");
+            throw new RuntimeException("Customer does not exist");
         }
         
-        // 2. 验证等级
+        // 2. Validate level
         if (!"NORMAL".equals(level) && !"VIP".equals(level) && !"SVIP".equals(level)) {
-            throw new RuntimeException("会员等级只能是NORMAL、VIP或SVIP");
+            throw new RuntimeException("Membership level can only be NORMAL, VIP, or SVIP");
         }
         
-        // 3. 更新等级
+        // 3. Update level
         customer.setLevel(level);
         customerMapper.updateById(customer);
         
@@ -168,14 +168,14 @@ public class AdministratorServiceImpl implements AdministratorService {
     public java.util.Map<String, Object> getDashboardData() {
         java.util.Map<String, Object> result = new java.util.HashMap<>();
         
-        // 1. 统计数据
+        // 1. Statistics data
         java.util.Map<String, Object> stats = new java.util.HashMap<>();
         
-        // 总用户数
+        // Total users
         Long totalUsers = customerMapper.selectCount(null);
         stats.put("totalUsers", totalUsers);
         
-        // 总商家数
+        // Total merchants
         Long totalMerchants = merchantMapper.selectCount(null);
         stats.put("totalMerchants", totalMerchants);
         
@@ -185,25 +185,25 @@ public class AdministratorServiceImpl implements AdministratorService {
         
         result.put("stats", stats);
         
-        // 2. 最近注册的用户（前10个）
+        // 2. Recently registered users (top 10)
         com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Customer> customerWrapper = 
             new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
         customerWrapper.orderByDesc(Customer::getCreateDate).last("LIMIT 10");
         java.util.List<Customer> recentUsers = customerMapper.selectList(customerWrapper);
-        // 清除密码
+        // Clear password
         recentUsers.forEach(c -> c.setPassword(null));
         result.put("recentUsers", recentUsers);
         
-        // 3. 最近注册的商家（前10个）
+        // 3. Recently registered merchants (top 10)
         com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Merchant> merchantWrapper = 
             new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
         merchantWrapper.orderByDesc(Merchant::getCreateDate).last("LIMIT 10");
         java.util.List<Merchant> recentMerchants = merchantMapper.selectList(merchantWrapper);
-        // 清除密码
+        // Clear password
         recentMerchants.forEach(m -> m.setPassword(null));
         result.put("recentMerchants", recentMerchants);
         
-        // 4. 订单趋势（最近7天）- 简化实现，返回模拟数据
+        // 4. Order trend (last 7 days) - Simplified implementation, return mock data
         java.util.List<java.util.Map<String, Object>> orderTrend = new java.util.ArrayList<>();
         java.time.LocalDate today = java.time.LocalDate.now();
         for (int i = 6; i >= 0; i--) {
@@ -237,7 +237,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     public CareKnowledge getKnowledgeById(Long id) {
         CareKnowledge knowledge = careKnowledgeMapper.selectById(id);
         if (knowledge == null) {
-            throw new RuntimeException("养护知识不存在");
+            throw new RuntimeException("Care knowledge does not exist");
         }
         return knowledge;
     }
@@ -245,23 +245,23 @@ public class AdministratorServiceImpl implements AdministratorService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CareKnowledge createKnowledge(CareKnowledge knowledge) {
-        // 设置默认状态
+        // Set default status
         if (knowledge.getStatus() == null || knowledge.getStatus().isEmpty()) {
             knowledge.setStatus("PUBLISHED");
         }
         
-        // 初始化浏览次数
+        // Initialize view count
         if (knowledge.getViewCount() == null) {
             knowledge.setViewCount(0);
         }
         
-        // 验证必填字段
+        // Validate required fields
         if (knowledge.getTitle() == null || knowledge.getTitle().isEmpty()) {
-            throw new RuntimeException("标题不能为空");
+            throw new RuntimeException("Title cannot be empty");
         }
         
         if (knowledge.getContent() == null || knowledge.getContent().isEmpty()) {
-            throw new RuntimeException("内容不能为空");
+            throw new RuntimeException("Content cannot be empty");
         }
         
         careKnowledgeMapper.insert(knowledge);
@@ -273,7 +273,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     public CareKnowledge updateKnowledge(CareKnowledge knowledge) {
         CareKnowledge existing = careKnowledgeMapper.selectById(knowledge.getId());
         if (existing == null) {
-            throw new RuntimeException("养护知识不存在");
+            throw new RuntimeException("Care knowledge does not exist");
         }
         
         careKnowledgeMapper.updateById(knowledge);
@@ -285,12 +285,12 @@ public class AdministratorServiceImpl implements AdministratorService {
     public CareKnowledge updateKnowledgeStatus(Long id, String status) {
         CareKnowledge knowledge = careKnowledgeMapper.selectById(id);
         if (knowledge == null) {
-            throw new RuntimeException("养护知识不存在");
+            throw new RuntimeException("Care knowledge does not exist");
         }
         
-        // 验证状态值
+        // Validate status value
         if (!"PUBLISHED".equals(status) && !"DRAFT".equals(status)) {
-            throw new RuntimeException("状态只能是PUBLISHED或DRAFT");
+            throw new RuntimeException("Status can only be PUBLISHED or DRAFT");
         }
         
         knowledge.setStatus(status);
@@ -303,7 +303,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     public void deleteKnowledge(Long id) {
         CareKnowledge knowledge = careKnowledgeMapper.selectById(id);
         if (knowledge == null) {
-            throw new RuntimeException("养护知识不存在");
+            throw new RuntimeException("Care knowledge does not exist");
         }
         
         careKnowledgeMapper.deleteById(id);
@@ -313,9 +313,9 @@ public class AdministratorServiceImpl implements AdministratorService {
     public Administrator getProfileById(Long adminId) {
         Administrator admin = administratorMapper.selectById(adminId);
         if (admin == null) {
-            throw new RuntimeException("管理员不存在");
+            throw new RuntimeException("Administrator does not exist");
         }
-        // 密码置空
+        // Set password to null
         admin.setPassword(null);
         return admin;
     }
@@ -325,7 +325,7 @@ public class AdministratorServiceImpl implements AdministratorService {
     public Administrator updateProfile(Long adminId, String name) {
         Administrator admin = administratorMapper.selectById(adminId);
         if (admin == null) {
-            throw new RuntimeException("管理员不存在");
+            throw new RuntimeException("Administrator does not exist");
         }
         
         if (name != null && !name.trim().isEmpty()) {
@@ -333,7 +333,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         }
         
         administratorMapper.updateById(admin);
-        // 密码置空
+        // Set password to null
         admin.setPassword(null);
         return admin;
     }
@@ -343,16 +343,16 @@ public class AdministratorServiceImpl implements AdministratorService {
     public void updatePassword(Long adminId, String oldPassword, String newPassword) {
         Administrator admin = administratorMapper.selectById(adminId);
         if (admin == null) {
-            throw new RuntimeException("管理员不存在");
+            throw new RuntimeException("Administrator does not exist");
         }
         
-        // 验证原密码
+        // Verify original password
         String encryptedOldPassword = SecureUtil.md5(oldPassword);
         if (!encryptedOldPassword.equals(admin.getPassword())) {
-            throw new RuntimeException("原密码错误");
+            throw new RuntimeException("Original password is incorrect");
         }
         
-        // 设置新密码
+        // Set new password
         String encryptedNewPassword = SecureUtil.md5(newPassword);
         admin.setPassword(encryptedNewPassword);
         administratorMapper.updateById(admin);

@@ -8,12 +8,12 @@ import vtc.xueqing.flower.vo.ShoppingCartVO;
 import java.util.List;
 
 /**
- * 购物车Mapper接口
+ * Shopping Cart Mapper Interface
  */
 public interface ShoppingCartMapper extends BaseMapper<ShoppingCart> {
     
     /**
-     * 获取用户购物车列表（包含商品信息）
+     * Get user shopping cart list (includes product information)
      */
         @Select("SELECT sc.id, sc.user_id, sc.prod_id, sc.quantity, sc.selected, " +
             "sc.create_date, sc.update_date, " +

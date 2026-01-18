@@ -10,18 +10,18 @@ import vtc.xueqing.flower.vo.OrderDetailVO;
 import vtc.xueqing.flower.vo.OrderVO;
 
 /**
- * 订单Mapper接口
+ * Order Mapper Interface
  */
 public interface OrderMapper extends BaseMapper<Order> {
 
     /**
-     * 查询订单列表，附带客户和商家名称
+     * Query order list with customer and merchant names
      *
-     * @param page 分页对象
-     * @param userId 用户ID（可选）
-     * @param merchId 商家ID（可选）
-     * @param status 订单状态（可选）
-     * @return 订单VO分页列表
+     * @param page pagination object
+     * @param userId user ID (optional)
+     * @param merchId merchant ID (optional)
+     * @param status order status (optional)
+     * @return order VO pagination list
      */
     @Select("<script>" +
             "SELECT o.*, c.name AS customer_name, m.name AS merchant_name " +
@@ -47,12 +47,12 @@ public interface OrderMapper extends BaseMapper<Order> {
                                             @Param("status") String status);
 
     /**
-     * 查询所有订单（带客户和商家名称）- 管理员用
+     * Query all orders (with customer and merchant names) - for administrators
      * 
-     * @param page 分页对象
-     * @param status 订单状态（可选）
-     * @param keyword 搜索关键词：订单号或客户名（可选）
-     * @return 订单VO分页列表
+     * @param page pagination object
+     * @param status order status (optional)
+     * @param keyword search keyword: order number or customer name (optional)
+     * @return order VO pagination list
      */
     @Select("<script>" +
             "SELECT o.*, c.name AS customer_name, m.name AS merchant_name " +
@@ -75,10 +75,10 @@ public interface OrderMapper extends BaseMapper<Order> {
                                               @Param("keyword") String keyword);
     
     /**
-     * 根据订单ID查询订单详情（带客户和商家名称）
+     * Query order details by order ID (with customer and merchant names)
      * 
-     * @param orderId 订单ID
-     * @return 订单详情VO
+     * @param orderId order ID
+     * @return order detail VO
      */
     @Select("SELECT o.*, c.name AS customer_name, c.phone AS customer_phone, m.name AS merchant_name " +
             "FROM orders o " +

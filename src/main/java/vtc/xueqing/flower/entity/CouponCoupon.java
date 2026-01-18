@@ -10,8 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 优惠券券码实体类
- * 对应数据库表：coupon_coupons
+ * Coupon Code Entity Class
+ * Corresponds to database table: coupon_coupons
  */
 @Data
 @TableName("coupon_coupons")
@@ -26,37 +26,37 @@ public class CouponCoupon implements Serializable {
     private Long id;
 
     /**
-     * 优惠券ID
+     * Coupon ID
      */
     @TableField("coupon_id")
     private Long couponId;
 
     /**
-     * 券码
+     * Coupon Code
      */
     @TableField("code")
     private String code;
 
     /**
-     * 使用用户ID
+     * User ID Who Used
      */
     @TableField("user_id")
     private Long userId;
 
     /**
-     * 是否已使用：0-未使用，1-已使用
+     * Whether Used: 0-Not Used, 1-Used
      */
     @TableField("used")
     private Integer used;
 
     /**
-     * 使用时间
+     * Usage Time
      */
     @TableField("used_date")
     private LocalDateTime usedDate;
 
     /**
-     * 创建时间
+     * Creation Time
      */
     @TableField("create_date")
     private LocalDateTime createDate;

@@ -9,15 +9,15 @@ import vtc.xueqing.flower.entity.ProductReview;
 import vtc.xueqing.flower.vo.ProductReviewVO;
 
 /**
- * 产品评价Mapper接口
+ * Product Review Mapper Interface
  */
 public interface ProductReviewMapper extends BaseMapper<ProductReview> {
     
     /**
-     * 获取所有评价列表（管理员）- 包含关联信息
-     * @param page 分页对象
-     * @param status 审核状态
-     * @return 评价VO列表
+     * Get all reviews list (admin) - includes associated information
+     * @param page pagination object
+     * @param status review status
+     * @return review VO list
      */
     @Select("<script>" +
             "SELECT " +

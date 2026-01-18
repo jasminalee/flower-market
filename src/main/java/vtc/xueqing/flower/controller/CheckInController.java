@@ -51,7 +51,7 @@ public class CheckInController {
     
     @ApiOperation("Get Check-in Statistics")
     @GetMapping("/stats")
-    public Result<Map<String, Object>> getCheckInStats(@ApiParam("用户ID") @RequestParam Long userId) {
+    public Result<Map<String, Object>> getCheckInStats(@ApiParam("User ID") @RequestParam Long userId) {
         try {
             Map<String, Object> stats = new HashMap<>();
             stats.put("continuousDays", checkInService.getContinuousDays(userId));

@@ -54,7 +54,7 @@ public class MerchantController {
     public Result<Merchant> updateProfile(@RequestBody Merchant merchant) {
         try {
             Merchant updated = merchantService.updateMerchant(merchant);
-            return Result.success("更新成功", updated);
+            return Result.success("Update Successful", updated);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
@@ -83,9 +83,9 @@ public class MerchantController {
             @RequestParam(required = false) String keyword
     ) {
         try {
-            // 如果没有传递merchId，返回错误提示
+            // If merchId is not passed, return error message
             if (merchId == null) {
-                return Result.error("商家ID不能为空");
+                return Result.error("Merchant ID cannot be empty");
             }
             
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> page;
@@ -114,9 +114,9 @@ public class MerchantController {
             @RequestParam(required = false) String status
     ) {
         try {
-            // 如果没有传递merchId，返回错误提示
+            // If merchId is not passed, return error message
             if (merchId == null) {
-                return Result.error("商家ID不能为空");
+                return Result.error("Merchant ID cannot be empty");
             }
             
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Order> page = 
@@ -155,7 +155,7 @@ public class MerchantController {
     ) {
         try {
             if (merchId == null) {
-                return Result.error("商家ID不能为空");
+                return Result.error("Merchant ID cannot be empty");
             }
             
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Coupon> page = 
@@ -213,7 +213,7 @@ public class MerchantController {
         try {
             coupon.setCouponId(id);
             vtc.xueqing.flower.entity.Coupon updated = merchantService.updateMerchantCoupon(coupon);
-            return Result.success("更新成功", updated);
+            return Result.success("Update Successful", updated);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

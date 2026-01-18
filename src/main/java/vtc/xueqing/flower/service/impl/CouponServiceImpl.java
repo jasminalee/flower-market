@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 优惠券服务实现类
+ * Coupon Service Implementation Class
  */
 @Service
 public class CouponServiceImpl implements CouponService {
@@ -33,12 +33,12 @@ public class CouponServiceImpl implements CouponService {
         
         LocalDateTime now = LocalDateTime.now();
         
-        // 筛选条件
+        // Filter conditions
         wrapper.eq(merchId != null, Coupon::getMerchId, merchId)
                 .eq(Coupon::getStatus, "ACTIVE")
-                .le(Coupon::getStartDate, now) // 开始时间 <= 当前时间
-                .ge(Coupon::getEndDate, now)   // 结束时间 >= 当前时间
-                .apply("total_quantity > received_quantity") // 还有库存
+                .le(Coupon::getStartDate, now) // Start date <= current time
+                .ge(Coupon::getEndDate, now)   // End date >= current time
+                .apply("total_quantity > received_quantity") // Still in stock
                 .orderByDesc(Coupon::getCreateDate);
         
         return couponMapper.selectPage(page, wrapper);
@@ -47,41 +47,41 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CustomerCoupon receiveCoupon(Long userId, Long couponId) {
-        // 1. 获取优惠券信息
+        // 1. Get coupon information
         Coupon coupon = couponMapper.selectById(couponId);
         if (coupon == null) {
-            throw new RuntimeException("优惠券不存在");
+            throw new RuntimeException("Coupon does not exist");
         }
         
-        // 2. 检查优惠券状态
+        // 2. Check coupon status
         if (!"ACTIVE".equals(coupon.getStatus())) {
-            throw new RuntimeException("优惠券未激活");
+            throw new RuntimeException("Coupon not activated");
         }
         
-        // 3. 检查有效期
+        // 3. Check validity period
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(coupon.getStartDate())) {
-            throw new RuntimeException("优惠券尚未开始");
+            throw new RuntimeException("Coupon not started yet");
         }
         if (now.isAfter(coupon.getEndDate())) {
-            throw new RuntimeException("优惠券已过期");
+            throw new RuntimeException("Coupon has expired");
         }
         
-        // 4. 检查库存
+        // 4. Check inventory
         if (coupon.getReceivedQuantity() >= coupon.getTotalQuantity()) {
-            throw new RuntimeException("优惠券已被领完");
+            throw new RuntimeException("Coupon has been claimed out");
         }
         
-        // 5. 检查用户是否已领取过
+        // 5. Check if user has already claimed
         LambdaQueryWrapper<CustomerCoupon> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(CustomerCoupon::getUserId, userId)
                 .eq(CustomerCoupon::getCouponId, couponId);
         Long count = customerCouponMapper.selectCount(wrapper);
         if (count > 0) {
-            throw new RuntimeException("您已领取过此优惠券");
+            throw new RuntimeException("You have already claimed this coupon");
         }
         
-        // 6. 创建用户优惠券记录
+        // 6. Create user coupon record
         CustomerCoupon customerCoupon = new CustomerCoupon();
         customerCoupon.setUserId(userId);
         customerCoupon.setCouponId(couponId);
@@ -89,7 +89,7 @@ public class CouponServiceImpl implements CouponService {
         customerCoupon.setReceiveDate(LocalDateTime.now());
         customerCouponMapper.insert(customerCoupon);
         
-        // 7. 更新优惠券已领取数量
+        // 7. Update coupon claimed quantity
         coupon.setReceivedQuantity(coupon.getReceivedQuantity() + 1);
         couponMapper.updateById(coupon);
         
@@ -104,7 +104,7 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CustomerCoupon useCoupon(Long userId, Long couponId, Long orderId) {
-        // 1. 查找用户的优惠券
+        // 1. Find user's coupon
         LambdaQueryWrapper<CustomerCoupon> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(CustomerCoupon::getUserId, userId)
                 .eq(CustomerCoupon::getCouponId, couponId)
@@ -112,24 +112,24 @@ public class CouponServiceImpl implements CouponService {
         CustomerCoupon customerCoupon = customerCouponMapper.selectOne(wrapper);
         
         if (customerCoupon == null) {
-            throw new RuntimeException("优惠券不存在或已使用");
+            throw new RuntimeException("Coupon does not exist or has been used");
         }
         
-        // 2. 检查优惠券是否过期
+        // 2. Check if coupon has expired
         Coupon coupon = couponMapper.selectById(couponId);
         if (coupon == null) {
-            throw new RuntimeException("优惠券不存在");
+            throw new RuntimeException("Coupon does not exist");
         }
         
         LocalDateTime now = LocalDateTime.now();
         if (now.isAfter(coupon.getEndDate())) {
-            // 标记为已过期
+            // Mark as expired
             customerCoupon.setStatus("EXPIRED");
             customerCouponMapper.updateById(customerCoupon);
-            throw new RuntimeException("优惠券已过期");
+            throw new RuntimeException("Coupon has expired");
         }
         
-        // 3. 使用优惠券
+        // 3. Use coupon
         customerCoupon.setStatus("USED");
         customerCoupon.setUsedDate(LocalDateTime.now());
         customerCoupon.setOrderId(orderId);
@@ -141,7 +141,7 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Coupon createCoupon(Coupon coupon) {
-        // 设置初始值
+        // Set initial values
         if (coupon.getReceivedQuantity() == null) {
             coupon.setReceivedQuantity(0);
         }
@@ -150,13 +150,13 @@ public class CouponServiceImpl implements CouponService {
             coupon.setStatus("ACTIVE");
         }
         
-        // 验证数据
+        // Validate data
         if (coupon.getTotalQuantity() <= 0) {
-            throw new RuntimeException("发放数量必须大于0");
+            throw new RuntimeException("Distribution quantity must be greater than 0");
         }
         
         if (coupon.getStartDate().isAfter(coupon.getEndDate())) {
-            throw new RuntimeException("开始时间不能晚于结束时间");
+            throw new RuntimeException("Start time cannot be later than end time");
         }
         
         couponMapper.insert(coupon);

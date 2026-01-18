@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * Shopping cart view object with product details.
- * 包含商品详细信息
+ * Contains product details
  */
 @Data
 public class ShoppingCartVO implements Serializable {
