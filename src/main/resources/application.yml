@@ -1,6 +1,6 @@
 # Application service web port
 server:
-  port: 4000
+  port: 3000
 spring:
   mvc:
     pathmatch:
@@ -8,7 +8,7 @@ spring:
   # Database configuration
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/flower_market?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://127.0.0.1:3306/?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
   # SQL initialization configuration
