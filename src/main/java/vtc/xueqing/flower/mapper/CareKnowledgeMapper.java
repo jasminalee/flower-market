@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import vtc.xueqing.flower.entity.CareKnowledge;
 
 /**
- * 养护知识Mapper接口
+ * Care Knowledge Mapper Interface
  */
 public interface CareKnowledgeMapper extends BaseMapper<CareKnowledge> {
 }
