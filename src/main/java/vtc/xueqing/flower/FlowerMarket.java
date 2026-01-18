@@ -20,7 +20,7 @@ public class FlowerMarket  implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Started Successfully, Address: http://localhost:{}/doc.html", port);
-        log.info("Started Successfully, Address: http://localhost:{}/", port);
+        log.info("Server address: http://localhost:{}/", port);
     }
     public static void main(String[] args) {
         SpringApplication.run(FlowerMarket.class, args);
