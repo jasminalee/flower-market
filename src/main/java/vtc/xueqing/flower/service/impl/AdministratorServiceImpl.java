@@ -63,7 +63,7 @@ public class AdministratorServiceImpl implements AdministratorService {
             throw new RuntimeException("Incorrect password");
         }
         
-        // 4. 返回时密码置空
+        // 4. Set password to null when returning
         admin.setPassword(null);
         return admin;
     }
@@ -136,7 +136,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         merchant.setStatus(status);
         merchantMapper.updateById(merchant);
         
-        // 4. 返回时密码置空
+        // 4. Set password to null when returning
         merchant.setPassword(null);
         return merchant;
     }
@@ -159,7 +159,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         customer.setLevel(level);
         customerMapper.updateById(customer);
         
-        // 4. 返回时密码置空
+        // 4. Set password to null when returning
         customer.setPassword(null);
         return customer;
     }
@@ -179,7 +179,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         Long totalMerchants = merchantMapper.selectCount(null);
         stats.put("totalMerchants", totalMerchants);
         
-        // 总订单数和总销售额（需要OrderMapper）
+        // Total order count and total sales (requires OrderMapper)
         stats.put("totalOrders", 0);
         stats.put("totalSales", "0.00");
         
@@ -210,7 +210,7 @@ public class AdministratorServiceImpl implements AdministratorService {
             java.util.Map<String, Object> dayData = new java.util.HashMap<>();
             java.time.LocalDate date = today.minusDays(i);
             dayData.put("date", date.format(java.time.format.DateTimeFormatter.ofPattern("MM-dd")));
-            dayData.put("count", 0); // 实际应该查询数据库
+            dayData.put("count", 0); // Actually should query database
             orderTrend.add(dayData);
         }
         result.put("orderTrend", orderTrend);

@@ -425,7 +425,7 @@ public class MerchantServiceImpl implements MerchantService {
     public vtc.xueqing.flower.entity.Coupon updateMerchantCoupon(vtc.xueqing.flower.entity.Coupon coupon) {
         vtc.xueqing.flower.entity.Coupon existing = couponMapper.selectById(coupon.getCouponId());
         if (existing == null) {
-            throw new BusinessException("优惠券不存在");
+            throw new BusinessException("Coupon does not exist");
         }
         coupon.setUpdateDate(LocalDateTime.now());
         couponMapper.updateById(coupon);
@@ -437,7 +437,7 @@ public class MerchantServiceImpl implements MerchantService {
     public void deleteMerchantCoupon(Long id) {
         vtc.xueqing.flower.entity.Coupon existing = couponMapper.selectById(id);
         if (existing == null) {
-            throw new BusinessException("优惠券不存在");
+            throw new BusinessException("Coupon does not exist");
         }
         couponMapper.deleteById(id);
     }
