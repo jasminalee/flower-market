@@ -1,6 +1,6 @@
 # Application service web port
 server:
-  port: 3000
+  port: 8090
 spring:
   mvc:
     pathmatch:
