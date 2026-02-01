@@ -309,7 +309,52 @@ public class MerchantServiceImpl implements MerchantService {
             default: return status;
         }
     }
-    
+        
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public vtc.xueqing.flower.entity.Product createProduct(vtc.xueqing.flower.entity.Product product) {
+        // Validate required fields
+        if (product.getMerchId() == null) {
+            throw new BusinessException("Merchant ID cannot be empty");
+        }
+        if (product.getName() == null || product.getName().trim().isEmpty()) {
+            throw new BusinessException("Product name cannot be empty");
+        }
+        if (product.getPrice() == null || product.getPrice().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Product price must be greater than 0");
+        }
+        if (product.getStock() == null || product.getStock() < 0) {
+            throw new BusinessException("Product stock cannot be negative");
+        }
+            
+        // Set creation time and update time
+        product.setCreateDate(LocalDateTime.now());
+        product.setUpdateDate(LocalDateTime.now());
+            
+        // Calculate stock status based on stock quantity
+        if (product.getStock() == 0) {
+            product.setStockStatus(Constants.STOCK_STATUS_OUT_OF_STOCK);
+        } else if (product.getStock() < 10) {
+            product.setStockStatus(Constants.STOCK_STATUS_LOW_STOCK);
+        } else {
+            product.setStockStatus(Constants.STOCK_STATUS_IN_STOCK);
+        }
+            
+        // Set status to active by default
+        if (product.getStatus() == null) {
+            product.setStatus(Constants.PRODUCT_STATUS_ACTIVE);
+        }
+            
+        // Insert product to database
+        int result = productMapper.insert(product);
+        if (result == 0) {
+            throw new BusinessException("Failed to create product");
+        }
+            
+        log.info("Product created successfully, productId: {}, name: {}", product.getProdId(), product.getName());
+        return product;
+    }
+        
     @Override
     public com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Product> getMerchantProducts(
             Long merchId, Long current, Long size, String keyword) {

@@ -101,4 +101,11 @@ public interface MerchantService {
      * @param id coupon ID
      */
     void deleteMerchantCoupon(Long id);
+    
+    /**
+     * Create a new product for merchant.
+     * @param product product info
+     * @return created product
+     */
+    vtc.xueqing.flower.entity.Product createProduct(vtc.xueqing.flower.entity.Product product);
 }

@@ -3,13 +3,18 @@ package vtc.xueqing.flower.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import vtc.xueqing.flower.common.Constants;
 import vtc.xueqing.flower.common.Result;
 import vtc.xueqing.flower.entity.Merchant;
 import vtc.xueqing.flower.entity.Order;
+import vtc.xueqing.flower.entity.Product;
 import vtc.xueqing.flower.service.MerchantService;
 import vtc.xueqing.flower.service.OrderService;
+import vtc.xueqing.flower.utils.FileUploadUtils;
 
 import javax.annotation.Resource;
 
@@ -27,6 +32,9 @@ public class MerchantController {
 
     @Resource
     private OrderService orderService;
+
+    @Autowired
+    private FileUploadUtils fileUploadUtils;
 
     @ApiOperation("Merchant Registration")
     @PostMapping("/register")
@@ -229,7 +237,63 @@ public class MerchantController {
             return Result.error(e.getMessage());
         }
     }
-
+    
+    @ApiOperation("Create Product")
+    @PostMapping("/products")
+    public Result<Product> createProduct(
+            @RequestParam("merchId") Long merchId,
+            @RequestParam("name") String name,
+            @RequestParam("price") java.math.BigDecimal price,
+            @RequestParam("stock") Integer stock,
+            @RequestParam(value = "catId", required = false) Long catId,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
+            @RequestParam(value = "images", required = false) MultipartFile[] images) {
+        try {
+            // Create product object
+            Product product = new Product();
+            product.setMerchId(merchId);
+            product.setName(name);
+            product.setPrice(price);
+            product.setStock(stock);
+            product.setCatId(catId);
+            product.setDescription(description);
+            
+            // Process main image if provided
+            if (mainImage != null && !mainImage.isEmpty()) {
+                String mainImagePath = fileUploadUtils.uploadFile(mainImage, "products/main");
+                product.setMainImage(mainImagePath);
+            }
+            
+            // Process additional images if provided
+            if (images != null && images.length > 0) {
+                java.util.List<String> imagePaths = new java.util.ArrayList<>();
+                for (MultipartFile image : images) {
+                    if (image != null && !image.isEmpty()) {
+                        String imagePath = fileUploadUtils.uploadFile(image, "products/detail");
+                        imagePaths.add(imagePath);
+                    }
+                }
+                if (!imagePaths.isEmpty()) {
+                    product.setImages(new com.fasterxml.jackson.databind.ObjectMapper().
+                            writeValueAsString(imagePaths));
+                }
+            }
+            
+            // Set default values
+            product.setSales(0);
+            product.setStatus(Constants.PRODUCT_STATUS_ACTIVE);
+            product.setStockStatus(Constants.STOCK_STATUS_IN_STOCK);
+            
+            // Call service to create product
+            Product createdProduct = merchantService.createProduct(product);
+            return Result.success("Product Created Successfully", createdProduct);
+        } catch (Exception e) {
+            log.error("Error creating product: ", e);
+            return Result.error("Failed to create product: " + e.getMessage());
+        }
+    }
+    
     private vtc.xueqing.flower.vo.MerchantOrderDetailVO buildMerchantOrderDetail(
             vtc.xueqing.flower.vo.OrderDetailVO detail) {
         vtc.xueqing.flower.vo.MerchantOrderDetailVO vo = new vtc.xueqing.flower.vo.MerchantOrderDetailVO();

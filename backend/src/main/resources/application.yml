@@ -19,6 +19,18 @@ spring:
     url: jdbc:mysql://127.0.0.1:3306/flower_market?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: root
+# File upload configuration
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+      enabled: true
+
+# Custom file upload path configuration
+file:
+  upload:
+    path: ./uploads/images/
+
 # MyBatis-Plus configuration
 mybatis-plus:
   configuration:
