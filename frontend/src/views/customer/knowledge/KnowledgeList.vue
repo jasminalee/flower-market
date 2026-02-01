@@ -60,6 +60,7 @@
                       :src="item.coverImage || 'https://via.placeholder.com/400x250?text=Plant+Care'" 
                     fit="cover"
                     style="width: 100%; height: 200px;"
+                    crossorigin="anonymous"
                   />
                   <div class="category-tag">
                     <el-tag size="small">{{ item.category }}</el-tag>

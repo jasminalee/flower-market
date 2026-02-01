@@ -29,7 +29,7 @@ spring:
 # Custom file upload path configuration
 file:
   upload:
-    path: ./uploads/images/
+    path: D:\IdeaProjects\flower-market\uploads\images
 
 # MyBatis-Plus configuration
 mybatis-plus:

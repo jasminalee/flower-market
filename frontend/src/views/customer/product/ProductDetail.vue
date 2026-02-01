@@ -14,6 +14,7 @@
                   :preview-src-list="imageList"
                   fit="cover"
                   class="main-image"
+                  crossorigin="anonymous"
                 />
                 <div class="image-list" v-if="imageList.length > 1">
                   <div 
@@ -23,7 +24,7 @@
                     :class="{ active: currentImage === img }"
                     @click="currentImage = img"
                   >
-                    <el-image :src="img" fit="cover" />
+                    <el-image :src="img" fit="cover" crossorigin="anonymous" />
                   </div>
                 </div>
               </div>

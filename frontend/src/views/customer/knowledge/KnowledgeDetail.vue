@@ -42,6 +42,7 @@
               :src="knowledge.coverImage" 
               fit="cover"
               style="width: 100%; max-height: 400px; border-radius: 8px;"
+              crossorigin="anonymous"
             />
           </div>
           
@@ -102,6 +103,7 @@
                 :src="item.coverImage || 'https://via.placeholder.com/120x80?text=Plant+Care'" 
                 fit="cover"
                 style="width: 120px; height: 80px; border-radius: 4px;"
+                crossorigin="anonymous"
               />
               <div class="related-info">
                 <h4 class="related-title ellipsis-2">{{ item.title }}</h4>

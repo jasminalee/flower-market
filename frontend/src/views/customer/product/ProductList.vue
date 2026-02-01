@@ -51,6 +51,9 @@
                   :src="product.mainImage || 'https://via.placeholder.com/300x200'" 
                   class="product-image" 
                   @click="goToDetail(product.prodId)" 
+                  @error="onImageError(product)"
+                  @load="onImageLoad(product)"
+                  crossorigin="anonymous"
                 />
                 <div class="product-info">
                   <h4 class="product-name ellipsis" @click="goToDetail(product.prodId)">{{ product.name }}</h4>
@@ -199,8 +202,19 @@ const loadProducts = async () => {
     }
     
     const res = await getProductList(params)
+    console.log('Raw product list data:', res.data?.records)
     products.value = res.data?.records || []
     total.value = res.data?.total || 0
+    
+    // Debug product images
+    products.value.forEach(product => {
+      console.log('Product:', product.name, 'Main image path:', product.mainImage)
+      if (!product.mainImage || product.mainImage === 'null' || product.mainImage === 'undefined') {
+        console.warn('Product', product.name, 'has invalid main image path:', product.mainImage)
+      } else {
+        console.log('Product', product.name, 'image URL will be:', product.mainImage)
+      }
+    })
     
     // Load favorite status for each product if user is logged in
     if (userStore.isLoggedIn) {
@@ -294,6 +308,17 @@ const toggleFavorite = async (product) => {
   } catch (error) {
     ElMessage.error(error.message || 'Operation failed')
   }
+}
+
+// Image event handlers for debugging
+const onImageError = (product) => {
+  console.error('Image failed to load for product:', product.name, 'at path:', product.mainImage)
+  console.log('Full product object:', product)
+  console.log('Image URL attempted:', product.mainImage)
+}
+
+const onImageLoad = (product) => {
+  console.log('Image loaded successfully for product:', product.name, 'at path:', product.mainImage)
 }
 </script>
 

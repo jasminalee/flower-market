@@ -74,6 +74,7 @@
                     :src="row.mainImage || 'https://via.placeholder.com/60x60'" 
                     fit="cover"
                     style="width: 60px; height: 60px; border-radius: 4px;"
+                    crossorigin="anonymous"
                   />
                   <div class="product-name">{{ row.name }}</div>
                 </div>

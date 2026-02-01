@@ -44,6 +44,7 @@
                   :src="item.mainImage || 'https://via.placeholder.com/80x80'" 
                   fit="cover"
                   style="width: 80px; height: 80px; border-radius: 4px;"
+                  crossorigin="anonymous"
                 />
                 <div class="product-info">
                   <div class="product-name">{{ item.name }}</div>

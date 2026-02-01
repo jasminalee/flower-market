@@ -46,7 +46,18 @@
               fit="cover"
               style="width: 60px; height: 60px; border-radius: 4px"
               :preview-src-list="[row.image]"
-            />
+              :preview-teleported="true"
+              @error="onImageError(row)"
+              @load="onImageLoad(row)"
+              crossorigin="anonymous"
+            >
+              <template #placeholder>
+                <div class="image-placeholder">Loading...</div>
+              </template>
+              <template #error>
+                <div class="image-error">Failed</div>
+              </template>
+            </el-image>
           </template>
         </el-table-column>
         <el-table-column prop="name" label="Product Name" min-width="150" />
@@ -140,12 +151,25 @@ const fetchProducts = async () => {
     console.log('Raw product data:', res.data.records)
     tableData.value = (res.data.records || []).map(item => {
       console.log('Product catId:', item.catId, 'mapped category name:', categoryMap.value[item.catId])
+      // Debug image path
+      console.log('Original mainImage path:', item.mainImage)
+      const imagePath = item.mainImage
+      console.log('Mapped image path:', imagePath)
+      // Check if the image path is valid
+      let imageUrl = null
+      if (!imagePath || imagePath === 'null' || imagePath === 'undefined') {
+        console.warn('Product', item.name, 'has invalid image path:', imagePath)
+      } else {
+        // Use relative path so it goes through the Vite proxy
+        imageUrl = imagePath
+        console.log('Product', item.name, 'image URL will be:', imageUrl)
+      }
       return {
         ...item,
         categoryText: categoryMap.value[item.catId] || `Category ${item.catId}`,
         statusText: item.status === 'ACTIVE' ? 'On Sale' : 'Off Sale',
         // Map field names for frontend display
-        image: item.mainImage,
+        image: imageUrl,
         price: item.price
       }
     })
@@ -216,6 +240,17 @@ const handleDelete = async (row) => {
   }
 }
 
+// Image event handlers for debugging
+const onImageError = (row) => {
+  console.error('Image failed to load for product:', row.name, 'at path:', row.image)
+  console.log('Full product object:', row)
+  console.log('Image URL attempted:', row.image || row.image)
+}
+
+const onImageLoad = (row) => {
+  console.log('Image loaded successfully for product:', row.name, 'at path:', row.image)
+}
+
 // Load categories list
 const loadCategories = async () => {
   try {
@@ -259,6 +294,27 @@ onMounted(async () => {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+.image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: #f5f5f5;
+  color: #999;
+}
+
+.image-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: #f5f5f5;
+  color: #909399;
+  font-size: 12px;
 }
 </style>
 

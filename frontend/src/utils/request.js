@@ -30,6 +30,9 @@ service.interceptors.request.use(
       }
     }
     
+    // Log API request for debugging
+    console.log('API Request:', config.method?.toUpperCase(), config.url, config.params, config.data)
+    
     return config
   },
   error => {
@@ -41,6 +44,9 @@ service.interceptors.request.use(
 // Response interceptor
 service.interceptors.response.use(
   response => {
+    // Log API response for debugging
+    console.log('API Response:', response.config.url, response.data)
+    
     const res = response.data
     
     // Return blob responses directly
