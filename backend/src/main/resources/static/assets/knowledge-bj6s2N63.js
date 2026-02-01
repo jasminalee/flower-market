@@ -1,0 +1,1 @@
+import{S as t}from"./index-Br0p5E83.js";const o=e=>t({url:"/api/admin/knowledge",method:"get",params:e}),a=e=>t({url:`/api/admin/knowledge/${e}`,method:"get"}),r=e=>t({url:"/api/admin/knowledge",method:"post",data:e}),l=(e,n)=>t({url:`/api/admin/knowledge/${e}`,method:"put",data:n}),g=e=>t({url:`/api/admin/knowledge/${e}`,method:"delete"});export{a,r as c,g as d,o as g,l as u};

@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-
+const TARGET_URL = 'http://localhost:8090';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -20,15 +20,15 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:8090',
+        target: TARGET_URL,
         changeOrigin: true
       },
       '/images': {
-        target: 'http://localhost:8090',
+        target: TARGET_URL,
         changeOrigin: true
       },
       '/products': {
-        target: 'http://localhost:8090',
+        target: TARGET_URL,
         changeOrigin: true
       }
     }
