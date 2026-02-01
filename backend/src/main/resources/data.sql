@@ -2,7 +2,7 @@
 -- Flower Market database seed data
 -- Note: passwords use MD5; sample passwords match usernames unless stated
 -- ============================================
-
+-- CREATE DATABASE IF NOT EXISTS flower_market;
 USE `flower_market`;
 
 
