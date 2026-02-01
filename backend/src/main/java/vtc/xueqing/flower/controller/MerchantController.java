@@ -334,7 +334,8 @@ public class MerchantController {
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
-            @RequestParam(value = "images", required = false) MultipartFile[] images) {
+            @RequestParam(value = "existingImages", required = false) String existingImages,
+            @RequestParam(value = "images", required = false) MultipartFile[] newImages) {
         try {
             // Get existing product
             Product product = productService.getProductById(id);
@@ -362,19 +363,37 @@ public class MerchantController {
                 product.setMainImage(mainImagePath);
             }
             
-            // Process additional images if provided
-            if (images != null && images.length > 0) {
-                java.util.List<String> imagePaths = new java.util.ArrayList<>();
-                for (MultipartFile image : images) {
+            // Combine existing and new images
+            java.util.List<String> allImagePaths = new java.util.ArrayList<>();
+            
+            // Add existing image URLs if provided
+            if (existingImages != null && !existingImages.isEmpty()) {
+                try {
+                    java.util.List<String> existingList = new com.fasterxml.jackson.databind.ObjectMapper()
+                            .readValue(existingImages, java.util.List.class);
+                    allImagePaths.addAll(existingList);
+                    log.info("Added {} existing images", existingList.size());
+                } catch (Exception e) {
+                    log.error("Failed to parse existingImages: ", e);
+                }
+            }
+            
+            // Add new image files
+            if (newImages != null && newImages.length > 0) {
+                for (MultipartFile image : newImages) {
                     if (image != null && !image.isEmpty()) {
                         String imagePath = fileUploadUtils.uploadFile(image, productDetailDir);
-                        imagePaths.add(imagePath);
+                        allImagePaths.add(imagePath);
+                        log.info("Uploaded new image: {}", imagePath);
                     }
                 }
-                if (!imagePaths.isEmpty()) {
-                    product.setImages(new com.fasterxml.jackson.databind.ObjectMapper().
-                            writeValueAsString(imagePaths));
-                }
+            }
+            
+            // Update images field
+            if (!allImagePaths.isEmpty()) {
+                product.setImages(new com.fasterxml.jackson.databind.ObjectMapper()
+                        .writeValueAsString(allImagePaths));
+                log.info("Product images updated with {} total images", allImagePaths.size());
             }
             
             // Update product
@@ -383,6 +402,21 @@ public class MerchantController {
         } catch (Exception e) {
             log.error("Error updating product: ", e);
             return Result.error("Failed to update product: " + e.getMessage());
+        }
+    }
+    
+    @ApiOperation("Upload Product Image")
+    @PostMapping("/products/upload/image")
+    public Result<String> uploadProductImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "type", defaultValue = "detail") String type) {
+        try {
+            String uploadDir = type.equals("main") ? productMainDir : productDetailDir;
+            String imagePath = fileUploadUtils.uploadFile(file, uploadDir);
+            return Result.success("Image uploaded successfully", imagePath);
+        } catch (Exception e) {
+            log.error("Error uploading image: ", e);
+            return Result.error("Failed to upload image: " + e.getMessage());
         }
     }
     

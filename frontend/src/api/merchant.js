@@ -160,23 +160,36 @@ export const updateProduct = (id, data) => {
   // Convert data to FormData for multipart/form-data submission
   const formData = new FormData()
   
-  // Add all product fields to FormData, converting base64 images to Blobs
+  console.log('updateProduct data:', data)
+  
+  // Separate image URLs from other data
+  const imageUrls = []
+  const filesToUpload = []
+  
+  if (data.images && Array.isArray(data.images)) {
+    data.images.forEach((img, index) => {
+      if (typeof img === 'string') {
+        if (img.startsWith('data:image')) {
+          // New image - needs to be uploaded
+          const imgBlob = base64ToBlob(img)
+          filesToUpload.push(imgBlob)
+        } else {
+          // Existing URL - just keep the URL
+          imageUrls.push(img)
+        }
+      }
+    })
+  }
+  
+  // Add all product fields to FormData
   Object.keys(data).forEach(key => {
     const value = data[key]
-    if (value !== undefined && value !== null) {
+    if (value !== undefined && value !== null && key !== 'images' && key !== 'detailImages') {
       if (key === 'image' && typeof value === 'string' && value.startsWith('data:image')) {
         // Convert main image from base64 to Blob
         const imageBlob = base64ToBlob(value)
         formData.append('mainImage', imageBlob, 'main_image.jpg')
-      } else if (key === 'detailImages' && Array.isArray(value)) {
-        // Convert detail images from base64 to Blobs
-        value.forEach((img, index) => {
-          if (typeof img === 'string' && img.startsWith('data:image')) {
-            const imgBlob = base64ToBlob(img)
-            formData.append('images', imgBlob, `detail_image_${index}.jpg`)
-          }
-        })
-      } else if (!['image', 'detailImages'].includes(key)) {
+      } else if (!['image'].includes(key)) {
         // Add other fields as-is
         if (Array.isArray(value)) {
           // Handle arrays (non-image)
@@ -190,9 +203,39 @@ export const updateProduct = (id, data) => {
     }
   })
   
+  // Add existing image URLs as a JSON string
+  if (imageUrls.length > 0) {
+    formData.append('existingImages', JSON.stringify(imageUrls))
+    console.log('Existing image URLs:', imageUrls)
+  }
+  
+  // Add new image files
+  filesToUpload.forEach((file, index) => {
+    formData.append('images', file, `detail_image_${index}.jpg`)
+  })
+  console.log('New images to upload:', filesToUpload.length)
+  
+  console.log('FormData being sent to /api/merchant/products/' + id)
+  
   return request({
     url: `/api/merchant/products/${id}`,
     method: 'put',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+// Upload product image directly (for real-time upload)
+export const uploadProductImage = (file, type = 'detail') => {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('type', type)
+  
+  return request({
+    url: '/api/merchant/products/upload/image',
+    method: 'post',
     data: formData,
     headers: {
       'Content-Type': 'multipart/form-data'

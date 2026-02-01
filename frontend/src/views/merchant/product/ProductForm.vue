@@ -103,7 +103,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getMerchantProduct, createProduct, updateProduct } from '@/api/merchant'
+import { getMerchantProduct, createProduct, updateProduct, uploadProductImage } from '@/api/merchant'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
@@ -165,27 +165,64 @@ const handleImageChange = (file) => {
   reader.readAsDataURL(file.raw)
 }
 
+// Convert image URL to displayable format
 const getImageUrl = (imagePath) => {
   if (!imagePath) return ''
-  // If it's already an absolute URL or base64 data, return as is
   if (imagePath.startsWith('http') || imagePath.startsWith('data:image')) {
     return imagePath
   }
-  // For relative paths (like /products/main/...), return as is since Vite proxy handles it
   return imagePath
 }
 
-const handleDetailImageChange = (file, fileList) => {
-  // Only process new uploads (raw files), not existing images
-  if (file.raw) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      // Add the new image to the list
-      detailImages.value = [...fileList]
+// Handle detail images - upload immediately to backend
+const handleDetailImageChange = async (file, fileList) => {
+  console.log('handleDetailImageChange called', { file, fileListLength: fileList.length })
+  
+  // Check if this is a new file upload (raw property exists)
+  if (file && file.raw) {
+    try {
+      // Upload to backend immediately
+      const res = await uploadProductImage(file.raw, 'detail')
+      
+      console.log('Upload response:', res)
+      
+      // Backend returns the image path directly in res.data
+      const imagePath = res.data
+      
+      if (!imagePath) {
+        throw new Error('Invalid response: missing image path')
+      }
+      
+      console.log('Image uploaded successfully, path:', imagePath)
+      
+      // Update the newly added file's URL - find by matching raw file
+      const updatedList = fileList.map((f) => {
+        if (f.raw === file.raw) {
+          return {
+            ...f,
+            url: imagePath,
+            name: imagePath.split('/').pop()
+          }
+        }
+        return f
+      })
+      
+      // Update the ref with the new list
+      detailImages.value = updatedList
+      
+      const allUrls = detailImages.value.map(img => img.url)
+      console.log('DetailImages for submission:', allUrls)
+      
+      ElMessage.success('Image uploaded successfully')
+    } catch (error) {
+      console.error('Image upload failed:', error)
+      ElMessage.error('Image upload failed: ' + (error.message || 'Unknown error'))
+      // Remove the failed upload (should be the last one)
+      detailImages.value = fileList.slice(0, -1)
     }
-    reader.readAsDataURL(file.raw)
   } else {
-    // For existing images (not raw files), just update the list
+    // For file removal or list updates - just sync with fileList
+    console.log('Syncing fileList without new upload, length:', fileList.length)
     detailImages.value = fileList
   }
 }
@@ -200,49 +237,60 @@ const handleSubmit = async () => {
 
   saving.value = true
   try {
-    // Prepare product data for form submission
-    // Map category code to catId for backend compatibility
     const catId = categoryCodeToId.value[formData.category]
     if (!catId && formData.category && isNaN(formData.category)) {
       console.warn('Selected category not found in category mapping:', formData.category)
       ElMessage.warning('Selected category may not be valid, please select a valid category')
     }
     
-    // Prepare product data for submission
     const productData = {
       ...formData,
-      catId: catId || formData.category,  // Map category code to catId
+      catId: catId || formData.category,
       merchId: userStore.userId,
     }
     
-    // Remove the original category field to avoid conflicts
     delete productData.category
     
-    // Only include images if they are new uploads (base64 data), not existing paths
-    const isNewMainImage = formData.image && formData.image.startsWith('data:image');
-    const hasNewDetailImages = detailImages.value.some(img => img.url && img.url.startsWith('data:image'));
-    
+    // Only include newly uploaded images (base64 data for main, URLs for detail images)
+    const isNewMainImage = formData.image?.startsWith('data:image')
     if (isNewMainImage) {
-      productData.image = formData.image; // Will be converted to file in API
+      productData.image = formData.image
     }
     
-    if (hasNewDetailImages) {
-      productData.detailImages = detailImages.value
-        .filter(img => img.url && img.url.startsWith('data:image')) // Only new uploads
-        .map(img => img.url);
+    // Detail images - collect all URLs (both existing and newly uploaded)
+    if (detailImages.value && detailImages.value.length > 0) {
+      // Extract all image URLs (both existing and new)
+      const imageUrls = detailImages.value
+        .filter(img => img && img.url) // Ensure valid entries
+        .map(img => {
+          console.log('Including image:', { url: img.url, isExisting: img.isExisting })
+          return img.url
+        })
+      
+      console.log('All detail images for submission:', imageUrls)
+      
+      if (imageUrls.length > 0) {
+        // Send as both formats for compatibility
+        // images: JSON array (frontend format)
+        // detailImages: JSON array (alternative name)
+        productData.images = imageUrls
+        productData.detailImages = imageUrls
+      }
     }
+    
+    console.log('Final product data being sent:', productData)
     
     if (isEdit.value) {
-      // For editing, if no new images were uploaded, don't send image fields to preserve existing images
       await updateProduct(productId.value, productData)
-      ElMessage.success('Saved successfully')
+      ElMessage.success('Product updated successfully')
     } else {
       await createProduct(productData)
-      ElMessage.success('Added successfully')
+      ElMessage.success('Product created successfully')
     }
     
     router.push('/merchant/products')
   } catch (error) {
+    console.error('Submit error:', error)
     ElMessage.error(error.message || 'Operation failed')
   } finally {
     saving.value = false
@@ -285,50 +333,52 @@ const loadCategories = async () => {
 const fetchProduct = async () => {
   try {
     const res = await getMerchantProduct(productId.value)
-    // Map catId to category code for form compatibility
     const productData = {
       ...res.data,
-      category: categoryIdToCode.value[res.data.catId] || res.data.catId  // Map catId back to category code
+      category: categoryIdToCode.value[res.data.catId] || res.data.catId
     }
     
-    // If the category code isn't in our mapping, try to find it by checking if the catId exists in our categories
     if (!categoryIdToCode.value[res.data.catId] && !categories.value.some(cat => cat.cateId === res.data.catId)) {
-      // If we don't have the category loaded, try to load it
       console.warn('Product category not found in loaded categories:', res.data.catId)
     }
     
-    // Handle main image - keep relative path for display
+    // Handle main image
     if (res.data.mainImage) {
-      // Store the original mainImage path for display
-      formData.image = res.data.mainImage
+      productData.image = res.data.mainImage
     }
     
     Object.assign(formData, productData)
     
     // Handle detail images - images field is a JSON string from backend
+    // Parse existing URLs and convert them to el-upload compatible format
     if (res.data.images) {
       try {
-        let imageUrls = []
-        if (typeof res.data.images === 'string') {
-          imageUrls = JSON.parse(res.data.images)
-        } else {
-          imageUrls = Array.isArray(res.data.images) ? res.data.images : []
-        }
+        const imageUrls = typeof res.data.images === 'string' 
+          ? JSON.parse(res.data.images) 
+          : Array.isArray(res.data.images) ? res.data.images : []
         
+        console.log('Loaded existing detail images:', imageUrls)
+        
+        // Convert URL strings to el-upload file objects
+        // These are existing images, so they don't have raw files
         detailImages.value = imageUrls.map((url, index) => ({
-          uid: index,
-          url: url  // Keep relative path for display
+          uid: `${Date.now()}-${index}`, // Unique ID for Vue key binding
+          url: url, // The URL from backend
+          name: url.split('/').pop() || `image-${index}`, // Extract filename
+          isExisting: true // Mark as existing image (not newly uploaded)
         }))
+        
+        console.log('Initialized detailImages with existing files:', detailImages.value)
       } catch (error) {
         console.error('Failed to parse images:', error)
       }
-    }
-    
-    // Fallback for detailImages field if it exists (for backward compatibility)
-    if (res.data.detailImages && detailImages.value.length === 0) {
+    } else if (res.data.detailImages?.length > 0) {
+      // Fallback for detailImages field (backward compatibility)
       detailImages.value = res.data.detailImages.map((url, index) => ({
-        uid: index,
-        url: url  // Keep relative path for display
+        uid: `${Date.now()}-${index}`,
+        url: url,
+        name: url.split('/').pop() || `image-${index}`,
+        isExisting: true
       }))
     }
   } catch (error) {
