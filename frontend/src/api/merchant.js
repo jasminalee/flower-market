@@ -115,23 +115,36 @@ export const createProduct = (data) => {
   // Convert data to FormData for multipart/form-data submission
   const formData = new FormData()
   
-  // Add all product fields to FormData, converting base64 images to Blobs
+  console.log('createProduct data:', data)
+  
+  // Separate image URLs from file uploads
+  const imageUrls = []
+  const filesToUpload = []
+  
+  if (data.images && Array.isArray(data.images)) {
+    data.images.forEach((img, index) => {
+      if (typeof img === 'string') {
+        if (img.startsWith('data:image')) {
+          // Base64 image - needs conversion
+          const imgBlob = base64ToBlob(img)
+          filesToUpload.push(imgBlob)
+        } else {
+          // URL string - keep as-is
+          imageUrls.push(img)
+        }
+      }
+    })
+  }
+  
+  // Add all product fields to FormData
   Object.keys(data).forEach(key => {
     const value = data[key]
-    if (value !== undefined && value !== null) {
+    if (value !== undefined && value !== null && key !== 'images' && key !== 'detailImages') {
       if (key === 'image' && typeof value === 'string' && value.startsWith('data:image')) {
         // Convert main image from base64 to Blob
         const imageBlob = base64ToBlob(value)
         formData.append('mainImage', imageBlob, 'main_image.jpg')
-      } else if (key === 'detailImages' && Array.isArray(value)) {
-        // Convert detail images from base64 to Blobs
-        value.forEach((img, index) => {
-          if (typeof img === 'string' && img.startsWith('data:image')) {
-            const imgBlob = base64ToBlob(img)
-            formData.append('images', imgBlob, `detail_image_${index}.jpg`)
-          }
-        })
-      } else if (!['image', 'detailImages'].includes(key)) {
+      } else if (!['image'].includes(key)) {
         // Add other fields as-is
         if (Array.isArray(value)) {
           // Handle arrays (non-image)
@@ -144,6 +157,20 @@ export const createProduct = (data) => {
       }
     }
   })
+  
+  // Add existing image URLs as a JSON string
+  if (imageUrls.length > 0) {
+    formData.append('existingImages', JSON.stringify(imageUrls))
+    console.log('Existing image URLs:', imageUrls)
+  }
+  
+  // Add new image files
+  filesToUpload.forEach((file, index) => {
+    formData.append('images', file, `detail_image_${index}.jpg`)
+  })
+  console.log('New images to upload:', filesToUpload.length)
+  
+  console.log('FormData being sent to /api/merchant/products (create)')
   
   return request({
     url: '/api/merchant/products',

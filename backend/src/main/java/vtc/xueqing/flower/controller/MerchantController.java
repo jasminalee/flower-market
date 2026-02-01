@@ -276,6 +276,7 @@ public class MerchantController {
             @RequestParam(value = "catId", required = false) Long catId,
             @RequestParam(value = "description", required = false) String description,
             @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
+            @RequestParam(value = "existingImages", required = false) String existingImages,
             @RequestParam(value = "images", required = false) MultipartFile[] images) {
         try {
             // Create product object
@@ -293,19 +294,37 @@ public class MerchantController {
                 product.setMainImage(mainImagePath);
             }
             
-            // Process additional images if provided
+            // Collect all image paths (existing URLs + newly uploaded files)
+            java.util.List<String> imagePaths = new java.util.ArrayList<>();
+            
+            // Add existing image URLs if provided
+            if (existingImages != null && !existingImages.isEmpty()) {
+                try {
+                    java.util.List<String> existingList = new com.fasterxml.jackson.databind.ObjectMapper()
+                            .readValue(existingImages, java.util.List.class);
+                    imagePaths.addAll(existingList);
+                    log.info("Added {} existing images", existingList.size());
+                } catch (Exception e) {
+                    log.error("Failed to parse existingImages: ", e);
+                }
+            }
+            
+            // Add newly uploaded image files
             if (images != null && images.length > 0) {
-                java.util.List<String> imagePaths = new java.util.ArrayList<>();
                 for (MultipartFile image : images) {
                     if (image != null && !image.isEmpty()) {
                         String imagePath = fileUploadUtils.uploadFile(image, productDetailDir);
                         imagePaths.add(imagePath);
+                        log.info("Uploaded new image: {}", imagePath);
                     }
                 }
-                if (!imagePaths.isEmpty()) {
-                    product.setImages(new com.fasterxml.jackson.databind.ObjectMapper().
-                            writeValueAsString(imagePaths));
-                }
+            }
+            
+            // Set images field
+            if (!imagePaths.isEmpty()) {
+                product.setImages(new com.fasterxml.jackson.databind.ObjectMapper()
+                        .writeValueAsString(imagePaths));
+                log.info("Product images set with {} total images", imagePaths.size());
             }
             
             // Set default values
