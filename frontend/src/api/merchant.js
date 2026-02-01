@@ -92,19 +92,74 @@ export const getMerchantProduct = (id) => {
   })
 }
 
+// Helper function to convert base64 to Blob
+const base64ToBlob = (base64String, mimeType = 'image/jpeg') => {
+  // Remove data URL prefix if present
+  const base64WithoutPrefix = base64String.replace(/^data:image\/\w+;base64,/, '')
+  
+  // Decode base64 string
+  const binaryString = atob(base64WithoutPrefix)
+  
+  // Convert to byte array
+  const bytes = new Uint8Array(binaryString.length)
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i)
+  }
+  
+  // Create and return Blob
+  return new Blob([bytes], { type: mimeType })
+}
+
 // Create product
 export const createProduct = (data) => {
+  // Convert data to FormData for multipart/form-data submission
+  const formData = new FormData()
+  
+  // Add all product fields to FormData, converting base64 images to Blobs
+  Object.keys(data).forEach(key => {
+    const value = data[key]
+    if (value !== undefined && value !== null) {
+      if (key === 'image' && typeof value === 'string' && value.startsWith('data:image')) {
+        // Convert main image from base64 to Blob
+        const imageBlob = base64ToBlob(value)
+        formData.append('mainImage', imageBlob, 'main_image.jpg')
+      } else if (key === 'detailImages' && Array.isArray(value)) {
+        // Convert detail images from base64 to Blobs
+        value.forEach((img, index) => {
+          if (typeof img === 'string' && img.startsWith('data:image')) {
+            const imgBlob = base64ToBlob(img)
+            formData.append('images', imgBlob, `detail_image_${index}.jpg`)
+          }
+        })
+      } else if (!['image', 'detailImages'].includes(key)) {
+        // Add other fields as-is
+        if (Array.isArray(value)) {
+          // Handle arrays (non-image)
+          value.forEach(item => {
+            formData.append(key, item)
+          })
+        } else {
+          formData.append(key, value)
+        }
+      }
+    }
+  })
+  
   return request({
     url: '/api/merchant/products',
     method: 'post',
-    data
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
 
 // Update product
 export const updateProduct = (id, data) => {
+  // For updating, use the general product endpoint with JSON data
   return request({
-    url: `/api/merchant/products/${id}`,
+    url: `/api/products/${id}`,
     method: 'put',
     data
   })

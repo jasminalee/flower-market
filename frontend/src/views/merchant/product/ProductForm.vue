@@ -21,10 +21,12 @@
 
             <el-form-item label="Category" prop="category">
               <el-select v-model="formData.category" placeholder="Select category">
-                <el-option label="Flowers" value="FLOWER" />
-                <el-option label="Green Plants" value="GREEN_PLANT" />
-                <el-option label="Bouquets" value="BOUQUET" />
-                <el-option label="Potted" value="POTTED" />
+                <el-option 
+                  v-for="category in categories"
+                  :key="category.cateId"
+                  :label="category.name"
+                  :value="category.code || category.cateId"
+                />
               </el-select>
             </el-form-item>
 
@@ -103,11 +105,20 @@ import { useRouter, useRoute } from 'vue-router'
 import { getMerchantProduct, createProduct, updateProduct } from '@/api/merchant'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
+import { getAllCategories } from '@/api/product'
 
 const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
 const saving = ref(false)
+
+const userStore = useUserStore()
+
+// Category mapping
+const categories = ref([])
+const categoryCodeToId = ref({})
+const categoryIdToCode = ref({})
 
 const isEdit = ref(false)
 const productId = ref(null)
@@ -165,16 +176,32 @@ const handleSubmit = async () => {
 
   saving.value = true
   try {
-    const data = {
+    // Prepare product data for form submission
+    // Map category code to catId for backend compatibility
+    const catId = categoryCodeToId.value[formData.category]
+    if (!catId && formData.category && isNaN(formData.category)) {
+      console.warn('Selected category not found in category mapping:', formData.category)
+      ElMessage.warning('Selected category may not be valid, please select a valid category')
+    }
+    
+    const productData = {
       ...formData,
+      catId: catId || formData.category,  // Map category code to catId
+      merchId: userStore.userId,
       detailImages: detailImages.value.map(img => img.url)
     }
+    
+    // Remove the original category field to avoid conflicts
+    delete productData.category
 
     if (isEdit.value) {
-      await updateProduct(productId.value, data)
+      // For editing, we need to send the product data as JSON
+      // Ensure the product belongs to the current merchant
+      productData.merchId = userStore.userId
+      await updateProduct(productId.value, productData)
       ElMessage.success('Saved successfully')
     } else {
-      await createProduct(data)
+      await createProduct(productData)
       ElMessage.success('Added successfully')
     }
     
@@ -190,10 +217,50 @@ const handleCancel = () => {
   router.back()
 }
 
+const loadCategories = async () => {
+  try {
+    const res = await getAllCategories()
+    categories.value = res.data || []
+    
+    // Build category maps
+    const codeToId = {}
+    const idToCode = {}
+    
+    categories.value.forEach(cat => {
+      // Assuming the backend has fields like code (FLOWER, etc.) and cateId (numeric ID)
+      if (cat.code) {
+        codeToId[cat.code] = cat.cateId
+        idToCode[cat.cateId] = cat.code
+      } else {
+        // If no code field, use name as fallback
+        codeToId[cat.name.toUpperCase().replace(/\s+/g, '_')] = cat.cateId
+        idToCode[cat.cateId] = cat.name.toUpperCase().replace(/\s+/g, '_')
+      }
+    })
+    
+    categoryCodeToId.value = codeToId
+    categoryIdToCode.value = idToCode
+  } catch (error) {
+    console.error('Failed to load categories:', error)
+    ElMessage.error('Failed to load categories: ' + (error.message || 'Unknown error'))
+  }
+}
+
 const fetchProduct = async () => {
   try {
     const res = await getMerchantProduct(productId.value)
-    Object.assign(formData, res.data)
+    // Map catId to category code for form compatibility
+    const productData = {
+      ...res.data,
+      category: categoryIdToCode.value[res.data.catId] || res.data.catId  // Map catId back to category code
+    }
+    
+    // If the category code isn't in our mapping, try to find it by checking if the catId exists in our categories
+    if (!categoryIdToCode.value[res.data.catId] && !categories.value.some(cat => cat.cateId === res.data.catId)) {
+      // If we don't have the category loaded, try to load it
+      console.warn('Product category not found in loaded categories:', res.data.catId)
+    }
+    Object.assign(formData, productData)
     if (res.data.detailImages) {
       detailImages.value = res.data.detailImages.map((url, index) => ({
         uid: index,
@@ -205,12 +272,15 @@ const fetchProduct = async () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Load categories first
+  await loadCategories()
+  
   const id = route.params.id
   if (id && id !== 'add') {
     isEdit.value = true
     productId.value = id
-    fetchProduct()
+    await fetchProduct()
   }
 })
 </script>
