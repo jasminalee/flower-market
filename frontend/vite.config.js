@@ -23,6 +23,10 @@ export default defineConfig({
         target: 'http://localhost:8090',
         changeOrigin: true
       },
+      '/images': {
+        target: 'http://localhost:8090',
+        changeOrigin: true
+      },
       '/products': {
         target: 'http://localhost:8090',
         changeOrigin: true

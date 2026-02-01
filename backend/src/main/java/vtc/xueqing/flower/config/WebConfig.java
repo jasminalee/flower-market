@@ -20,17 +20,17 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/");
         
-        // 映射上传的图片文件 - 直接映射到 products 路径
+        // 映射上传的图片文件 - 统一使用 /images/** 路径
         // Ensure the upload path ends with separator for proper path concatenation
-        String normalizedUploadPath = uploadPath.endsWith("/") ? uploadPath : uploadPath + "/";
-        // Map /products/** to the correct physical location: [uploadPath]/products/
-        // For example, if uploadPath is "./uploads/images/", then /products/** maps to ./uploads/images/products/**
-        registry.addResourceHandler("/products/**")
-                .addResourceLocations("file:" + normalizedUploadPath + "products/");
+        String normalizedUploadPath = uploadPath.replace("\\", "/");
+        if (!normalizedUploadPath.endsWith("/")) {
+            normalizedUploadPath += "/";
+        }
         
-        // Also keep the general uploads mapping for other file types if needed
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath);
+        // Map /images/** to file system path [uploadPath]/
+        // For example: /images/products/main/xxx.jpg -> uploads/images/products/main/xxx.jpg
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:" + normalizedUploadPath);
     }
 
     // 2. 配置首页默认跳转，访问根路径 http://localhost:8080 直接返回 index.html

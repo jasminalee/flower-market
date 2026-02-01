@@ -41,8 +41,8 @@
 
             <el-form-item label="Status" prop="status">
               <el-radio-group v-model="formData.status">
-                <el-radio label="ON_SALE">On Sale</el-radio>
-                <el-radio label="OFF_SALE">Off Sale</el-radio>
+                <el-radio label="ACTIVE">On Sale</el-radio>
+                <el-radio label="INACTIVE">Off Sale</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -56,7 +56,7 @@
                 :auto-upload="false"
                 :on-change="handleImageChange"
               >
-                <img v-if="formData.image" :src="formData.image" class="product-image" />
+                <img v-if="formData.image" :src="getImageUrl(formData.image)" class="product-image" />
                 <el-icon v-else class="uploader-icon"><Plus /></el-icon>
               </el-upload>
               <div class="upload-tip">Recommended size: 800x800px</div>
@@ -84,6 +84,7 @@
             :file-list="detailImages"
             :on-change="handleDetailImageChange"
             :on-remove="handleDetailImageRemove"
+            :class="detailImages.length > 0 ? 'has-images' : ''"
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
@@ -130,7 +131,7 @@ const formData = reactive({
   stock: 0,
   image: '',
   description: '',
-  status: 'ON_SALE'
+  status: 'ACTIVE'
 })
 
 const detailImages = ref([])
@@ -140,7 +141,20 @@ const rules = {
   category: [{ required: true, message: 'Please select a category', trigger: 'change' }],
   price: [{ required: true, message: 'Please enter product price', trigger: 'blur' }],
   stock: [{ required: true, message: 'Please enter stock quantity', trigger: 'blur' }],
-  image: [{ required: true, message: 'Please upload a main product image', trigger: 'change' }]
+  image: [{ 
+    validator: (rule, value, callback) => {
+      // In edit mode, image is optional (already exists in DB)
+      // In create mode, image is required
+      if (isEdit.value) {
+        callback()
+      } else if (!value) {
+        callback(new Error('Please upload a main product image'))
+      } else {
+        callback()
+      }
+    }, 
+    trigger: 'change' 
+  }]
 }
 
 const handleImageChange = (file) => {
@@ -151,18 +165,28 @@ const handleImageChange = (file) => {
   reader.readAsDataURL(file.raw)
 }
 
-const handleDetailImageChange = (file, fileList) => {
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    detailImages.value = fileList.map((f, index) => {
-      if (f.raw && !f.url) {
-        return { ...f, url: e.target.result }
-      }
-      return f
-    })
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return ''
+  // If it's already an absolute URL or base64 data, return as is
+  if (imagePath.startsWith('http') || imagePath.startsWith('data:image')) {
+    return imagePath
   }
+  // For relative paths (like /products/main/...), return as is since Vite proxy handles it
+  return imagePath
+}
+
+const handleDetailImageChange = (file, fileList) => {
+  // Only process new uploads (raw files), not existing images
   if (file.raw) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      // Add the new image to the list
+      detailImages.value = [...fileList]
+    }
     reader.readAsDataURL(file.raw)
+  } else {
+    // For existing images (not raw files), just update the list
+    detailImages.value = fileList
   }
 }
 
@@ -184,20 +208,32 @@ const handleSubmit = async () => {
       ElMessage.warning('Selected category may not be valid, please select a valid category')
     }
     
+    // Prepare product data for submission
     const productData = {
       ...formData,
       catId: catId || formData.category,  // Map category code to catId
       merchId: userStore.userId,
-      detailImages: detailImages.value.map(img => img.url)
     }
     
     // Remove the original category field to avoid conflicts
     delete productData.category
-
+    
+    // Only include images if they are new uploads (base64 data), not existing paths
+    const isNewMainImage = formData.image && formData.image.startsWith('data:image');
+    const hasNewDetailImages = detailImages.value.some(img => img.url && img.url.startsWith('data:image'));
+    
+    if (isNewMainImage) {
+      productData.image = formData.image; // Will be converted to file in API
+    }
+    
+    if (hasNewDetailImages) {
+      productData.detailImages = detailImages.value
+        .filter(img => img.url && img.url.startsWith('data:image')) // Only new uploads
+        .map(img => img.url);
+    }
+    
     if (isEdit.value) {
-      // For editing, we need to send the product data as JSON
-      // Ensure the product belongs to the current merchant
-      productData.merchId = userStore.userId
+      // For editing, if no new images were uploaded, don't send image fields to preserve existing images
       await updateProduct(productId.value, productData)
       ElMessage.success('Saved successfully')
     } else {
@@ -260,11 +296,39 @@ const fetchProduct = async () => {
       // If we don't have the category loaded, try to load it
       console.warn('Product category not found in loaded categories:', res.data.catId)
     }
+    
+    // Handle main image - keep relative path for display
+    if (res.data.mainImage) {
+      // Store the original mainImage path for display
+      formData.image = res.data.mainImage
+    }
+    
     Object.assign(formData, productData)
-    if (res.data.detailImages) {
+    
+    // Handle detail images - images field is a JSON string from backend
+    if (res.data.images) {
+      try {
+        let imageUrls = []
+        if (typeof res.data.images === 'string') {
+          imageUrls = JSON.parse(res.data.images)
+        } else {
+          imageUrls = Array.isArray(res.data.images) ? res.data.images : []
+        }
+        
+        detailImages.value = imageUrls.map((url, index) => ({
+          uid: index,
+          url: url  // Keep relative path for display
+        }))
+      } catch (error) {
+        console.error('Failed to parse images:', error)
+      }
+    }
+    
+    // Fallback for detailImages field if it exists (for backward compatibility)
+    if (res.data.detailImages && detailImages.value.length === 0) {
       detailImages.value = res.data.detailImages.map((url, index) => ({
         uid: index,
-        url
+        url: url  // Keep relative path for display
       }))
     }
   } catch (error) {
@@ -332,5 +396,21 @@ onMounted(async () => {
 
 .detail-uploader {
   width: 100%;
+}
+
+.detail-uploader.has-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.detail-uploader.has-images :deep(.el-upload) {
+  width: auto;
+  height: auto;
+}
+
+.detail-uploader.has-images :deep(.el-upload-list__item) {
+  width: 120px;
+  height: 120px;
 }
 </style>

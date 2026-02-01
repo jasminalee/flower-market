@@ -59,12 +59,12 @@ public class FileUploadUtils {
         // Save file
         file.transferTo(destinationFile.toAbsolutePath());
 
-        // Return relative path
+        // Return relative path with /images/ prefix for web access
         String relativePath = destinationFile.toString().substring(rootLocation.toString().length());
         if (relativePath.startsWith(File.separator)) {
             relativePath = relativePath.substring(1);
         }
-        return "/" + relativePath.replace(File.separator, "/");
+        return "/images/" + relativePath.replace(File.separator, "/");
     }
 
     /**

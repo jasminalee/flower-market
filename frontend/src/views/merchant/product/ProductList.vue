@@ -166,6 +166,8 @@ const fetchProducts = async () => {
       }
       return {
         ...item,
+        // Ensure a normalized id field is available for routing/editing
+        id: item.id ?? item.prodId ?? item.productId,
         categoryText: categoryMap.value[item.catId] || `Category ${item.catId}`,
         statusText: item.status === 'ACTIVE' ? 'On Sale' : 'Off Sale',
         // Map field names for frontend display
@@ -198,7 +200,8 @@ const handleAdd = () => {
 }
 
 const handleEdit = (row) => {
-  router.push(`/merchant/products/edit/${row.id}`)
+  const pid = row.id ?? row.prodId ?? row.productId
+  router.push(`/merchant/products/edit/${pid}`)
 }
 
 const handleTrackability = (row) => {

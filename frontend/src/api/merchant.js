@@ -157,11 +157,46 @@ export const createProduct = (data) => {
 
 // Update product
 export const updateProduct = (id, data) => {
-  // For updating, use the general product endpoint with JSON data
+  // Convert data to FormData for multipart/form-data submission
+  const formData = new FormData()
+  
+  // Add all product fields to FormData, converting base64 images to Blobs
+  Object.keys(data).forEach(key => {
+    const value = data[key]
+    if (value !== undefined && value !== null) {
+      if (key === 'image' && typeof value === 'string' && value.startsWith('data:image')) {
+        // Convert main image from base64 to Blob
+        const imageBlob = base64ToBlob(value)
+        formData.append('mainImage', imageBlob, 'main_image.jpg')
+      } else if (key === 'detailImages' && Array.isArray(value)) {
+        // Convert detail images from base64 to Blobs
+        value.forEach((img, index) => {
+          if (typeof img === 'string' && img.startsWith('data:image')) {
+            const imgBlob = base64ToBlob(img)
+            formData.append('images', imgBlob, `detail_image_${index}.jpg`)
+          }
+        })
+      } else if (!['image', 'detailImages'].includes(key)) {
+        // Add other fields as-is
+        if (Array.isArray(value)) {
+          // Handle arrays (non-image)
+          value.forEach(item => {
+            formData.append(key, item)
+          })
+        } else {
+          formData.append(key, value)
+        }
+      }
+    }
+  })
+  
   return request({
-    url: `/api/products/${id}`,
+    url: `/api/merchant/products/${id}`,
     method: 'put',
-    data
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
 

@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import vtc.xueqing.flower.entity.Order;
 import vtc.xueqing.flower.entity.Product;
 import vtc.xueqing.flower.service.MerchantService;
 import vtc.xueqing.flower.service.OrderService;
+import vtc.xueqing.flower.service.ProductService;
 import vtc.xueqing.flower.utils.FileUploadUtils;
 
 import javax.annotation.Resource;
@@ -33,8 +35,20 @@ public class MerchantController {
     @Resource
     private OrderService orderService;
 
+    @Resource
+    private ProductService productService;
+
     @Autowired
     private FileUploadUtils fileUploadUtils;
+
+    @Value("${file.upload.path}")
+    private String uploadPath;
+
+    @Value("${file.upload.product-main}")
+    private String productMainDir;
+
+    @Value("${file.upload.product-detail}")
+    private String productDetailDir;
 
     @ApiOperation("Merchant Registration")
     @PostMapping("/register")
@@ -108,6 +122,20 @@ public class MerchantController {
             }
             
             return Result.success(page);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    
+    @ApiOperation("Get Merchant Product Detail")
+    @GetMapping("/products/{id}")
+    public Result<Product> getMerchantProduct(@PathVariable Long id) {
+        try {
+            Product product = productService.getProductById(id);
+            if (product == null) {
+                return Result.error("Product does not exist");
+            }
+            return Result.success(product);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
@@ -261,7 +289,7 @@ public class MerchantController {
             
             // Process main image if provided
             if (mainImage != null && !mainImage.isEmpty()) {
-                String mainImagePath = fileUploadUtils.uploadFile(mainImage, "products/main");
+                String mainImagePath = fileUploadUtils.uploadFile(mainImage, productMainDir);
                 product.setMainImage(mainImagePath);
             }
             
@@ -270,7 +298,7 @@ public class MerchantController {
                 java.util.List<String> imagePaths = new java.util.ArrayList<>();
                 for (MultipartFile image : images) {
                     if (image != null && !image.isEmpty()) {
-                        String imagePath = fileUploadUtils.uploadFile(image, "products/detail");
+                        String imagePath = fileUploadUtils.uploadFile(image, productDetailDir);
                         imagePaths.add(imagePath);
                     }
                 }
@@ -291,6 +319,70 @@ public class MerchantController {
         } catch (Exception e) {
             log.error("Error creating product: ", e);
             return Result.error("Failed to create product: " + e.getMessage());
+        }
+    }
+    
+    @ApiOperation("Update Product")
+    @PutMapping("/products/{id}")
+    public Result<Product> updateProduct(
+            @PathVariable Long id,
+            @RequestParam("merchId") Long merchId,
+            @RequestParam("name") String name,
+            @RequestParam("price") java.math.BigDecimal price,
+            @RequestParam("stock") Integer stock,
+            @RequestParam(value = "catId", required = false) Long catId,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
+            @RequestParam(value = "images", required = false) MultipartFile[] images) {
+        try {
+            // Get existing product
+            Product product = productService.getProductById(id);
+            if (product == null) {
+                return Result.error("Product does not exist");
+            }
+            
+            // Update basic fields
+            product.setName(name);
+            product.setPrice(price);
+            product.setStock(stock);
+            if (catId != null) {
+                product.setCatId(catId);
+            }
+            if (description != null) {
+                product.setDescription(description);
+            }
+            if (status != null) {
+                product.setStatus(status);
+            }
+            
+            // Process main image if provided
+            if (mainImage != null && !mainImage.isEmpty()) {
+                String mainImagePath = fileUploadUtils.uploadFile(mainImage, productMainDir);
+                product.setMainImage(mainImagePath);
+            }
+            
+            // Process additional images if provided
+            if (images != null && images.length > 0) {
+                java.util.List<String> imagePaths = new java.util.ArrayList<>();
+                for (MultipartFile image : images) {
+                    if (image != null && !image.isEmpty()) {
+                        String imagePath = fileUploadUtils.uploadFile(image, productDetailDir);
+                        imagePaths.add(imagePath);
+                    }
+                }
+                if (!imagePaths.isEmpty()) {
+                    product.setImages(new com.fasterxml.jackson.databind.ObjectMapper().
+                            writeValueAsString(imagePaths));
+                }
+            }
+            
+            // Update product
+            Product updatedProduct = productService.updateProduct(product);
+            return Result.success("Product Updated Successfully", updatedProduct);
+        } catch (Exception e) {
+            log.error("Error updating product: ", e);
+            return Result.error("Failed to update product: " + e.getMessage());
         }
     }
     
