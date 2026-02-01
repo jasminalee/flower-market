@@ -37,7 +37,7 @@
       </el-row>
       
       <div class="footer-bottom">
-        <p>&copy; 2024 Flower Market. All Rights Reserved</p>
+        <p>&copy; 2026 Flower Market. All Rights Reserved</p>
       </div>
     </div>
   </div>
