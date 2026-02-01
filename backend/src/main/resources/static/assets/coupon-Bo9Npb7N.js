@@ -1,1 +1,0 @@
-import{S as t}from"./index-Br0p5E83.js";const s=o=>t({url:"/api/coupons",method:"get",params:o}),p=(o,e)=>t({url:`/api/coupons/${o}/receive`,method:"post",params:{userId:e}}),u=o=>t({url:"/api/coupons/my",method:"get",params:o});export{s as a,p as c,u as g};
