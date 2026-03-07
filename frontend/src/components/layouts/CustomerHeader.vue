@@ -38,19 +38,28 @@
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="profile">
+                  <el-dropdown-item v-if="userStore.userType === 'ADMIN'" command="dashboard">
+                    <el-icon><Monitor /></el-icon>
+                    Admin Dashboard
+                  </el-dropdown-item>
+                  <el-dropdown-item v-else-if="userStore.userType === 'MERCHANT'" command="dashboard">
+                    <el-icon><Shop /></el-icon>
+                    Merchant Center
+                  </el-dropdown-item>
+                  <el-dropdown-item v-else command="profile">
                     <el-icon><User /></el-icon>
                     Profile
                   </el-dropdown-item>
-                  <el-dropdown-item command="orders">
+                  
+                  <el-dropdown-item v-if="userStore.userType === 'CUSTOMER'" command="orders">
                     <el-icon><DocumentCopy /></el-icon>
                     My Orders
                   </el-dropdown-item>
-                  <el-dropdown-item command="favorites">
+                  <el-dropdown-item v-if="userStore.userType === 'CUSTOMER'" command="favorites">
                     <el-icon><StarFilled /></el-icon>
                     My Favorites
                   </el-dropdown-item>
-                  <el-dropdown-item command="coupons">
+                  <el-dropdown-item v-if="userStore.userType === 'CUSTOMER'" command="coupons">
                     <el-icon><Ticket /></el-icon>
                     My Coupons
                   </el-dropdown-item>
@@ -124,8 +133,14 @@ const handleCommand = async (command) => {
     await userStore.logout()
     ElMessage.success('Logged out')
     router.push('/login')
-  } else if (command === 'profile') {
-    router.push('/profile')
+  } else if (command === 'profile' || command === 'dashboard') {
+    if (userStore.userType === 'ADMIN') {
+      router.push('/admin/dashboard')
+    } else if (userStore.userType === 'MERCHANT') {
+      router.push('/merchant/dashboard')
+    } else {
+      router.push('/profile')
+    }
   } else if (command === 'orders') {
     router.push('/profile/orders')
   } else if (command === 'favorites') {

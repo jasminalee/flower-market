@@ -60,12 +60,12 @@
             {{ formatDate(row.createDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="200" fixed="right">
+        <el-table-column label="Actions" width="280" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row.id)">Edit</el-button>
-            <el-button v-if="row.status === 'PUBLISHED'" type="warning" link @click="handleToggleStatus(row.id, 'DRAFT')">Unpublish</el-button>
-            <el-button v-else type="success" link @click="handleToggleStatus(row.id, 'PUBLISHED')">Publish</el-button>
-            <el-button type="danger" link @click="handleDelete(row.id)">Delete</el-button>
+            <el-button type="primary" link icon="Edit" @click="handleEdit(row.id)">Edit</el-button>
+            <el-button v-if="row.status === 'PUBLISHED'" type="warning" link icon="Download" @click="handleToggleStatus(row.id, 'DRAFT')">Unpublish</el-button>
+            <el-button v-else type="success" link icon="Upload" @click="handleToggleStatus(row.id, 'PUBLISHED')">Publish</el-button>
+            <el-button type="danger" link icon="Delete" @click="handleDelete(row.id)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -90,6 +90,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Edit, Delete, Upload, Download, Plus } from '@element-plus/icons-vue'
 import { getKnowledgeList, deleteKnowledge } from '@/api/knowledge'
 import { formatDate } from '@/utils/format'
 import request from '@/utils/request'

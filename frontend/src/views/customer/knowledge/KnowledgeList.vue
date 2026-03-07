@@ -115,6 +115,96 @@
         </div>
       </div>
     </div>
+
+    <!-- Post Article Dialog -->
+    <el-dialog 
+      v-model="showPostDialog" 
+      title="Share Your Plant Care Wisdom" 
+      width="650px" 
+      custom-class="fancy-post-dialog"
+      @close="resetPostForm"
+    >
+      <div class="dialog-intro">
+        <el-icon class="intro-icon"><Edit /></el-icon>
+        <p>Help our community grow by sharing your gardening expertize and floral tips.</p>
+      </div>
+
+      <el-form :model="postForm" :rules="postRules" ref="postFormRef" label-position="top">
+        <div class="form-section-header">Basic Information</div>
+        <el-row :gutter="20">
+          <el-col :span="14">
+            <el-form-item label="Captivating Title" prop="title">
+              <el-input 
+                v-model="postForm.title" 
+                placeholder="e.g., How to keep hydrangeas blue" 
+                maxlength="100" 
+                show-word-limit 
+                class="fancy-input"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="10">
+            <el-form-item label="Category" prop="category">
+              <el-select v-model="postForm.category" placeholder="Choose a type" style="width: 100%" class="fancy-select">
+                <el-option label="🌸 Flower Care" value="Flower Care" />
+                <el-option label="🌿 Plant Care" value="Plant Care" />
+                <el-option label="📚 Encyclopedia" value="Plant Encyclopedia" />
+                <el-option label="🎬 Tutorial" value="Floral Tutorial" />
+                <el-option label="📅 Seasonal" value="Seasonal Guide" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <div class="form-section-header">Content Details</div>
+        <el-form-item label="Brief Summary" prop="summary">
+          <el-input 
+            v-model="postForm.summary" 
+            type="textarea" 
+            placeholder="A short introduction to entice readers..." 
+            :rows="2"
+            maxlength="200"
+            show-word-limit
+            class="fancy-input"
+          />
+        </el-form-item>
+
+        <el-form-item label="Detailed Guide" prop="content">
+          <el-input 
+            v-model="postForm.content" 
+            type="textarea" 
+            placeholder="Step-by-step instructions or deep dive into the topic..." 
+            :rows="8"
+            class="fancy-input content-editor"
+            style="width: 100%"
+          />
+        </el-form-item>
+
+        <div class="form-section-header">Visuals & Meta</div>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="Cover Image URL" prop="coverImage">
+              <el-input v-model="postForm.coverImage" placeholder="Paste image link here" class="fancy-input" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Tags" prop="tags">
+              <el-input v-model="postForm.tags" placeholder="e.g., rose, water, sun" class="fancy-input" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      
+      <template #footer>
+        <div class="fancy-footer">
+          <el-button @click="showPostDialog = false" class="btn-cancel">Cancel</el-button>
+          <el-button type="primary" @click="submitPost" :loading="submitting" class="btn-submit">
+            Publish My Post
+            <el-icon class="el-icon--right"><Promotion /></el-icon>
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
     
     <CustomerFooter />
   </div>
@@ -123,18 +213,24 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, User, View, Clock } from '@element-plus/icons-vue'
+import { Search, User, View, Clock, Edit, Promotion } from '@element-plus/icons-vue'
 import CustomerHeader from '@/components/layouts/CustomerHeader.vue'
 import CustomerFooter from '@/components/layouts/CustomerFooter.vue'
 import { getKnowledgeList } from '@/api/knowledge'
+import request from '@/utils/request'
+import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import { formatDate } from '@/utils/format'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 const loading = ref(false)
 const knowledgeList = ref([])
 const total = ref(0)
+const submitting = ref(false)
+const showPostDialog = ref(false)
+const postFormRef = ref(null)
 
 const filters = reactive({
   category: '',
@@ -146,9 +242,58 @@ const pagination = reactive({
   size: 9
 })
 
+const postForm = reactive({
+  title: 'How to Care for My New Bouquet',
+  category: 'Flower Care',
+  summary: 'Keep your fresh cut flowers vibrant for longer with these simple daily routines.',
+  content: '### Preparation\n1. Use a clean vase filled with lukewarm water.\n2. Cut the stems at a 45-degree angle.\n\n### Daily Maintenance\n* Change the water every 2 days.\n* Remove any leaves below the water line.\n* Keep away from direct sunlight and fruit.',
+  coverImage: '/uploads/images/knowledge/sample-flower.jpg',
+  tags: 'fresh flowers, vase life, floral care'
+})
+
+const postRules = {
+  title: [{ required: true, message: 'Please enter a catchy title', trigger: 'blur' }],
+  category: [{ required: true, message: 'Please select a category', trigger: 'change' }],
+  content: [{ required: true, message: 'Content cannot be empty', trigger: 'blur' }]
+}
+
 onMounted(() => {
   loadKnowledgeList()
 })
+
+const resetPostForm = () => {
+  if (postFormRef.value) postFormRef.value.resetFields()
+  postForm.tags = ''
+}
+
+const submitPost = async () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('You must be logged in to post an article.')
+    router.push('/login')
+    return
+  }
+
+  await postFormRef.value.validate(async (valid) => {
+    if (valid) {
+      submitting.value = true
+      try {
+        await request.post('/api/care-knowledge', {
+          ...postForm,
+          author: userStore.userInfo?.username || userStore.username || 'Anonymous User',
+          status: 'PUBLISHED'
+        })
+        ElMessage.success('Post published! Your knowledge will help others.')
+        showPostDialog.value = false
+        loadKnowledgeList()
+      } catch (error) {
+        console.error('Submit post error:', error)
+        ElMessage.error('Oops! Failed to publish your post. Please try again.')
+      } finally {
+        submitting.value = false
+      }
+    }
+  })
+}
 
 const loadKnowledgeList = async () => {
   loading.value = true
@@ -223,6 +368,19 @@ const goToDetail = (id) => {
 .page-header .subtitle {
   font-size: 16px;
   color: #666;
+}
+
+.filter-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .filter-bar :deep(.el-card__body) {
@@ -300,6 +458,92 @@ const goToDetail = (id) => {
 
 .meta-info .el-icon {
   font-size: 14px;
+}
+
+/* Fancy Dialog Styles */
+.fancy-post-dialog :deep(.el-dialog__header) {
+  margin-right: 0;
+  padding: 24px 24px 16px;
+  background: linear-gradient(135deg, #f0f7f4 0%, #ffffff 100%);
+  border-bottom: 1px solid #eef2f1;
+}
+
+.fancy-post-dialog :deep(.el-dialog__title) {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.dialog-intro {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fdf6ec;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  color: #a6732e;
+  font-size: 14px;
+  border: 1px solid #f9ebd8;
+}
+
+.intro-icon {
+  font-size: 18px;
+}
+
+.form-section-header {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #909399;
+  margin: 20px 0 12px;
+  display: flex;
+  align-items: center;
+}
+
+.form-section-header::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ebeef5;
+  margin-left: 10px;
+}
+
+.fancy-input :deep(.el-input__wrapper),
+.fancy-input :deep(.el-textarea__inner),
+.fancy-select :deep(.el-input__wrapper) {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid #e4e7ed;
+  transition: all 0.3s ease;
+}
+
+.content-editor :deep(.el-textarea__inner) {
+  padding: 12px;
+  line-height: 1.6;
+}
+
+.fancy-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 10px;
+}
+
+.btn-submit {
+  padding: 10px 24px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+.btn-cancel {
+  border-radius: 8px;
 }
 
 .ellipsis-2 {

@@ -60,9 +60,9 @@
             {{ formatDate(row.createDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Action" width="150" fixed="right">
+        <el-table-column label="Action" width="180" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link size="small" @click="handleViewDetail(row)">
+            <el-button type="primary" link icon="View" @click="handleViewDetail(row)">
               View Details
             </el-button>
           </template>
@@ -123,6 +123,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { View } from '@element-plus/icons-vue'
 import { formatDate } from '@/utils/format'
 import request from '@/utils/request'
 

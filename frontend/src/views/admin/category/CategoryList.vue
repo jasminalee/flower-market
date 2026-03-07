@@ -38,11 +38,11 @@
         </el-table-column>
         <el-table-column prop="description" label="Description" min-width="200" show-overflow-tooltip/>
         <el-table-column prop="createDate" label="Created At" width="180"/>
-        <el-table-column label="Actions" width="200" fixed="right">
+        <el-table-column label="Actions" width="280" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleAddChild(row)">Add Subcategory</el-button>
-            <el-button type="primary" size="small" link @click="handleEdit(row)">Edit</el-button>
-            <el-button type="danger" size="small" link @click="handleDelete(row)">Delete</el-button>
+            <el-button type="primary" link icon="Plus" @click="handleAddChild(row)">Add Sub</el-button>
+            <el-button type="primary" link icon="Edit" @click="handleEdit(row)">Edit</el-button>
+            <el-button type="danger" link icon="Delete" @click="handleDelete(row)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -104,7 +104,7 @@
 <script setup>
 import {ref, reactive, computed, onMounted} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
-import {Plus} from '@element-plus/icons-vue'
+import {Plus, Edit, Delete} from '@element-plus/icons-vue'
 import request from '@/utils/request'
 
 const categories = ref([])

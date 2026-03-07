@@ -75,18 +75,19 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="280" fixed="right">
+        <el-table-column label="Actions" width="300" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleEdit(row)">Edit</el-button>
+            <el-button type="primary" link icon="Edit" @click="handleEdit(row)">Edit</el-button>
             <el-button
               :type="row.status === 'ACTIVE' ? 'warning' : 'success'"
               link
+              :icon="row.status === 'ACTIVE' ? 'Bottom' : 'Top'"
               @click="handleToggleStatus(row)"
             >
               {{ row.status === 'ACTIVE' ? 'Off Sale' : 'On Sale' }}
             </el-button>
-            <el-button type="info" link @click="handleTrackability(row)">Traceability</el-button>
-            <el-button type="danger" link @click="handleDelete(row)">Delete</el-button>
+            <el-button type="info" link icon="Search" @click="handleTrackability(row)">Traceability</el-button>
+            <el-button type="danger" link icon="Delete" @click="handleDelete(row)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -113,7 +114,7 @@ import { useRouter } from 'vue-router'
 import { getMerchantProducts, updateProductStatus, deleteProduct } from '@/api/merchant'
 import { getAllCategories } from '@/api/product'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Edit, Delete, Top, Bottom, Search } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
