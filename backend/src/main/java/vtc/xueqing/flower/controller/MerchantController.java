@@ -50,6 +50,9 @@ public class MerchantController {
     @Value("${file.upload.product-detail}")
     private String productDetailDir;
 
+    @Value("${file.upload.merchant-logo}")
+    private String merchantLogoDir;
+
     @ApiOperation("Merchant Registration")
     @PostMapping("/register")
     public Result<Merchant> register(@Validated @RequestBody Merchant merchant) {
@@ -72,12 +75,41 @@ public class MerchantController {
     }
     
     @ApiOperation("Update Merchant Information")
-    @PutMapping("/profile")
-    public Result<Merchant> updateProfile(@RequestBody Merchant merchant) {
+    @PostMapping("/profile/update")
+    public Result<Merchant> updateProfile(
+            @RequestParam("merchId") Long merchId,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "contactName", required = false) String contactName,
+            @RequestParam(value = "phone", required = false) String phone,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "businessHours", required = false) String businessHours,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "logoFile", required = false) MultipartFile logoFile) {
         try {
+            Merchant merchant = merchantService.getMerchantById(merchId);
+            if (merchant == null) {
+                return Result.error("Merchant does not exist");
+            }
+
+            if (name != null) merchant.setName(name);
+            if (contactName != null) merchant.setContactName(contactName);
+            if (phone != null) merchant.setPhone(phone);
+            if (email != null) merchant.setEmail(email);
+            if (address != null) merchant.setAddress(address);
+            if (businessHours != null) merchant.setBusinessHours(businessHours);
+            if (description != null) merchant.setDescription(description);
+
+            // Handle logo upload
+            if (logoFile != null && !logoFile.isEmpty()) {
+                String logoPath = fileUploadUtils.uploadFile(logoFile, merchantLogoDir);
+                merchant.setShopLogo(logoPath);
+            }
+
             Merchant updated = merchantService.updateMerchant(merchant);
             return Result.success("Update Successful", updated);
         } catch (Exception e) {
+            log.error("Error updating merchant profile: ", e);
             return Result.error(e.getMessage());
         }
     }

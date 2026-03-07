@@ -68,10 +68,28 @@ export const getMerchantProfile = (id) => {
 
 // Update merchant profile
 export const updateMerchantProfile = (data) => {
+  const formData = new FormData()
+  
+  Object.keys(data).forEach(key => {
+    const value = data[key]
+    if (value !== undefined && value !== null) {
+      if (key === 'logo' && typeof value === 'string' && value.startsWith('data:image')) {
+        // Convert logo from base64 to Blob
+        const logoBlob = base64ToBlob(value)
+        formData.append('logoFile', logoBlob, 'merchant_logo.jpg')
+      } else if (key !== 'logo') {
+        formData.append(key, value)
+      }
+    }
+  })
+
   return request({
-    url: '/api/merchant/profile',
-    method: 'put',
-    data
+    url: '/api/merchant/profile/update',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
 

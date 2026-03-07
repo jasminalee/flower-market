@@ -69,6 +69,8 @@ CREATE TABLE `merchants` (
   `email` VARCHAR(100) NOT NULL COMMENT 'Merchant email',
   `password` VARCHAR(255) NOT NULL COMMENT 'Password (encrypted)',
   `phone` VARCHAR(20) NOT NULL COMMENT 'Merchant phone',
+  `contact_name` VARCHAR(50) COMMENT 'Contact name',
+  `business_hours` VARCHAR(100) COMMENT 'Business hours',
   `shop_logo` VARCHAR(255) COMMENT 'Shop logo',
   `qualification` VARCHAR(255) COMMENT 'Merchant qualification proof',
   `address` VARCHAR(255) COMMENT 'Merchant address',

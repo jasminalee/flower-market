@@ -50,6 +50,18 @@ public class Merchant implements Serializable {
     private String phone;
 
     /**
+     * Contact name
+     */
+    @TableField("contact_name")
+    private String contactName;
+
+    /**
+     * Business hours
+     */
+    @TableField("business_hours")
+    private String businessHours;
+
+    /**
      * Shop logo
      */
     @TableField("shop_logo")
