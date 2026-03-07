@@ -264,6 +264,12 @@ const router = createRouter({
           meta: { title: 'Merchant Details' }
         },
         {
+          path: 'suppliers',
+          name: 'SupplierManagement',
+          component: () => import('@/views/admin/supplier/Index.vue'),
+          meta: { title: 'Supplier' }
+        },
+        {
           path: 'reviews',
           name: 'ReviewManagement',
           component: () => import('@/views/admin/review/ReviewList.vue'),

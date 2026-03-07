@@ -45,6 +45,24 @@ public class Product implements Serializable {
     private Long catId;
 
     /**
+     * Supplier ID
+     */
+    @TableField("supplier_id")
+    private Long supplierId;
+
+    /**
+     * Supplier Name (filled by association query)
+     */
+    @TableField(exist = false)
+    private String supplierName;
+
+    /**
+     * Supplier Rating (filled by association query)
+     */
+    @TableField(exist = false)
+    private Double supplierRating;
+
+    /**
      * Product name
      */
     @TableField("name")
@@ -85,6 +103,30 @@ public class Product implements Serializable {
      */
     @TableField("description")
     private String description;
+
+    /**
+     * Flowering period (e.g., 7-10 days)
+     */
+    @TableField("flowering_period")
+    private String floweringPeriod;
+
+    /**
+     * Care difficulty: EASY, MEDIUM, HARD
+     */
+    @TableField("care_difficulty")
+    private String careDifficulty;
+
+    /**
+     * Suitable environment details (temperature, light, humidity)
+     */
+    @TableField("suitable_environment")
+    private String suitableEnvironment;
+
+    /**
+     * Flower language (meaning)
+     */
+    @TableField("floral_language")
+    private String floralLanguage;
 
     /**
      * Product status: ACTIVE-listed, INACTIVE-unlisted, DELETED-deleted

@@ -39,6 +39,29 @@
               <el-input-number v-model="formData.stock" :min="0" :step="1" />
             </el-form-item>
 
+            <el-form-item label="Supplier" prop="supplierId">
+              <el-select v-model="formData.supplierId" placeholder="Select supplier" clearable filterable>
+                <el-option 
+                  v-for="item in suppliers"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="Flowering Period" prop="floweringPeriod">
+              <el-input v-model="formData.floweringPeriod" placeholder="e.g., 7-10 days" />
+            </el-form-item>
+
+            <el-form-item label="Care Difficulty" prop="careDifficulty">
+              <el-select v-model="formData.careDifficulty" placeholder="Select difficulty">
+                <el-option label="Easy" value="EASY" />
+                <el-option label="Medium" value="MEDIUM" />
+                <el-option label="Hard" value="HARD" />
+              </el-select>
+            </el-form-item>
+
             <el-form-item label="Status" prop="status">
               <el-radio-group v-model="formData.status">
                 <el-radio label="ACTIVE">On Sale</el-radio>
@@ -48,6 +71,19 @@
           </el-col>
 
           <el-col :span="12">
+            <el-form-item label="Suitable Env" prop="suitableEnvironment">
+              <el-input 
+                v-model="formData.suitableEnvironment" 
+                type="textarea" 
+                :rows="3" 
+                placeholder="Temperature, light, humidity requirements" 
+              />
+            </el-form-item>
+
+            <el-form-item label="Floral Language" prop="floralLanguage">
+              <el-input v-model="formData.floralLanguage" placeholder="Flower meaning" />
+            </el-form-item>
+
             <el-form-item label="Main Image" prop="image">
               <el-upload
                 class="image-uploader"
@@ -104,6 +140,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getMerchantProduct, createProduct, updateProduct, uploadProductImage } from '@/api/merchant'
+import { getActiveSuppliers } from '@/api/supplier'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
@@ -115,6 +152,17 @@ const formRef = ref(null)
 const saving = ref(false)
 
 const userStore = useUserStore()
+
+// Suppliers
+const suppliers = ref([])
+const loadSuppliers = async () => {
+  try {
+    const { data } = await getActiveSuppliers()
+    suppliers.value = data || []
+  } catch (error) {
+    console.error('Failed to load suppliers:', error)
+  }
+}
 
 // Category mapping
 const categories = ref([])
@@ -129,8 +177,13 @@ const formData = reactive({
   category: '',
   price: 0,
   stock: 0,
+  supplierId: null,
   image: '',
   description: '',
+  floweringPeriod: '',
+  careDifficulty: 'MEDIUM',
+  suitableEnvironment: '',
+  floralLanguage: '',
   status: 'ACTIVE'
 })
 
@@ -387,8 +440,11 @@ const fetchProduct = async () => {
 }
 
 onMounted(async () => {
-  // Load categories first
-  await loadCategories()
+  // Load categories and suppliers first
+  await Promise.all([
+    loadCategories(),
+    loadSuppliers()
+  ])
   
   const id = route.params.id
   if (id && id !== 'add') {

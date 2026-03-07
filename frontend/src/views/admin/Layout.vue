@@ -57,6 +57,10 @@
             <el-icon><Shop /></el-icon>
             <span>Merchants</span>
           </el-menu-item>
+          <el-menu-item index="/admin/suppliers">
+            <el-icon><Van /></el-icon>
+            <span>Supplier</span>
+          </el-menu-item>
           <el-menu-item index="/admin/reviews">
             <el-icon><ChatDotRound /></el-icon>
             <span>Reviews</span>
@@ -100,6 +104,7 @@ import {
   DataBoard,
   User,
   Shop,
+  Van,
   ChatDotRound,
   Document,
   Reading,

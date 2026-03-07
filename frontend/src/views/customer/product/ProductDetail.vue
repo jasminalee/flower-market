@@ -54,6 +54,16 @@
                     <span class="label">Category:</span>
                     <span>{{ product.categoryName || 'N/A' }}</span>
                   </div>
+                  <div class="attr-item" v-if="product.supplierName">
+                    <span class="label">Supplier:</span>
+                    <el-tooltip :content="'Rating: ' + (product.supplierRating || 'N/A')" placement="top">
+                      <span class="supplier-info">
+                        {{ product.supplierName }}
+                        <el-icon v-if="product.supplierRating" color="#ff9900"><StarFilled /></el-icon>
+                        <span v-if="product.supplierRating" class="rating-text">{{ product.supplierRating }}</span>
+                      </span>
+                    </el-tooltip>
+                  </div>
                   <div class="attr-item">
                     <span class="label">Merchant:</span>
                     <span>{{ product.merchantName || 'Unknown Merchant' }} (ID: {{ product.merchId || '-' }})</span>
@@ -66,6 +76,26 @@
                     <span class="label">Origin:</span>
                     <span>{{ product.origin }}</span>
                   </div>
+                  <div class="attr-item" v-if="product.floweringPeriod">
+                    <span class="label">Flowering:</span>
+                    <span>{{ product.floweringPeriod }}</span>
+                  </div>
+                  <div class="attr-item" v-if="product.careDifficulty">
+                    <span class="label">Difficulty:</span>
+                    <el-tag :type="product.careDifficulty === 'EASY' ? 'success' : (product.careDifficulty === 'HARD' ? 'danger' : 'warning')" size="small">
+                      {{ product.careDifficulty }}
+                    </el-tag>
+                  </div>
+                  <div class="attr-item" v-if="product.floralLanguage">
+                    <span class="label">Meaning:</span>
+                    <span class="floral-language">{{ product.floralLanguage }}</span>
+                  </div>
+                </div>
+                
+                <el-divider v-if="product.suitableEnvironment" />
+                <div class="env-section" v-if="product.suitableEnvironment">
+                    <span class="label">Suitable Environment:</span>
+                    <p class="env-text">{{ product.suitableEnvironment }}</p>
                 </div>
                 
                 <el-divider />
@@ -385,6 +415,21 @@ const handleFavorite = async () => {
 .attr-item {
   margin-bottom: var(--spacing-md);
   font-size: 14px;
+}
+
+.supplier-info {
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.rating-text {
+  color: #ff9900;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .label {

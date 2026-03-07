@@ -7,10 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import vtc.xueqing.flower.common.Constants;
 import vtc.xueqing.flower.entity.Product;
+import vtc.xueqing.flower.entity.Supplier;
 import vtc.xueqing.flower.exception.BusinessException;
 import vtc.xueqing.flower.entity.Merchant;
 import vtc.xueqing.flower.mapper.ProductMapper;
 import vtc.xueqing.flower.mapper.MerchantMapper;
+import vtc.xueqing.flower.mapper.SupplierMapper;
 import vtc.xueqing.flower.service.ProductService;
 
 import javax.annotation.Resource;
@@ -28,6 +30,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Resource
     private MerchantMapper merchantMapper;
+
+    @Resource
+    private SupplierMapper supplierMapper;
 
     @Override
     public Product createProduct(Product product) {
@@ -100,6 +105,8 @@ public class ProductServiceImpl implements ProductService {
         }
         // Populate merchant name
         fillMerchantName(java.util.Collections.singletonList(product));
+        // Populate supplier info
+        fillSupplierInfo(java.util.Collections.singletonList(product));
         return product;
     }
 
@@ -128,6 +135,7 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> page = new Page<>(current, size);
         Page<Product> resultPage = productMapper.selectPage(page, wrapper);
         fillMerchantName(resultPage.getRecords());
+        fillSupplierInfo(resultPage.getRecords());
         return resultPage;
     }
 
@@ -177,5 +185,33 @@ public class ProductServiceImpl implements ProductService {
         java.util.Map<Long, String> merchNameMap = merchants.stream()
                 .collect(java.util.stream.Collectors.toMap(Merchant::getMerchId, Merchant::getName));
         products.forEach(p -> p.setMerchantName(merchNameMap.get(p.getMerchId())));
+    }
+
+    /**
+     * Populate supplier information in batch.
+     */
+    private void fillSupplierInfo(java.util.List<Product> products) {
+        if (products == null || products.isEmpty()) {
+            return;
+        }
+        java.util.Set<Long> supplierIds = products.stream()
+                .map(Product::getSupplierId)
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
+        if (supplierIds.isEmpty()) {
+            return;
+        }
+        java.util.List<Supplier> suppliers = supplierMapper.selectBatchIds(supplierIds);
+        java.util.Map<Long, Supplier> supplierMap = suppliers.stream()
+                .collect(java.util.stream.Collectors.toMap(Supplier::getId, s -> s));
+        products.forEach(p -> {
+            if (p.getSupplierId() != null) {
+                Supplier s = supplierMap.get(p.getSupplierId());
+                if (s != null) {
+                    p.setSupplierName(s.getName());
+                    p.setSupplierRating(s.getRating() != null ? s.getRating().doubleValue() : null);
+                }
+            }
+        });
     }
 }

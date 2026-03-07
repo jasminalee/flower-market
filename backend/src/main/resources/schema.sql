@@ -31,6 +31,7 @@ DROP TABLE IF EXISTS `merchants`;
 DROP TABLE IF EXISTS `customers`;
 DROP TABLE IF EXISTS `administrators`;
 DROP TABLE IF EXISTS `system_configuration`;
+DROP TABLE IF EXISTS `suppliers`;
 
 
 -- ============================================
@@ -126,6 +127,7 @@ CREATE TABLE `products` (
   `prod_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Product ID',
   `merch_id` BIGINT NOT NULL COMMENT 'Merchant ID',
   `cat_id` BIGINT NOT NULL COMMENT 'Category ID',
+  `supplier_id` BIGINT COMMENT 'Supplier ID',
   `name` VARCHAR(100) NOT NULL COMMENT 'Product name',
   `price` DECIMAL(10, 2) NOT NULL COMMENT 'Product price',
   `stock` INT NOT NULL DEFAULT 0 COMMENT 'Stock quantity',
@@ -133,6 +135,10 @@ CREATE TABLE `products` (
   `main_image` VARCHAR(255) COMMENT 'Primary product image',
   `images` TEXT COMMENT 'Product image set (JSON array)',
   `description` TEXT COMMENT 'Product description',
+  `flowering_period` VARCHAR(100) COMMENT 'Flowering period (e.g., 7-10 days)',
+  `care_difficulty` VARCHAR(20) DEFAULT 'MEDIUM' COMMENT 'Care difficulty: EASY, MEDIUM, HARD',
+  `suitable_environment` TEXT COMMENT 'Suitable environment details (temp, light, humidity)',
+  `floral_language` VARCHAR(255) COMMENT 'Flower meaning/language',
   `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT 'Product status: ACTIVE-listed, INACTIVE-unlisted, DELETED-removed',
   `stock_status` VARCHAR(20) DEFAULT 'IN_STOCK' COMMENT 'Stock status: IN_STOCK, LOW_STOCK, OUT_OF_STOCK',
   `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
@@ -144,8 +150,10 @@ CREATE TABLE `products` (
   KEY `idx_price` (`price`),
   KEY `idx_sales` (`sales`),
   KEY `idx_create_date` (`create_date`),
+  KEY `idx_supplier_id` (`supplier_id`),
   CONSTRAINT `fk_products_merchant` FOREIGN KEY (`merch_id`) REFERENCES `merchants` (`merch_id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_products_category` FOREIGN KEY (`cat_id`) REFERENCES `product_categories` (`cate_id`)
+  CONSTRAINT `fk_products_category` FOREIGN KEY (`cat_id`) REFERENCES `product_categories` (`cate_id`),
+  CONSTRAINT `fk_products_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Products table';
 
 -- ============================================
@@ -415,6 +423,28 @@ CREATE TABLE `system_configuration` (
   UNIQUE KEY `uk_config_key` (`config_key`),
   KEY `idx_category` (`category`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='System configuration table';
+
+-- ============================================
+-- 18. Suppliers table (suppliers)
+-- ============================================
+DROP TABLE IF EXISTS `suppliers`;
+CREATE TABLE `suppliers` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Supplier ID',
+  `name` VARCHAR(100) NOT NULL COMMENT 'Supplier name',
+  `contact_person` VARCHAR(50) COMMENT 'Contact person',
+  `phone` VARCHAR(20) COMMENT 'Phone number',
+  `email` VARCHAR(100) COMMENT 'Email',
+  `address` VARCHAR(255) COMMENT 'Address',
+  `description` TEXT COMMENT 'Description',
+  `rating` DECIMAL(3, 2) DEFAULT 5.00 COMMENT 'Rating: 1.0-5.0',
+  `status` VARCHAR(20) DEFAULT 'ACTIVE' COMMENT 'Status: ACTIVE, INACTIVE, SUSPENDED',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  `update_date` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
+  PRIMARY KEY (`id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_rating` (`rating`),
+  KEY `idx_create_date` (`create_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Suppliers table';
 
 
 
