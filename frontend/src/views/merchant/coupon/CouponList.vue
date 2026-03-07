@@ -36,9 +36,9 @@
             {{ row.receivedQuantity || 0 }}/{{ row.totalQuantity || 0 }}
           </template>
         </el-table-column>
-        <el-table-column label="Validity" min-width="220">
+        <el-table-column label="Expiration Date" width="160">
           <template #default="{ row }">
-            {{ formatDateTime(row.startDate) }} to {{ formatDateTime(row.endDate) }}
+            {{ formatDateTime(row.endDate) }}
           </template>
         </el-table-column>
         <el-table-column label="Status" width="100">
@@ -339,6 +339,7 @@ const handleDelete = async (row) => {
 const formatDateTime = (dateTime) => {
   if (!dateTime) return '-'
   const date = new Date(dateTime)
+  if (isNaN(date.getTime())) return dateTime
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
