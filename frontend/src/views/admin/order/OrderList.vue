@@ -1,24 +1,26 @@
 <template>
   <div class="order-list">
-    <h2 class="page-title">Order Management</h2>
-
-    <!-- Status tabs -->
-    <el-tabs v-model="activeTab" @tab-change="handleTabChange" class="tabs">
-      <el-tab-pane label="All" name="ALL" />
-      <el-tab-pane label="Pending Payment" name="SUBMITTED" />
-      <el-tab-pane label="Pending Shipment" name="PAID" />
-      <el-tab-pane label="Pending Receipt" name="SHIPPED" />
-      <el-tab-pane label="Completed" name="COMPLETED" />
-      <el-tab-pane label="Refund Applied" name="REFUND_APPLIED" />
-      <el-tab-pane label="Refunded" name="REFUNDED" />
-      <el-tab-pane label="Cancelled" name="CANCELLED" />
-    </el-tabs>
+    <div class="page-header">
+      <h2 class="page-title">Order Management</h2>
+    </div>
 
     <!-- Search -->
-    <el-card shadow="never" class="search-card">
-      <el-form :inline="true">
-        <el-form-item label="Search">
+    <el-card class="search-card">
+      <el-form :inline="true" :model="searchForm">
+        <el-form-item label="Keyword">
           <el-input v-model="searchForm.keyword" placeholder="Order No / Customer" clearable style="width: 200px" />
+        </el-form-item>
+        <el-form-item label="Status">
+          <el-select v-model="activeTab" placeholder="All Status" clearable style="width: 180px" @change="handleTabChange">
+            <el-option label="All Statuses" name="ALL" value="ALL" />
+            <el-option label="Pending Payment" name="SUBMITTED" value="SUBMITTED" />
+            <el-option label="Pending Shipment" name="PAID" value="PAID" />
+            <el-option label="Pending Receipt" name="SHIPPED" value="SHIPPED" />
+            <el-option label="Completed" name="COMPLETED" value="COMPLETED" />
+            <el-option label="Refund Applied" name="REFUND_APPLIED" value="REFUND_APPLIED" />
+            <el-option label="Refunded" name="REFUNDED" value="REFUNDED" />
+            <el-option label="Cancelled" name="CANCELLED" value="CANCELLED" />
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">Search</el-button>
@@ -28,7 +30,7 @@
     </el-card>
 
     <!-- Orders table -->
-    <el-card shadow="never" class="table-card">
+    <el-card class="table-card">
       <el-table :data="orderList" v-loading="loading" style="width: 100%">
         <el-table-column prop="orderNo" label="Order No" width="180" />
         <el-table-column prop="customerName" label="Customer" width="140" />

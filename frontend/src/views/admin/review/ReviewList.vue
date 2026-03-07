@@ -1,9 +1,11 @@
 <template>
   <div class="review-list">
-    <h2 class="page-title">Review Management</h2>
+    <div class="page-header">
+      <h2 class="page-title">Review Management</h2>
+    </div>
 
     <!-- Search filters -->
-    <el-card shadow="never" class="search-card">
+    <el-card class="search-card">
       <el-form :inline="true">
         <el-form-item label="Status">
           <el-select v-model="searchForm.status" placeholder="All statuses" clearable style="width: 150px">
@@ -29,7 +31,7 @@
     </el-card>
 
     <!-- Review table -->
-    <el-card shadow="never" class="table-card">
+    <el-card class="table-card">
       <el-table :data="reviewList" v-loading="loading" style="width: 100%">
         <el-table-column label="Product" width="250">
           <template #default="{ row }">

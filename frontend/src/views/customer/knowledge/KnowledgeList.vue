@@ -183,8 +183,20 @@
         <div class="form-section-header">Visuals & Meta</div>
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="Cover Image URL" prop="coverImage">
-              <el-input v-model="postForm.coverImage" placeholder="Paste image link here" class="fancy-input" />
+            <el-form-item label="Cover Image" prop="coverImage">
+              <el-upload
+                class="fancy-uploader"
+                action="/api/products/upload/image"
+                :show-file-list="false"
+                :on-success="handleUploadSuccess"
+                :before-upload="beforeUpload"
+              >
+                <img v-if="postForm.coverImage" :src="postForm.coverImage" class="uploaded-image" />
+                <div v-else class="upload-placeholder">
+                  <el-icon class="upload-icon"><Plus /></el-icon>
+                  <span>Upload Cover</span>
+                </div>
+              </el-upload>
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -263,7 +275,29 @@ onMounted(() => {
 
 const resetPostForm = () => {
   if (postFormRef.value) postFormRef.value.resetFields()
-  postForm.tags = ''
+  postForm.tags = 'fresh flowers, vase life, floral care'
+}
+
+const handleUploadSuccess = (response) => {
+  if (response.code === 200) {
+    postForm.coverImage = response.data
+    ElMessage.success('Image uploaded successfully')
+  } else {
+    ElMessage.error(response.message || 'Upload failed')
+  }
+}
+
+const beforeUpload = (file) => {
+  const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png'
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isJPGorPNG) {
+    ElMessage.error('Avatar picture must be JPG or PNG format!')
+  }
+  if (!isLt2M) {
+    ElMessage.error('Avatar picture size can not exceed 2MB!')
+  }
+  return isJPGorPNG && isLt2M
 }
 
 const submitPost = async () => {
@@ -544,6 +578,46 @@ const goToDetail = (id) => {
 
 .btn-cancel {
   border-radius: 8px;
+}
+
+/* Uploader Styles */
+.fancy-uploader :deep(.el-upload) {
+  border: 1px dashed #d9d9d9;
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fafafa;
+  transition: all 0.3s;
+}
+
+.fancy-uploader :deep(.el-upload:hover) {
+  border-color: var(--el-color-primary);
+  background: #f0f7ff;
+}
+
+.uploaded-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #8c939d;
+  font-size: 13px;
+}
+
+.upload-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
 }
 
 .ellipsis-2 {

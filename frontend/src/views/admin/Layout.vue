@@ -253,6 +253,55 @@ const handleCommand = async (command) => {
 
 /* Main Content Area */
 .admin-main {
+  background-color: #f5f7fa;
+  padding: 24px;
+  min-height: calc(100vh - 60px);
   overflow-y: auto;
+}
+
+:deep(.page-header) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+:deep(.page-title) {
+  font-size: 24px;
+  font-weight: 600 !important;
+  color: #303133;
+  margin: 0 !important;
+}
+
+:deep(.search-card),
+:deep(.table-card) {
+  margin-bottom: 24px;
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px 0 rgba(0,0,0,0.05) !important;
+}
+
+:deep(.el-card__header) {
+  border-bottom: 1px solid #f0f2f5;
+  padding: 16px 24px;
+  font-weight: 600;
+}
+
+:deep(.el-table) {
+  --el-table-header-bg-color: #fafafa !important;
+  border-radius: 4px;
+}
+
+:deep(.el-table th.el-table__cell) {
+  font-weight: 600 !important;
+  color: #303133 !important;
+  background-color: #fafafa !important;
+}
+
+:deep(.pagination-container),
+:deep(.pagination-wrapper) {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

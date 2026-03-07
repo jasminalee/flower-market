@@ -1,50 +1,60 @@
 <template>
   <div class="admin-dashboard">
-    <h2 class="page-title">Admin Dashboard</h2>
+    <div class="page-header">
+      <h2 class="page-title">Dashboard Overview</h2>
+    </div>
 
     <!-- Data Overview Cards -->
     <el-row :gutter="20" class="stats-row">
       <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
+        <el-card shadow="never" class="stat-card">
           <div class="stat-content">
             <div class="stat-info">
               <div class="stat-label">Total Users</div>
               <div class="stat-value">{{ stats.totalUsers }}</div>
             </div>
-            <el-icon class="stat-icon" color="#409eff"><User /></el-icon>
+            <div class="stat-icon-wrapper" style="background: rgba(64, 158, 255, 0.1)">
+              <el-icon class="stat-icon" color="#409eff"><User /></el-icon>
+            </div>
           </div>
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
+        <el-card shadow="never" class="stat-card">
           <div class="stat-content">
             <div class="stat-info">
               <div class="stat-label">Total Merchants</div>
               <div class="stat-value">{{ stats.totalMerchants }}</div>
             </div>
-            <el-icon class="stat-icon" color="#67c23a"><Shop /></el-icon>
+            <div class="stat-icon-wrapper" style="background: rgba(103, 194, 58, 0.1)">
+              <el-icon class="stat-icon" color="#67c23a"><Shop /></el-icon>
+            </div>
           </div>
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
+        <el-card shadow="never" class="stat-card">
           <div class="stat-content">
             <div class="stat-info">
               <div class="stat-label">Total Orders</div>
               <div class="stat-value">{{ stats.totalOrders }}</div>
             </div>
-            <el-icon class="stat-icon" color="#e6a23c"><ShoppingCart /></el-icon>
+            <div class="stat-icon-wrapper" style="background: rgba(230, 162, 60, 0.1)">
+              <el-icon class="stat-icon" color="#e6a23c"><ShoppingCart /></el-icon>
+            </div>
           </div>
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover" class="stat-card">
+        <el-card shadow="never" class="stat-card">
           <div class="stat-content">
             <div class="stat-info">
               <div class="stat-label">Total Sales</div>
               <div class="stat-value">¥{{ stats.totalSales }}</div>
             </div>
-            <el-icon class="stat-icon" color="#f56c6c"><Money /></el-icon>
+            <div class="stat-icon-wrapper" style="background: rgba(245, 108, 108, 0.1)">
+              <el-icon class="stat-icon" color="#f56c6c"><Money /></el-icon>
+            </div>
           </div>
         </el-card>
       </el-col>
@@ -53,17 +63,16 @@
     <el-row :gutter="20" class="content-row">
       <!-- Recent Registered Users -->
       <el-col :span="12">
-        <el-card shadow="hover">
+        <el-card shadow="never" class="table-card">
           <template #header>
             <div class="card-header">
-              <span>Recent Registered Users</span>
+              <span class="header-title">Recent Registered Users</span>
               <el-button type="primary" link @click="$router.push('/admin/customers')">View All</el-button>
             </div>
           </template>
           <el-table :data="recentUsers" style="width: 100%" v-loading="loading">
             <el-table-column prop="name" label="Username" />
-            <el-table-column prop="email" label="Email" />
-            <el-table-column prop="phone" label="Phone" width="120" />
+            <el-table-column prop="email" label="Email" show-overflow-tooltip />
             <el-table-column prop="createDate" label="Registration Time" width="160">
               <template #default="{ row }">
                 {{ formatDate(row.createDate) }}
@@ -75,19 +84,19 @@
 
       <!-- Top Selling Products (Global) -->
       <el-col :span="12">
-        <el-card shadow="hover">
+        <el-card shadow="never" class="table-card">
           <template #header>
             <div class="card-header">
-              <span>Top Selling Products (Global)</span>
-              <el-button type="primary" link @click="$router.push('/admin/merchants')">View All Merchants</el-button>
+              <span class="header-title">Top Selling Products</span>
+              <el-button type="primary" link @click="$router.push('/admin/merchants')">View Merchants</el-button>
             </div>
           </template>
           <el-table :data="topProducts" style="width: 100%" v-loading="loading">
-            <el-table-column type="index" label="Rank" width="60" />
+            <el-table-column type="index" label="Rank" width="60" align="center" />
             <el-table-column prop="name" label="Product Name" />
-            <el-table-column prop="sales" label="Total Sales" width="120">
+            <el-table-column prop="sales" label="Sales" width="120" align="right">
               <template #default="{ row }">
-                <span style="font-weight: bold; color: #f56c6c">{{ row.sales }}</span> Units
+                <span class="sales-value">{{ row.sales }}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -98,19 +107,19 @@
     <el-row :gutter="20" class="content-row">
       <!-- Recent Registered Merchants -->
       <el-col :span="24">
-        <el-card shadow="hover">
+        <el-card shadow="never" class="table-card">
           <template #header>
             <div class="card-header">
-              <span>Recent Registered Merchants</span>
+              <span class="header-title">Recent Registered Merchants</span>
               <el-button type="primary" link @click="$router.push('/admin/merchants')">View All</el-button>
             </div>
           </template>
           <el-table :data="recentMerchants" style="width: 100%" v-loading="loading">
             <el-table-column prop="name" label="Store Name" />
             <el-table-column prop="phone" label="Contact Phone" width="150" />
-            <el-table-column prop="status" label="Status" width="120">
+            <el-table-column prop="status" label="Status" width="120" align="center">
               <template #default="{ row }">
-                <el-tag :type="getMerchantStatusType(row.status)">{{ getMerchantStatusText(row.status) }}</el-tag>
+                <el-tag :type="getMerchantStatusType(row.status)" effect="light">{{ getMerchantStatusText(row.status) }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column prop="createDate" label="Registration Time" width="180">
@@ -126,17 +135,17 @@
     <!-- Order Trend Chart -->
     <el-row :gutter="20" class="chart-row">
       <el-col :span="24">
-        <el-card shadow="hover">
+        <el-card shadow="never" class="table-card">
           <template #header>
             <div class="card-header">
-              <span>Order Trend (Last 7 Days)</span>
+              <span class="header-title">Order Trend (Last 7 Days)</span>
             </div>
           </template>
           <div class="chart-container" v-loading="loading">
             <div class="chart-item" v-for="(item, index) in orderTrend" :key="index">
               <div class="chart-label">{{ item.date }}</div>
               <div class="chart-bar">
-                <div class="chart-bar-fill" :style="{ width: (item.count / maxOrderCount * 100) + '%' }"></div>
+                <div class="chart-bar-fill" :style="{ width: (item.count / (maxOrderCount || 1) * 100) + '%' }"></div>
               </div>
               <div class="chart-value">{{ item.count }}</div>
             </div>

@@ -1,6 +1,11 @@
 <template>
   <div class="supplier-container">
-    <el-card class="filter-card">
+    <div class="page-header">
+      <h2 class="page-title">Supplier Management</h2>
+      <el-button type="primary" icon="Plus" @click="handleAdd">Add Supplier</el-button>
+    </div>
+
+    <el-card class="search-card">
       <el-form :inline="true" :model="queryParams" class="demo-form-inline">
         <el-form-item label="Supplier Name">
           <el-input v-model="queryParams.name" placeholder="Enter supplier name" clearable />
@@ -20,12 +25,6 @@
     </el-card>
 
     <el-card class="table-card">
-      <template #header>
-        <div class="card-header">
-          <el-button type="primary" icon="Plus" @click="handleAdd">Add Supplier</el-button>
-        </div>
-      </template>
-
       <el-table v-loading="loading" :data="supplierList" border style="width: 100%">
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column prop="name" label="Supplier Name" min-width="150" show-overflow-tooltip />

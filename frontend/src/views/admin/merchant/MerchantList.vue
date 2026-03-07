@@ -1,9 +1,11 @@
 <template>
   <div class="merchant-list">
-    <h2 class="page-title">Merchant Management</h2>
+    <div class="page-header">
+      <h2 class="page-title">Merchant Management</h2>
+    </div>
 
     <!-- Search -->
-    <el-card shadow="never" class="search-card">
+    <el-card class="search-card">
       <el-form :inline="true">
         <el-form-item label="Store Name">
           <el-input v-model="searchForm.keyword" placeholder="Enter store name" clearable style="width: 200px" />
@@ -24,7 +26,7 @@
     </el-card>
 
     <!-- Merchants table -->
-    <el-card shadow="never" class="table-card">
+    <el-card class="table-card">
       <el-table :data="merchantList" v-loading="loading" style="width: 100%">
         <el-table-column label="Logo" width="80">
           <template #default="{ row }">

@@ -1,18 +1,14 @@
 <template>
   <div class="category-list">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>Product Categories</span>
-          <el-button type="primary" @click="handleAdd">
-            <el-icon>
-              <Plus/>
-            </el-icon>
-            Add Category
-          </el-button>
-        </div>
-      </template>
+    <div class="page-header">
+      <h2 class="page-title">Product Categories</h2>
+      <el-button type="primary" @click="handleAdd">
+        <el-icon><Plus /></el-icon>
+        Add Category
+      </el-button>
+    </div>
 
+    <el-card class="table-card">
       <el-table
           :data="categories"
           style="width: 100%"
@@ -26,13 +22,12 @@
         <el-table-column label="Icon" width="100" align="center">
           <template #default="{ row }">
             <div class="icon-container">
-              <img
-                  v-if="row.icon"
-                  :src="row.icon"
-                  alt="Category icon"
-                  class="category-icon"
+              <CategoryIcons 
+                v-if="row.icon && (row.icon.includes('.png') || row.icon.includes('.jpg'))" 
+                :icon-type="getIconType(row)" 
+                :size="24" 
               />
-              <span v-else>-</span>
+              <CategoryIcons v-else :icon-type="getIconType(row)" :size="24" />
             </div>
           </template>
         </el-table-column>
@@ -47,6 +42,10 @@
         </el-table-column>
       </el-table>
     </el-card>
+
+    <div class="pagination-wrapper" v-if="categories.length > 0">
+      <!-- Tree tables usually don't need pagination if small, but let's keep space for consistency -->
+    </div>
 
     <!-- Category form dialog -->
     <el-dialog
@@ -105,6 +104,7 @@
 import {ref, reactive, computed, onMounted} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {Plus, Edit, Delete} from '@element-plus/icons-vue'
+import CategoryIcons from '@/components/icons/CategoryIcons.vue'
 import request from '@/utils/request'
 
 const categories = ref([])
@@ -113,6 +113,29 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const formRef = ref()
 const isEdit = ref(false)
+
+// Function to determine icon type from path or name
+const getIconType = (row) => {
+  if (row.icon) {
+    if (row.icon.includes('bouquet')) return 'bouquet'
+    if (row.icon.includes('pot')) return 'pot'
+    if (row.icon.includes('gift')) return 'gift'
+    if (row.icon.includes('petal')) return 'petal'
+    if (row.icon.includes('plant')) return 'plant'
+    if (row.icon.includes('festival')) return 'festival'
+  }
+  
+  // Fallback to name-based logic
+  const name = row.name.toLowerCase()
+  if (name.includes('flower') || name.includes('bouquet')) return 'bouquet'
+  if (name.includes('pot') || name.includes('succulent')) return 'pot'
+  if (name.includes('gift') || name.includes('card')) return 'gift'
+  if (name.includes('seed') || name.includes('petal')) return 'petal'
+  if (name.includes('plant') || name.includes('tree')) return 'plant'
+  if (name.includes('festival') || name.includes('event')) return 'festival'
+  
+  return 'default'
+}
 
 const form = reactive({
   cateId: null,
