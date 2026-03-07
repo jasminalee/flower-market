@@ -32,16 +32,13 @@ export default defineConfig({
   server: {
     host: true,
     port: 3000,
+    historyApiFallback: true, // 解决刷新 404 问题
     proxy: {
       '/api': {
         target: TARGET_URL,
         changeOrigin: true
       },
       '/images': {
-        target: TARGET_URL,
-        changeOrigin: true
-      },
-      '/products': {
         target: TARGET_URL,
         changeOrigin: true
       }

@@ -140,23 +140,38 @@
             
             <el-tab-pane label="Traceability" name="traceability">
               <div class="traceability-content">
-                <el-timeline v-if="product.traceInfo && product.traceInfo.length > 0">
-                  <el-timeline-item
-                    v-for="(item, index) in product.traceInfo"
-                    :key="index"
-                    :timestamp="item.time"
-                    placement="top"
-                  >
-                    <el-card>
-                      <h4>{{ item.stage }}</h4>
-                      <p>{{ item.description }}</p>
-                    </el-card>
-                  </el-timeline-item>
-                </el-timeline>
-                <el-empty v-else description="No traceability info" />
+                <el-descriptions
+                  v-if="traceInfo"
+                  class="trace-desc"
+                  :column="1"
+                  border
+                >
+                  <el-descriptions-item label="Origin">
+                    {{ traceInfo.origin || 'N/A' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="Planting Method">
+                    {{ traceInfo.plantingMethod || 'N/A' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="Picking Date">
+                    {{ traceInfo.pickingDate || 'N/A' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="Processing Date">
+                    {{ traceInfo.procDate || 'N/A' }}
+                  </el-descriptions-item>
+                  <el-descriptions-item label="Certification">
+                    <el-tag v-if="traceInfo.certification" type="success" effect="plain">
+                      {{ traceInfo.certification }}
+                    </el-tag>
+                    <span v-else>N/A</span>
+                  </el-descriptions-item>
+                  <el-descriptions-item label="Description">
+                    {{ traceInfo.description || 'No additional details.' }}
+                  </el-descriptions-item>
+                </el-descriptions>
+                <el-empty v-else description="No traceability info available" />
               </div>
             </el-tab-pane>
-            
+
             <el-tab-pane label="Reviews" name="reviews">
               <div class="reviews-content">
                 <div class="reviews-header">
@@ -204,6 +219,7 @@ import { useRouter, useRoute } from 'vue-router'
 import CustomerHeader from '@/components/layouts/CustomerHeader.vue'
 import CustomerFooter from '@/components/layouts/CustomerFooter.vue'
 import { getProductDetail, addFavorite, removeFavorite, checkFavorite } from '@/api/product'
+import request from '@/utils/request'
 import { useCartStore } from '@/stores/cart'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
@@ -217,6 +233,7 @@ const userStore = useUserStore()
 const loading = ref(false)
 const product = ref(null)
 const reviews = ref([])
+const traceInfo = ref(null)
 const quantity = ref(1)
 const activeTab = ref('detail')
 const currentImage = ref('')
@@ -226,7 +243,15 @@ const imageList = computed(() => {
   if (!product.value) return []
   const images = [product.value.mainImage]
   if (product.value.images) {
-    images.push(...product.value.images.split(',').filter(img => img))
+    try {
+      // images might be a JSON string or comma separated
+      const extraImages = product.value.images.startsWith('[') 
+        ? JSON.parse(product.value.images) 
+        : product.value.images.split(',').filter(img => img)
+      images.push(...extraImages)
+    } catch (e) {
+      images.push(...product.value.images.split(',').filter(img => img))
+    }
   }
   return images.filter(img => img)
 })
@@ -246,13 +271,47 @@ const loadProductDetail = async () => {
     product.value = res.data
     currentImage.value = res.data.mainImage || 'https://via.placeholder.com/600x600'
     
-    // Load reviews (mock data, actual implementation should call review API)
-    reviews.value = res.data.reviews || []
+    // Load Traceability & Reviews
+    fetchTraceability()
+    fetchReviews()
   } catch (error) {
     console.error('Load product detail error:', error)
     ElMessage.error('Failed to load product details')
   } finally {
     loading.value = false
+  }
+}
+
+const fetchTraceability = async () => {
+  try {
+    const { data } = await request.get(`/api/products/trackability/${route.params.id}`)
+    traceInfo.value = data
+  } catch (error) {
+    console.error('Fetch traceability error:', error)
+  }
+}
+
+const fetchReviews = async () => {
+  try {
+    const { data } = await request.get(`/api/products/${route.params.id}/reviews`, {
+      params: { current: 1, size: 20 }
+    })
+    const records = data.records || []
+    reviews.value = records.map(review => {
+      let images = []
+      if (review.images) {
+        try {
+          images = typeof review.images === 'string' 
+            ? JSON.parse(review.images) 
+            : review.images
+        } catch (e) {
+          images = []
+        }
+      }
+      return { ...review, images }
+    })
+  } catch (error) {
+    console.error('Fetch reviews error:', error)
   }
 }
 

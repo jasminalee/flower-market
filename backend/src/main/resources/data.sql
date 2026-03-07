@@ -92,8 +92,16 @@ INSERT INTO `flower_market`.`products`(`prod_id`, `merch_id`, `cat_id`, `supplie
 INSERT INTO `product_trackability` (`prod_id`, `origin`, `planting_method`, `picking_date`, `proc_date`, `certification`, `description`) VALUES
 (1, 'Ecuador', 'Greenhouse cultivation', '2025-12-10', '2025-12-11', 'ISO9001 quality certification', 'High-altitude 2800m roses with long vase life and vivid color'),
 (2, 'Ecuador', 'Greenhouse cultivation', '2025-12-09', '2025-12-10', 'ISO9001 quality certification', 'Selected champagne rose variety with elegant tone'),
+(3, 'Japan', 'Greenhouse cooling', '2025-12-15', '2025-12-17', 'JFA Standard', 'Preserved rose using advanced dehydration technology'),
+(4, 'Kunming, China', 'Modern Smart Greenhouse', '2026-01-05', '2026-01-06', 'Green Food Certification', 'A colorful blend of premium seasonal blossoms'),
 (5, 'Kunming, Yunnan', 'Open field cultivation', '2025-11-20', '2025-11-21', 'Organic certification', 'Yunnan highland succulents, premium quality'),
-(7, 'Foshan, Guangdong', 'Greenhouse cultivation', '2025-10-15', '2025-10-16', 'Green plant certification', 'Grown in professional nursery with guaranteed quality');
+(6, 'Kunming, Yunnan', 'Highland Greenhouse', '2025-11-22', '2025-11-23', 'Organic certification', 'Diverse succulent collection for enthusiasts'),
+(7, 'Foshan, Guangdong', 'Greenhouse cultivation', '2025-10-15', '2025-10-16', 'Green plant certification', 'Grown in professional nursery with guaranteed quality'),
+(8, 'Netherlands', 'Professional Nursery', '2025-09-20', '2025-09-25', 'NPS Quality Seal', 'Acclimatized indoor tree with lush green foliage'),
+(9, 'Taiwan', 'Temperature Controlled Lab', '2025-11-30', '2025-12-01', 'TGA Agricultural Standard', 'Prized orchid variety with extended blooming period'),
+(10, 'Quito, Ecuador', 'Premium Rose Base', '2026-02-10', '2026-02-11', 'Rose Origin Protection', 'Large-headed luxury red roses for confessions'),
+(11, 'Shandong, China', 'Base Cultivation', '2026-02-12', '2026-02-13', 'GAP Certification', 'Fresh carnations for gratitude expressions'),
+(12, 'Zhejiang, China', 'Farm field', '2026-02-14', '2026-02-15', 'Safe Farm Cert', 'Sunny sunflowers grown with sustainable methods');
 
 -- ============================================
 -- 7. Shopping cart
@@ -153,9 +161,14 @@ INSERT INTO `product_favorites` (`user_id`, `prod_id`, `fav_date`) VALUES
 -- 11. Product reviews
 -- ============================================
 INSERT INTO `product_reviews` (`user_id`, `prod_id`, `order_id`, `rating`, `content`, `images`, `verified`, `status`, `create_date`) VALUES
-(1, 1, 1, 5, 'Flowers were very fresh, packaging was great, delivery on time, my girlfriend loved it!', '["/images/reviews/review1_1.jpg", "/images/reviews/review1_2.jpg"]', 1, 'APPROVED', '2025-12-11 17:00:00'),
+(1, 1, 1, 5, 'Flowers were very fresh, packaging was great, delivery on time, my girlfriend loved it!', '[]', 1, 'APPROVED', '2025-12-11 17:00:00'),
 (3, 1, 4, 5, 'Huge rose blooms, bright color, great value', '[]', 1, 'APPROVED', '2025-12-13 11:00:00'),
-(3, 2, 4, 4, 'Champagne roses are beautiful, just a bit pricey', '["/images/reviews/review3_1.jpg"]', 1, 'APPROVED', '2025-12-13 11:05:00'),
+(2, 1, 1, 5, 'The best red roses I have ever purchased. Stunning!', '[]', 1, 'APPROVED', '2026-01-10 10:00:00'),
+(1, 2, 4, 5, 'Elegant color, wife was very happy with them.', '[]', 1, 'APPROVED', '2026-01-12 15:30:00'),
+(3, 2, 4, 4, 'Champagne roses are beautiful, just a bit pricey', '[]', 1, 'APPROVED', '2025-12-13 11:05:00'),
+(2, 3, 3, 5, 'Lasts so much longer than fresh flowers, looks real too.', '[]', 1, 'APPROVED', '2026-01-15 09:00:00'),
+(1, 5, 1, 5, 'Cute little succulent, perfect for my office desk.', '[]', 1, 'APPROVED', '2026-02-05 14:00:00'),
+(4, 7, 2, 4, 'Healthy plant, air feels fresher already.', '[]', 1, 'APPROVED', '2026-01-20 11:00:00'),
 (1, 11, 6, 3, 'Carnations were average and a little wilted', '[]', 1, 'PENDING', '2025-12-10 10:00:00');
 
 -- ============================================

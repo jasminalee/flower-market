@@ -100,6 +100,12 @@ const router = createRouter({
           meta: { title: 'Order Details' }
         },
         {
+          path: 'orders/:id/review',
+          name: 'PublishReview',
+          component: () => import('@/views/customer/profile/PublishReview.vue'),
+          meta: { title: 'Review Order' }
+        },
+        {
           path: 'favorites',
           name: 'MyFavorites',
           component: () => import('@/views/customer/profile/MyFavorites.vue'),
