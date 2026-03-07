@@ -51,12 +51,14 @@
     <!-- Orders table -->
     <el-card shadow="never" class="table-card">
       <el-table :data="tableData" v-loading="loading" style="width: 100%">
-        <el-table-column label="Order Info" min-width="200">
+        <el-table-column label="Order No" min-width="180">
           <template #default="{ row }">
-            <div class="order-id-cell">
-              <span class="order-no">#{{ row.orderNo }}</span>
-              <span class="order-time">{{ formatDateTime(row.orderDate) }}</span>
-            </div>
+            <span class="order-no">#{{ row.orderNo }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Order Date" width="180">
+          <template #default="{ row }">
+            <span class="order-time">{{ formatDateTime(row.orderDate) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="Customer" min-width="150">
