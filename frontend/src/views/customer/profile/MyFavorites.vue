@@ -154,7 +154,7 @@ const handleDelete = async (prodId) => {
     await request({
       url: `/api/products/${prodId}/favorite`,
       method: 'delete',
-      data: { userId: userStore.userId }
+      params: { userId: userStore.userId }
     })
     
     ElMessage.success('Removed from favorites')
@@ -183,7 +183,7 @@ const handleBatchDelete = async () => {
         request({
           url: `/api/products/${prodId}/favorite`,
           method: 'delete',
-          data: { userId: userStore.userId }
+          params: { userId: userStore.userId }
         })
       )
     )

@@ -17,28 +17,27 @@
         :model="formData"
         :rules="rules"
         label-width="120px"
-        :disabled="!isEditing"
       >
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="Store Name" prop="name">
-              <el-input v-model="formData.name" placeholder="Please enter the store name" />
+              <el-input v-model="formData.name" :disabled="!isEditing" placeholder="Please enter the store name" />
             </el-form-item>
 
             <el-form-item label="Contact" prop="contactName">
-              <el-input v-model="formData.contactName" placeholder="Please enter the contact name" />
+              <el-input v-model="formData.contactName" :disabled="!isEditing" placeholder="Please enter the contact name" />
             </el-form-item>
 
             <el-form-item label="Phone" prop="phone">
-              <el-input v-model="formData.phone" placeholder="Please enter the phone number" />
+              <el-input v-model="formData.phone" :disabled="!isEditing" placeholder="Please enter the phone number" />
             </el-form-item>
 
             <el-form-item label="Email" prop="email">
-              <el-input v-model="formData.email" placeholder="Please enter the email address" />
+              <el-input v-model="formData.email" :disabled="!isEditing" placeholder="Please enter the email address" />
             </el-form-item>
 
             <el-form-item label="Business Hours" prop="businessHours">
-              <el-input v-model="formData.businessHours" placeholder="e.g. 9:00-22:00" />
+              <el-input v-model="formData.businessHours" :disabled="!isEditing" placeholder="e.g. 9:00-22:00" />
             </el-form-item>
           </el-col>
 
@@ -47,7 +46,6 @@
               <el-upload
                 class="logo-uploader"
                 :show-file-list="false"
-                :disabled="!isEditing"
                 action="#"
                 :auto-upload="false"
                 :on-change="handleLogoChange"
@@ -55,18 +53,19 @@
                 <img v-if="formData.logo" :src="formData.logo" class="logo-image" />
                 <el-icon v-else class="logo-uploader-icon"><Plus /></el-icon>
               </el-upload>
-              <div class="upload-tip">Recommended size: 200x200px</div>
+              <div v-if="isEditing" class="upload-tip">Click to upload (Recommended size: 200x200px)</div>
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-form-item label="Address" prop="address">
-          <el-input v-model="formData.address" placeholder="Please enter the address" />
+          <el-input v-model="formData.address" :disabled="!isEditing" placeholder="Please enter the address" />
         </el-form-item>
 
         <el-form-item label="Description" prop="description">
           <el-input
             v-model="formData.description"
+            :disabled="!isEditing"
             type="textarea"
             :rows="6"
             placeholder="Please enter a short description"
@@ -128,6 +127,10 @@ const rules = {
 }
 
 const handleLogoChange = (file) => {
+  if (!isEditing.value) {
+    ElMessage.warning('Please click Edit button before uploading')
+    return
+  }
   const reader = new FileReader()
   reader.onload = (e) => {
     formData.logo = e.target.result
@@ -137,21 +140,26 @@ const handleLogoChange = (file) => {
 
 const handleEdit = () => {
   isEditing.value = true
-  originalData.value = { ...formData }
+  // Create a deep copy to avoid reference issues
+  originalData.value = JSON.parse(JSON.stringify(formData))
+  console.log('Editing started, isEditing:', isEditing.value)
 }
 
 const handleCancel = () => {
   isEditing.value = false
-  Object.assign(formData, originalData.value)
+  if (originalData.value) {
+    Object.assign(formData, originalData.value)
+  }
 }
 
 const handleSave = async () => {
-  const valid = await formRef.value.validate().catch(() => false)
-  if (!valid) return
-
-  saving.value = true
+  console.log('Attempting to save, isEditing:', isEditing.value)
   try {
-    await updateMerchantProfile({
+    const valid = await formRef.value.validate()
+    if (!valid) return
+    
+    saving.value = true
+    const updateData = {
       merchId: formData.merchId,
       name: formData.name,
       contactName: formData.contactName,
@@ -161,12 +169,19 @@ const handleSave = async () => {
       businessHours: formData.businessHours,
       logo: formData.logo,
       description: formData.description
-    })
+    }
+    
+    console.log('Sending update request:', updateData)
+    await updateMerchantProfile(updateData)
+    
     ElMessage.success('Saved successfully')
     isEditing.value = false
-    fetchProfile()
+    await fetchProfile()
   } catch (error) {
-    ElMessage.error(error.message || 'Save failed')
+    console.error('Save error:', error)
+    if (error !== false) { // Not a validation error
+      ElMessage.error(error.message || 'Save failed')
+    }
   } finally {
     saving.value = false
   }
@@ -174,11 +189,16 @@ const handleSave = async () => {
 
 const fetchProfile = async () => {
   try {
-    const merchantId = userStore.user?.merchantId || 1
+    const merchantId = userStore.userId || userStore.user?.merchantId || 1
+    console.log('Fetching profile for merchantId:', merchantId)
     const res = await getMerchantProfile(merchantId)
-    Object.assign(formData, res.data)
-    formData.statusText = res.data.status === 'ACTIVE' ? 'Open' : 'Frozen'
+    if (res.data) {
+      Object.assign(formData, res.data)
+      formData.statusText = res.data.status === 'ACTIVE' ? 'Open' : 'Frozen'
+      console.log('Profile updated in state:', formData)
+    }
   } catch (error) {
+    console.error('Fetch profile error:', error)
     ElMessage.error('Failed to load data')
   }
 }
