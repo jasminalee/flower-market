@@ -16,7 +16,7 @@
             <el-empty v-if="!loading && filteredCoupons.length === 0" description="No unused coupons" />
             
             <el-row :gutter="20" v-else>
-              <el-col :span="8" v-for="coupon in filteredCoupons" :key="coupon.customerCouponId">
+              <el-col :span="8" v-for="coupon in filteredCoupons" :key="coupon.id">
                 <div class="coupon-card" :class="getCouponTypeClass(coupon.type)">
                   <div class="coupon-left">
                     <div class="coupon-amount">
@@ -36,7 +36,7 @@
                   
                   <div class="coupon-right">
                     <div class="coupon-info">
-                      <h4 class="coupon-name">{{ coupon.name }}</h4>
+                      <h4 class="coupon-name">{{ coupon.couponName || coupon.name }}</h4>
                       <p class="coupon-desc">{{ coupon.description }}</p>
                       <div class="coupon-time">
                         <el-icon><Clock /></el-icon>
@@ -64,7 +64,7 @@
             <el-empty v-if="!loading && filteredCoupons.length === 0" description="No used coupons" />
             
             <el-row :gutter="20" v-else>
-              <el-col :span="8" v-for="coupon in filteredCoupons" :key="coupon.customerCouponId">
+              <el-col :span="8" v-for="coupon in filteredCoupons" :key="coupon.id">
                 <div class="coupon-card disabled" :class="getCouponTypeClass(coupon.type)">
                   <div class="coupon-left">
                     <div class="coupon-amount">
@@ -84,7 +84,7 @@
                   
                   <div class="coupon-right">
                     <div class="coupon-info">
-                      <h4 class="coupon-name">{{ coupon.name }}</h4>
+                      <h4 class="coupon-name">{{ coupon.couponName || coupon.name }}</h4>
                       <p class="coupon-desc">{{ coupon.description }}</p>
                       <div class="coupon-time">
                         <el-icon><Clock /></el-icon>
@@ -105,7 +105,7 @@
             <el-empty v-if="!loading && filteredCoupons.length === 0" description="No expired coupons" />
             
             <el-row :gutter="20" v-else>
-              <el-col :span="8" v-for="coupon in filteredCoupons" :key="coupon.customerCouponId">
+              <el-col :span="8" v-for="coupon in filteredCoupons" :key="coupon.id">
                 <div class="coupon-card disabled" :class="getCouponTypeClass(coupon.type)">
                   <div class="coupon-left">
                     <div class="coupon-amount">
@@ -125,7 +125,7 @@
                   
                   <div class="coupon-right">
                     <div class="coupon-info">
-                      <h4 class="coupon-name">{{ coupon.name }}</h4>
+                      <h4 class="coupon-name">{{ coupon.couponName || coupon.name }}</h4>
                       <p class="coupon-desc">{{ coupon.description }}</p>
                       <div class="coupon-time">
                           <el-icon><Clock /></el-icon>
@@ -167,13 +167,13 @@ const filteredCoupons = computed(() => {
   switch (activeTab.value) {
     case 'unused':
       return couponList.value.filter(c => 
-        c.status === 'UNUSED' && new Date(c.endTime) > now
+        c.status === 'UNUSED' && new Date(c.endDate) > now
       )
     case 'used':
       return couponList.value.filter(c => c.status === 'USED')
     case 'expired':
       return couponList.value.filter(c => 
-        c.status === 'UNUSED' && new Date(c.endTime) <= now
+        c.status === 'UNUSED' && new Date(c.endDate) <= now
       )
     default:
       return []
@@ -188,12 +188,14 @@ const loadMyCoupons = async () => {
   loading.value = true
   try {
     const res = await getCustomerCouponList({
-      userId: userStore.userId,
+      userId: userStore.userInfo?.userId || userStore.userId,
       current: 1,
       size: 100
     })
-    couponList.value = res.data?.records || []
-    } catch (error) {
+    console.log('My Coupons Data:', res.data)
+    // 根据响应结构尝试获取数据：可能是数组 res.data，也可能是分页对象 res.data.records
+    couponList.value = Array.isArray(res.data) ? res.data : (res.data?.records || [])
+  } catch (error) {
     console.error('Load my coupons error:', error)
     ElMessage.error(error.message || 'Failed to load coupons')
   } finally {
@@ -374,15 +376,4 @@ const goToCouponCenter = () => {
 }
 
 .coupon-time {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  color: #606266;
-}
-
-.use-btn {
-  width: 100%;
-  margin-top: 8px;
-}
-</style>
+  display: fle

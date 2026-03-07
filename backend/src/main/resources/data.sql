@@ -175,10 +175,10 @@ INSERT INTO `product_reviews` (`user_id`, `prod_id`, `order_id`, `rating`, `cont
 -- 12. Coupons
 -- ============================================
 INSERT INTO `coupons` (`coupon_id`, `merch_id`, `name`, `type`, `value`, `min_price`, `total_quantity`, `received_quantity`, `start_date`, `end_date`, `status`, `description`) VALUES
-(1, NULL, 'New User Coupon', 'FIXED_AMOUNT', 50.00, 200.00, 1000, 234, '2025-12-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', 'First order: save 50'),
-(2, NULL, 'Christmas Full Reduction', 'FULL_REDUCTION', 100.00, 500.00, 500, 123, '2025-12-20 00:00:00', '2025-12-26 23:59:59', 'ACTIVE', 'Holiday deal: spend 500 save 100'),
-(3, 1, 'Flower Shop 10% Off', 'DISCOUNT', 0.90, 100.00, 200, 89, '2025-12-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', 'Exclusive 10% off at Flower Shop Expert'),
-(4, 2, 'Green Plant 20% Off', 'DISCOUNT', 0.80, 150.00, 150, 67, '2025-12-01 00:00:00', '2025-12-31 23:59:59', 'ACTIVE', '20% off everything at Green Plant Living'),
+(1, NULL, 'New User Coupon', 'FIXED_AMOUNT', 50.00, 200.00, 1000, 234, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', 'First order: save 50'),
+(2, NULL, 'Christmas Full Reduction', 'FULL_REDUCTION', 100.00, 500.00, 500, 123, '2025-12-20 00:00:00', '2026-12-26 23:59:59', 'ACTIVE', 'Holiday deal: spend 500 save 100'),
+(3, 1, 'Flower Shop 10% Off', 'DISCOUNT', 0.90, 100.00, 200, 89, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', 'Exclusive 10% off at Flower Shop Expert'),
+(4, 2, 'Green Plant 20% Off', 'DISCOUNT', 0.80, 150.00, 150, 67, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', '20% off everything at Green Plant Living'),
 (5, NULL, 'Expired Coupon', 'FIXED_AMOUNT', 30.00, 100.00, 100, 100, '2025-11-01 00:00:00', '2025-11-30 23:59:59', 'EXPIRED', 'November-only coupon');
 
 -- ============================================
@@ -187,10 +187,24 @@ INSERT INTO `coupons` (`coupon_id`, `merch_id`, `name`, `type`, `value`, `min_pr
 INSERT INTO `customer_coupons` (`user_id`, `coupon_id`, `code`, `status`, `receive_date`, `used_date`, `order_id`) VALUES
 (1, 1, 'NEW50-USER1-001', 'USED', '2025-12-10 09:00:00', '2025-12-10 10:30:00', 1),
 (1, 2, 'XMAS100-USER1-002', 'UNUSED', '2025-12-12 10:00:00', NULL, NULL),
+(1, 3, 'FLOWER90-USER1-003', 'UNUSED', '2026-03-01 10:00:00', NULL, NULL),
+(1, 4, 'GREEN80-USER1-004', 'UNUSED', '2026-03-01 10:00:00', NULL, NULL),
 (2, 1, 'NEW50-USER2-001', 'UNUSED', '2025-12-11 14:00:00', NULL, NULL),
+(2, 2, 'XMAS100-USER2-002', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
+(2, 3, 'FLOWER90-USER2-003', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
+(2, 4, 'GREEN80-USER2-004', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
+(3, 1, 'NEW50-USER3-003', 'UNUSED', '2026-03-01 12:00:00', NULL, NULL),
 (3, 2, 'XMAS100-USER3-001', 'USED', '2025-12-12 15:00:00', '2025-12-12 16:45:00', 4),
 (3, 3, 'FLOWER90-USER3-002', 'UNUSED', '2025-12-11 11:00:00', NULL, NULL),
-(4, 4, 'GREEN80-USER4-001', 'UNUSED', '2025-12-10 16:00:00', NULL, NULL);
+(3, 4, 'GREEN80-USER3-004', 'UNUSED', '2026-03-01 12:00:00', NULL, NULL),
+(4, 1, 'NEW50-USER4-001', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
+(4, 2, 'XMAS100-USER4-002', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
+(4, 3, 'FLOWER90-USER4-003', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
+(4, 4, 'GREEN80-USER4-004', 'UNUSED', '2025-12-10 16:00:00', NULL, NULL),
+(5, 1, 'NEW50-USER5-001', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
+(5, 2, 'XMAS100-USER5-002', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
+(5, 3, 'FLOWER90-USER5-003', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
+(5, 4, 'GREEN80-USER5-004', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL);
 
 -- ============================================
 -- 14. Check-ins

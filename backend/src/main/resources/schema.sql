@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS `customers`;
 DROP TABLE IF EXISTS `administrators`;
 DROP TABLE IF EXISTS `system_configuration`;
 DROP TABLE IF EXISTS `suppliers`;
-
+DROP TABLE IF EXISTS `knowledge_comments`;
 
 -- ============================================
 -- 1. Customers table (customers)
@@ -492,6 +492,24 @@ CREATE INDEX idx_orders_merch_status ON orders(merch_id, status);
 -- Product query optimization
 CREATE INDEX idx_products_cat_status ON products(cat_id, status);
 CREATE INDEX idx_products_status_sales ON products(status, sales DESC);
+
+-- ============================================
+-- 17. Knowledge comments (knowledge_comments)
+-- ============================================
+CREATE TABLE `knowledge_comments` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Comment ID',
+  `knowledge_id` BIGINT NOT NULL COMMENT 'Knowledge ID',
+  `user_id` BIGINT NOT NULL COMMENT 'User ID',
+  `user_name` VARCHAR(50) COMMENT 'User name',
+  `content` TEXT NOT NULL COMMENT 'Comment content',
+  `status` VARCHAR(20) DEFAULT 'APPROVED' COMMENT 'Status: PENDING, APPROVED, REJECTED',
+  `create_date` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Created at',
+  PRIMARY KEY (`id`),
+  KEY `idx_knowledge_id` (`knowledge_id`),
+  KEY `idx_user_id` (`user_id`),
+  CONSTRAINT `fk_know_comm_knowledge` FOREIGN KEY (`knowledge_id`) REFERENCES `care_knowledge` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_know_comm_user` FOREIGN KEY (`user_id`) REFERENCES `customers` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Knowledge comments table';
 
 -- ============================================
 -- Done

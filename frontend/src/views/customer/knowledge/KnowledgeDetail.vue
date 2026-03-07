@@ -118,6 +118,50 @@
             </div>
           </div>
         </el-card>
+
+        <!-- Comments Section -->
+        <el-card class="mt-lg">
+          <template #header>
+            <div class="comments-header">
+              <h3>Comments ({{ commentList.length }})</h3>
+            </div>
+          </template>
+
+          <div class="comment-input-area" v-if="userStore.isLoggedIn">
+            <el-input
+              v-model="newComment"
+              type="textarea"
+              :rows="3"
+              placeholder="Write a comment..."
+              maxlength="500"
+              show-word-limit
+            />
+            <div class="submit-btn">
+              <el-button type="primary" @click="submitComment" :loading="submitting">Submit Comment</el-button>
+            </div>
+          </div>
+          <div v-else class="login-prompt">
+            <el-button type="primary" link @click="$router.push('/login')">Log in to comment</el-button>
+          </div>
+
+          <el-divider />
+
+          <div class="comment-list">
+            <div v-if="commentList.length === 0" class="no-comments">
+              <el-empty description="No comments yet. Be the first to comment!" />
+            </div>
+            <div v-for="comment in commentList" :key="comment.id" class="comment-item">
+              <div class="comment-user">
+                <el-avatar :size="32">{{ comment.userName?.charAt(0) || 'U' }}</el-avatar>
+                <span class="comment-username">{{ comment.userName }}</span>
+                <span class="comment-date">{{ formatDate(comment.createDate) }}</span>
+              </div>
+              <div class="comment-body">
+                {{ comment.content }}
+              </div>
+            </div>
+          </div>
+        </el-card>
       </div>
     </div>
     
@@ -132,18 +176,25 @@ import { User, Clock, View, ArrowLeft, Share } from '@element-plus/icons-vue'
 import CustomerHeader from '@/components/layouts/CustomerHeader.vue'
 import CustomerFooter from '@/components/layouts/CustomerFooter.vue'
 import { getKnowledgeDetail, getKnowledgeList } from '@/api/knowledge'
+import request from '@/utils/request'
+import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 import { formatDate } from '@/utils/format'
 
 const router = useRouter()
 const route = useRoute()
+const userStore = useUserStore()
 
 const loading = ref(false)
 const knowledge = ref(null)
 const relatedKnowledge = ref([])
+const commentList = ref([])
+const newComment = ref('')
+const submitting = ref(false)
 
 onMounted(() => {
   loadKnowledgeDetail()
+  loadComments()
 })
 
 const loadKnowledgeDetail = async () => {
@@ -162,6 +213,40 @@ const loadKnowledgeDetail = async () => {
     ElMessage.error('Failed to load article details')
   } finally {
     loading.value = false
+  }
+}
+
+const loadComments = async () => {
+  try {
+    const res = await request.get(`/api/knowledge-comments/${route.params.id}`)
+    commentList.value = res.data.records || []
+  } catch (error) {
+    console.error('Load comments error:', error)
+  }
+}
+
+const submitComment = async () => {
+  if (!newComment.value.trim()) {
+    ElMessage.warning('Please enter a comment.')
+    return
+  }
+  
+  submitting.value = true
+  try {
+    await request.post('/api/knowledge-comments', {
+      knowledgeId: route.params.id,
+      userId: userStore.userInfo?.userId || userStore.userId,
+      userName: userStore.userInfo?.username || userStore.username,
+      content: newComment.value
+    })
+    ElMessage.success('Comment submitted!')
+    newComment.value = ''
+    loadComments()
+  } catch (error) {
+    console.error('Submit comment error:', error)
+    ElMessage.error('Failed to submit comment.')
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -383,5 +468,67 @@ const handleShare = () => {
   -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Comments Section Styles */
+.comments-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.comment-input-area {
+  margin-bottom: 20px;
+}
+
+.submit-btn {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.comment-item {
+  padding: 15px 0;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.comment-username {
+  font-weight: 500;
+  color: #333;
+}
+
+.comment-date {
+  font-size: 12px;
+  color: #999;
+  margin-left: auto;
+}
+
+.comment-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #666;
+  padding-left: 42px;
+}
+
+.no-comments {
+  padding: 40px 0;
 }
 </style>
