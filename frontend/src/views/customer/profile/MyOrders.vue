@@ -1,129 +1,145 @@
 <template>
   <div class="my-orders-page">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <h2>My Orders</h2>
-        </div>
-      </template>
-      
-      <!-- Status filter -->
-      <div class="filter-tabs">
-        <el-radio-group v-model="filterStatus" @change="handleFilterChange">
-          <el-radio-button label="">All</el-radio-button>
-          <el-radio-button label="SUBMITTED">Pending Payment</el-radio-button>
-          <el-radio-button label="PAID">Pending Shipment</el-radio-button>
-          <el-radio-button label="SHIPPED">Pending Receipt</el-radio-button>
-          <el-radio-button label="COMPLETED">Completed</el-radio-button>
-          <el-radio-button label="REFUND_APPLIED">Refunding</el-radio-button>
-          <el-radio-button label="REFUNDED">Refunded</el-radio-button>
-          <el-radio-button label="CANCELLED">Cancelled</el-radio-button>
-        </el-radio-group>
+    <div class="page-header">
+      <h2 class="page-title">My Orders</h2>
+      <div class="header-actions">
+        <el-select
+          v-model="filterStatus"
+          placeholder="All Status"
+          clearable
+          style="width: 200px"
+          @change="handleFilterChange"
+        >
+          <el-option label="All Status" value="" />
+          <el-option label="Pending Payment" value="SUBMITTED" />
+          <el-option label="Pending Shipment" value="PAID" />
+          <el-option label="Pending Receipt" value="SHIPPED" />
+          <el-option label="Completed" value="COMPLETED" />
+          <el-option label="Refunding" value="REFUND_APPLIED" />
+          <el-option label="Refunded" value="REFUNDED" />
+          <el-option label="Cancelled" value="CANCELLED" />
+        </el-select>
       </div>
-      
-      <!-- Orders -->
-      <div class="orders-list" v-loading="loading">
-        <div class="order-item" v-for="order in orders" :key="order.id">
-          <div class="order-header">
-            <div class="order-header__left">
-              <span>Order No: {{ order.orderNo }}</span>
-              <span class="merchant">Merchant: {{ order.merchantName || 'Unknown' }}</span>
-            </div>
-            <div class="order-header__right">
-              <span>{{ order.orderDate }}</span>
-              <el-tag :type="getStatusType(order.status)">{{ getStatusText(order.status) }}</el-tag>
-            </div>
-          </div>
-          
-          <div class="order-body">
-            <div class="order-products">
-              <div 
-                class="product-item" 
-                v-for="item in order.items" 
-                :key="item.id"
-              >
-                <el-image 
-                  :src="item.mainImage || 'https://via.placeholder.com/80x80'" 
-                  fit="cover"
-                  style="width: 80px; height: 80px; border-radius: 4px;"
-                  crossorigin="anonymous"
-                />
-                <div class="product-info">
-                  <div class="product-name">{{ item.name }}</div>
-                  <div class="product-spec">
-                    <span>¥{{ item.unitPrice }}</span>
-                    <span>x{{ item.quantity }}</span>
+    </div>
+
+    <!-- Orders Table -->
+    <el-card shadow="never" class="table-card">
+      <el-table :data="orders" v-loading="loading" style="width: 100%" row-key="id">
+        <!-- Order info -->
+        <el-table-column label="Order Details" min-width="300">
+          <template #default="{ row }">
+            <div class="order-info-cell">
+              <div class="order-meta">
+                <span class="order-no">#{{ row.orderNo }}</span>
+                <span class="order-date">{{ formatDate(row.orderDate) || row.orderDate }}</span>
+              </div>
+              <div class="merchant-info">
+                <el-icon><Shop /></el-icon>
+                <span>{{ row.merchantName || 'Flower Market' }}</span>
+              </div>
+              <div class="product-mini-list">
+                <div v-for="item in row.items" :key="item.id" class="mini-product-item">
+                  <el-image 
+                    :src="item.mainImage" 
+                    fit="cover"
+                    class="mini-thumb"
+                  >
+                    <template #error>
+                      <div class="image-error-slot"><el-icon><Picture /></el-icon></div>
+                    </template>
+                  </el-image>
+                  <div class="mini-info">
+                    <div class="mini-name">{{ item.name }}</div>
+                    <div class="mini-price">¥{{ item.unitPrice }} x {{ item.quantity }}</div>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div class="order-amount">
-              <div class="amount-label">Amount</div>
-              <div class="amount-value">¥{{ Math.max(0, order.actualPrice || 0) }}</div>
+          </template>
+        </el-table-column>
+
+        <!-- Amount -->
+        <el-table-column label="Total Amount" width="150" align="center">
+          <template #default="{ row }">
+            <div class="total-amount">
+              <span class="currency">¥</span>
+              <span class="amount-value">{{ Math.max(0, row.actualPrice || 0) }}</span>
             </div>
-            
-            <div class="order-actions">
+          </template>
+        </el-table-column>
+
+        <!-- Status -->
+        <el-table-column label="Status" width="150" align="center">
+          <template #default="{ row }">
+            <el-tag :type="getStatusType(row.status)" effect="light" round>
+              {{ getStatusText(row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+
+        <!-- Actions -->
+        <el-table-column label="Actions" width="260" fixed="right" align="left">
+          <template #default="{ row }">
+            <div class="action-buttons">
               <el-button 
-                v-if="order.status === 'SUBMITTED'" 
+                v-if="row.status === 'SUBMITTED'" 
                 type="primary" 
-                size="small"
-                @click="handlePay(order)"
+                link
+                @click="handlePay(row)"
               >
                 Pay Now
               </el-button>
               
               <el-button 
-                v-if="order.status === 'SUBMITTED'" 
-                size="small"
-                @click="handleCancel(order)"
+                v-if="row.status === 'SUBMITTED'" 
+                type="danger"
+                link
+                @click="handleCancel(row)"
               >
-                Cancel Order
+                Cancel
               </el-button>
               
               <el-button 
-                v-if="order.status === 'SHIPPED'" 
-                type="primary" 
-                size="small"
-                @click="handleConfirmReceipt(order)"
+                v-if="row.status === 'SHIPPED'" 
+                type="success" 
+                link
+                @click="handleConfirmReceipt(row)"
               >
-                Confirm Receipt
+                Confirm
               </el-button>
 
               <el-button 
-                v-if="order.status === 'PAID' || order.status === 'SHIPPED'" 
-                type="danger" 
-                plain
-                size="small"
-                @click="handleRefund(order)"
+                v-if="row.status === 'PAID' || row.status === 'SHIPPED'" 
+                type="warning" 
+                link
+                @click="handleRefund(row)"
               >
                 Refund
               </el-button>
               
               <el-button 
-                v-if="order.status === 'COMPLETED' && !order.hasReview" 
+                v-if="row.status === 'COMPLETED' && !row.hasReview" 
                 type="primary" 
-                size="small"
-                @click="handleReview(order)"
+                link
+                @click="handleReview(row)"
               >
                 Review
               </el-button>
               
               <el-button 
-                size="small"
-                @click="handleViewDetail(order)"
+                type="info"
+                link
+                @click="handleViewDetail(row)"
               >
                 Details
               </el-button>
             </div>
-          </div>
-        </div>
-        
-        <el-empty v-if="orders.length === 0" description="No orders" />
-      </div>
-      
+          </template>
+        </el-table-column>
+      </el-table>
+
       <!-- Pagination -->
-      <div class="pagination-wrapper" v-if="total > 0">
+      <div class="pagination-footer">
         <el-pagination
           v-model:current-page="pagination.current"
           v-model:page-size="pagination.size"
@@ -135,9 +151,9 @@
         />
       </div>
     </el-card>
-    
+
     <!-- Payment dialog -->
-    <el-dialog v-model="showPayDialog" title="Pay Order" width="400px">
+    <el-dialog v-model="showPayDialog" title="Order Payment" width="420px" destroy-on-close class="payment-dialog">
       <div class="pay-dialog-content">
         <div class="pay-amount">
           <span>Amount:</span>
@@ -164,6 +180,8 @@ import { useRouter } from 'vue-router'
 import { getOrderList, cancelOrder, confirmOrder, payOrder, applyRefund } from '@/api/order'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { formatDate } from '@/utils/format'
+import { Shop, Picture, Monitor, DocumentCopy, StarFilled, Ticket, SwitchButton, User } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -340,148 +358,181 @@ const handleViewDetail = (order) => {
 
 <style scoped>
 .my-orders-page {
-  padding: var(--spacing-lg);
+  padding: 0;
 }
 
-.card-header {
+.page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 24px;
 }
 
-.card-header h2 {
+.page-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
+  color: #1a1a1a;
 }
 
-.filter-tabs {
-  margin-bottom: var(--spacing-lg);
+.table-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.orders-list {
-  min-height: 400px;
-}
-
-.order-item {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-lg);
-  overflow: hidden;
-}
-
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
-  background: var(--color-bg-base);
-  border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
-}
-
-.order-header__left,
-.order-header__right {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.order-header__left .merchant {
-  color: var(--color-text-secondary);
-}
-
-.order-body {
-  display: flex;
-  padding: var(--spacing-lg);
-  gap: var(--spacing-lg);
-}
-
-.order-products {
-  flex: 1;
+.order-info-cell {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 8px;
+  padding: 4px 0;
 }
 
-.product-item {
+.order-meta {
   display: flex;
-  gap: var(--spacing-md);
+  gap: 12px;
+  font-size: 13px;
+  color: #94a3b8;
 }
 
-.product-info {
-  flex: 1;
-}
-
-.product-name {
+.order-no {
+  color: #64748b;
   font-weight: 500;
-  margin-bottom: var(--spacing-xs);
 }
 
-.product-spec {
+.merchant-info {
   display: flex;
-  justify-content: space-between;
-  color: var(--color-text-secondary);
+  align-items: center;
+  gap: 6px;
   font-size: 14px;
+  font-weight: 500;
+  color: #334155;
 }
 
-.order-amount {
-  width: 150px;
-  text-align: center;
+.product-mini-list {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
 }
 
-.amount-label {
-  color: var(--color-text-secondary);
+.mini-product-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background-color: #f1f5f9;
+}
+
+.mini-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mini-name {
+  font-size: 13px;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-price {
   font-size: 12px;
-  margin-bottom: var(--spacing-xs);
+  color: #94a3b8;
+}
+
+.total-amount {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  color: #ef4444;
+}
+
+.currency {
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 2px;
 }
 
 .amount-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.pagination-footer {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.image-error-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #cbd5e1;
   font-size: 20px;
-  font-weight: 600;
-  color: var(--color-danger);
 }
 
-.order-actions {
-  width: 150px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--spacing-sm);
-}
-
-.pagination-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--spacing-xl);
-}
-
-/* Payment dialog */
 .pay-dialog-content {
-  padding: var(--spacing-lg);
+  padding: 10px 0;
 }
 
 .pay-amount {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  margin-bottom: 24px;
   font-size: 16px;
+  color: #64748b;
 }
 
 .pay-amount .amount {
+  display: block;
   font-size: 32px;
-  font-weight: 600;
-  color: var(--color-danger);
+  font-weight: 700;
+  color: #ef4444;
+  margin-top: 8px;
 }
 
 .payment-methods {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 16px;
+  padding: 0 20px;
+}
+
+:deep(.el-radio) {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-right: 0;
+  transition: all 0.2s;
+}
+
+:deep(.el-radio.is-checked) {
+  border-color: #409eff;
+  background-color: #f0f7ff;
+}
+
+:deep(.el-table__header) {
+  th {
+    background-color: #f8fafc !important;
+    color: #475569;
+    font-weight: 600;
+  }
 }
 </style>
