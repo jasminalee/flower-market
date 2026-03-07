@@ -45,17 +45,35 @@
           </template>
         </el-table-column>
         <el-table-column prop="createDate" label="Create Date" width="170" />
-        <el-table-column label="Actions" width="220" fixed="right" align="center">
+        <el-table-column label="Actions" width="200" fixed="right">
           <template #default="scope">
-            <el-button type="primary" link icon="Edit" @click="handleUpdate(scope.row)">Edit</el-button>
+            <el-button 
+              type="primary" 
+              plain
+              size="small"
+              icon="Edit" 
+              @click="handleUpdate(scope.row)"
+            >
+              Edit
+            </el-button>
             <el-button 
               :type="scope.row.status === 'ACTIVE' ? 'warning' : 'success'" 
-              link 
+              plain
+              size="small"
+              :icon="scope.row.status === 'ACTIVE' ? 'VideoPause' : 'VideoPlay'"
               @click="toggleStatus(scope.row)"
             >
               {{ scope.row.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
             </el-button>
-            <el-button type="danger" link icon="Delete" @click="handleDelete(scope.row)">Delete</el-button>
+            <el-button 
+              type="danger" 
+              plain
+              size="small"
+              icon="Delete" 
+              @click="handleDelete(scope.row)"
+            >
+              Delete
+            </el-button>
           </template>
         </el-table-column>
       </el-table>

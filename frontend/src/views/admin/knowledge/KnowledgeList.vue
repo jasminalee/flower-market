@@ -60,7 +60,7 @@
             {{ formatDate(row.createDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="260" fixed="right">
+        <el-table-column label="Actions" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row.id)">Edit</el-button>
             <el-button v-if="row.status === 'PUBLISHED'" type="warning" link @click="handleToggleStatus(row.id, 'DRAFT')">Unpublish</el-button>

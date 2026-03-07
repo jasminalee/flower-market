@@ -53,7 +53,7 @@
             {{ formatDateTime(row.createDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="220" fixed="right">
+        <el-table-column label="Actions" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">Edit</el-button>
             <el-button

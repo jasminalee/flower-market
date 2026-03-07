@@ -38,7 +38,7 @@
         </el-table-column>
         <el-table-column prop="description" label="Description" min-width="200" show-overflow-tooltip/>
         <el-table-column prop="createDate" label="Created At" width="180"/>
-        <el-table-column label="Actions" width="260" fixed="right">
+        <el-table-column label="Actions" width="200" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleAddChild(row)">Add Subcategory</el-button>
             <el-button type="primary" size="small" link @click="handleEdit(row)">Edit</el-button>

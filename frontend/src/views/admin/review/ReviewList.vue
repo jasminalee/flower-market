@@ -82,10 +82,34 @@
         </el-table-column>
         <el-table-column label="Actions" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleViewDetail(row)">Details</el-button>
+            <el-button 
+              type="primary" 
+              plain
+              size="small"
+              icon="View" 
+              @click="handleViewDetail(row)"
+            >
+              Details
+            </el-button>
             <template v-if="isPendingStatus(row.status)">
-              <el-button type="success" link @click="handleAudit(row.id, 'APPROVED')">Approve</el-button>
-              <el-button type="danger" link @click="handleAudit(row.id, 'REJECTED')">Reject</el-button>
+              <el-button 
+                type="success" 
+                plain
+                size="small"
+                icon="Check" 
+                @click="handleAudit(row.id, 'APPROVED')"
+              >
+                Approve
+              </el-button>
+              <el-button 
+                type="danger" 
+                plain
+                size="small"
+                icon="Close" 
+                @click="handleAudit(row.id, 'REJECTED')"
+              >
+                Reject
+              </el-button>
             </template>
           </template>
         </el-table-column>

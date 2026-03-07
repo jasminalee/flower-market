@@ -44,13 +44,59 @@
             {{ formatDate(row.createDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="340" fixed="right">
+        <el-table-column label="Actions" width="360" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleView(row.merchId)">View</el-button>
-            <el-button v-if="row.status === 'PENDING'" type="success" link @click="handleAudit(row.merchId, 'ACTIVE')">Approve</el-button>
-            <el-button v-if="row.status === 'PENDING'" type="danger" link @click="handleAudit(row.merchId, 'REJECTED')">Reject</el-button>
-            <el-button v-if="row.status === 'ACTIVE'" type="warning" link @click="handleToggleStatus(row.merchId, 'SUSPENDED')">Suspend</el-button>
-            <el-button v-if="row.status === 'SUSPENDED'" type="success" link @click="handleToggleStatus(row.merchId, 'ACTIVE')">Enable</el-button>
+            <el-button 
+              type="primary" 
+              plain
+              size="small"
+              icon="View" 
+              @click="handleView(row.merchId)"
+            >
+              View
+            </el-button>
+            <template v-if="row.status === 'PENDING'">
+              <el-button 
+                type="success" 
+                plain
+                size="small"
+                icon="Check" 
+                @click="handleAudit(row.merchId, 'ACTIVE')"
+              >
+                Approve
+              </el-button>
+              <el-button 
+                type="danger" 
+                plain
+                size="small"
+                icon="Close" 
+                @click="handleAudit(row.merchId, 'REJECTED')"
+              >
+                Reject
+              </el-button>
+            </template>
+            <template v-if="row.status === 'ACTIVE'">
+              <el-button 
+                type="warning" 
+                plain
+                size="small"
+                icon="VideoPause" 
+                @click="handleToggleStatus(row.merchId, 'SUSPENDED')"
+              >
+                Suspend
+              </el-button>
+            </template>
+            <template v-if="row.status === 'SUSPENDED'">
+              <el-button 
+                type="success" 
+                plain
+                size="small"
+                icon="VideoPlay" 
+                @click="handleToggleStatus(row.merchId, 'ACTIVE')"
+              >
+                Enable
+              </el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
