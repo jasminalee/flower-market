@@ -21,13 +21,20 @@ public class CareKnowledgeServiceImpl implements CareKnowledgeService {
     private CareKnowledgeMapper careKnowledgeMapper;
     
     @Override
-    public IPage<CareKnowledge> getCareKnowledgePage(Page<CareKnowledge> page, String category, String status) {
+    public IPage<CareKnowledge> getCareKnowledgePage(Page<CareKnowledge> page, String category, String status, String keyword) {
         LambdaQueryWrapper<CareKnowledge> wrapper = new LambdaQueryWrapper<>();
         
         // Filter conditions
         wrapper.eq(category != null && !category.isEmpty(), CareKnowledge::getCategory, category)
-                .eq(status != null && !status.isEmpty(), CareKnowledge::getStatus, status)
-                .orderByDesc(CareKnowledge::getCreateDate);
+                .eq(status != null && !status.isEmpty(), CareKnowledge::getStatus, status);
+        
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(CareKnowledge::getTitle, keyword)
+                    .or()
+                    .like(CareKnowledge::getContent, keyword));
+        }
+        
+        wrapper.orderByDesc(CareKnowledge::getCreateDate);
         
         return careKnowledgeMapper.selectPage(page, wrapper);
     }

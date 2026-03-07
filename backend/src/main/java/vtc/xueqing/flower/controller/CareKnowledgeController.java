@@ -29,11 +29,12 @@ public class CareKnowledgeController {
             @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
             @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
             @ApiParam("Category") @RequestParam(required = false) String category,
-            @ApiParam("Status") @RequestParam(required = false) String status
+            @ApiParam("Status") @RequestParam(required = false) String status,
+            @ApiParam("Keyword") @RequestParam(required = false) String keyword
     ) {
         try {
             Page<CareKnowledge> page = new Page<>(current, size);
-            IPage<CareKnowledge> knowledgePage = careKnowledgeService.getCareKnowledgePage(page, category, status);
+            IPage<CareKnowledge> knowledgePage = careKnowledgeService.getCareKnowledgePage(page, category, status, keyword);
             return Result.success(knowledgePage);
         } catch (Exception e) {
             return Result.error(e.getMessage());

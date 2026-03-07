@@ -498,3 +498,4 @@ public class OrderServiceImpl implements OrderService {
         return discountTotal.multiply(ratio).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 }
+ 

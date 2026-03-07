@@ -13,40 +13,48 @@
         <!-- Search and filters -->
         <div class="filter-bar mt-lg">
           <el-card shadow="never">
-            <el-form :inline="true">
-              <el-form-item label="Category">
-                <el-select v-model="filters.category" placeholder="All Categories" clearable @change="handleFilter">
-                  <el-option label="All Categories" value="" />
-                  <el-option label="Plant Care" value="plant-care" />
-                  <el-option label="Pest & Disease" value="pest-control" />
-                  <el-option label="Seasonal Care" value="seasonal-care" />
-                  <el-option label="Propagation" value="propagation" />
-                  <el-option label="Soil & Fertilizer" value="soil-fertilizer" />
-                  <el-option label="Watering" value="watering" />
-                </el-select>
-              </el-form-item>
-              
-              <el-form-item label="Search">
-                <el-input 
-                  v-model="filters.keyword" 
-                  placeholder="Search article titles or content" 
-                  clearable
-                  style="width: 250px"
-                  @keyup.enter="handleFilter"
-                >
-                  <template #suffix>
-                    <el-icon @click="handleFilter" style="cursor: pointer;">
-                      <Search />
-                    </el-icon>
-                  </template>
-                </el-input>
-              </el-form-item>
-              
-              <el-form-item>
-                <el-button type="primary" @click="handleFilter">Search</el-button>
-                <el-button @click="handleReset">Reset</el-button>
-              </el-form-item>
-            </el-form>
+            <div class="filter-content">
+              <el-form :inline="true" :model="filters" class="search-form">
+                <el-form-item label="Category">
+                  <el-select v-model="filters.category" placeholder="All Categories" clearable @change="handleFilter" style="width: 200px">
+                    <el-option label="All Categories" value="" />
+                    <el-option label="Flower Care" value="Flower Care" />
+                    <el-option label="Plant Care" value="Plant Care" />
+                    <el-option label="Plant Encyclopedia" value="Plant Encyclopedia" />
+                    <el-option label="Floral Tutorial" value="Floral Tutorial" />
+                    <el-option label="Seasonal Guide" value="Seasonal Guide" />
+                  </el-select>
+                </el-form-item>
+                
+                <el-form-item label="Search">
+                  <el-input 
+                    v-model="filters.keyword" 
+                    placeholder="Search article titles or content" 
+                    clearable
+                    style="width: 280px"
+                    @keyup.enter="handleFilter"
+                  >
+                    <template #suffix>
+                      <el-icon @click="handleFilter" style="cursor: pointer;">
+                        <Search />
+                      </el-icon>
+                    </template>
+                  </el-input>
+                </el-form-item>
+                
+                <el-form-item>
+                  <el-button type="primary" @click="handleFilter">Search</el-button>
+                  <el-button @click="handleReset">Reset</el-button>
+                </el-form-item>
+              </el-form>
+
+              <div class="action-buttons">
+                <el-button type="success" @click="showPostDialog = true">
+                  <el-icon><Edit /></el-icon>
+                  Post Article
+                </el-button>
+              </div>
+            </div>
           </el-card>
         </div>
         

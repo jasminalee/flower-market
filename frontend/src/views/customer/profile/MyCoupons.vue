@@ -376,4 +376,15 @@ const goToCouponCenter = () => {
 }
 
 .coupon-time {
-  display: fle
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #606266;
+}
+
+.use-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+</style>

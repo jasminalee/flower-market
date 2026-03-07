@@ -14,9 +14,10 @@ public interface CareKnowledgeService {
      * @param page pagination info
      * @param category category (optional)
      * @param status status (optional)
+     * @param keyword keyword (optional)
      * @return care knowledge list
      */
-    IPage<CareKnowledge> getCareKnowledgePage(Page<CareKnowledge> page, String category, String status);
+    IPage<CareKnowledge> getCareKnowledgePage(Page<CareKnowledge> page, String category, String status, String keyword);
     
     /**
      * Get care knowledge detail by ID.
