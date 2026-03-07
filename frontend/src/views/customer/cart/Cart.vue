@@ -68,7 +68,7 @@
                 </template>
               </el-table-column>
               
-              <el-table-column label="Actions" width="100">
+              <el-table-column label="Actions" width="120">
                 <template #default="{ row }">
                   <el-button 
                     text 
@@ -85,22 +85,7 @@
           </div>
           
           <div class="cart-footer" v-if="cartStore.cartItems.length > 0">
-            <div class="footer-left">
-              <el-checkbox 
-                v-model="isAllSelected" 
-                @change="handleSelectAll"
-              >
-                Select All
-              </el-checkbox>
-                <el-button 
-                text 
-                type="danger" 
-                @click="handleBatchDelete"
-                :disabled="selectedItems.length === 0"
-              >
-                Delete Selected
-              </el-button>
-            </div>
+        
             
             <div class="footer-right">
                 <div class="total-info">

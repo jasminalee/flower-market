@@ -204,7 +204,10 @@ const handleAudit = async (row, approved) => {
       }
     })
 
-    await auditRefund(row.id, approved, auditRemark || (approved ? 'Approved' : ''))
+    await auditRefund(row.id, {
+      approved,
+      remark: auditRemark || (approved ? 'Approved' : '')
+    })
     ElMessage.success(`Refund ${action}d successfully`)
     fetchOrderList()
   } catch (error) {
@@ -275,8 +278,7 @@ const getStatusText = (status) => {
     COMPLETED: 'Completed',
     CANCELLED: 'Cancelled',
     REFUND_APPLIED: 'Refund Applied',
-    REFUNDED: 'Refunded',
-    REFUND_REJECTED: 'Refund Rejected'
+    REFUNDED: 'Refunded'
   }
   return map[status] || 'Unknown'
 }

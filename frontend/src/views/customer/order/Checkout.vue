@@ -12,12 +12,7 @@
           <div v-loading="loading">
             <!-- Shipping address -->
             <div class="section">
-              <div class="section-header">
-                <h3>Shipping Info</h3>
-                <el-button size="small" @click="router.push('/profile/my-profile')">
-                  Change Address
-                </el-button>
-              </div>
+    
               
               <div v-if="userAddress" class="address-card">
                 <div class="address-row">

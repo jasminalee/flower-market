@@ -261,8 +261,7 @@ const getStatusText = (status) => {
     COMPLETED: 'Completed',
     CANCELLED: 'Cancelled',
     REFUND_APPLIED: 'Refunding',
-    REFUNDED: 'Refunded',
-    REFUND_REJECTED: 'Refund Rejected'
+    REFUNDED: 'Refunded'
   }
   return textMap[status] || status
 }

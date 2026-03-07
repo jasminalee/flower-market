@@ -466,9 +466,13 @@ public class OrderServiceImpl implements OrderService {
 
             order.setStatus(Constants.ORDER_STATUS_REFUNDED);
         } else {
-            // Revert status to previous (approximated, since we didn't store previous status. Typically PAID)
-            // For now, move to REFUND_REJECTED
-            order.setStatus(Constants.ORDER_STATUS_REFUND_REJECTED);
+            // Revert status based on delivery time:
+            // If delivery time exists, it was SHIPPED, otherwise it was PAID
+            if (order.getDeliveryTime() != null) {
+                order.setStatus(Constants.ORDER_STATUS_SHIPPED);
+            } else {
+                order.setStatus(Constants.ORDER_STATUS_PAID);
+            }
         }
         
         order.setRemark(auditRemark); // Reuse remark or similar for audit comments

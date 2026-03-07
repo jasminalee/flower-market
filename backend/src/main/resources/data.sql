@@ -129,20 +129,20 @@ INSERT INTO `orders` (`id`, `order_no`, `user_id`, `merch_id`, `order_date`, `to
 -- ============================================
 INSERT INTO `order_items` (`order_id`, `prod_id`, `name`, `main_image`, `quantity`, `unit_price`, `total_price`) VALUES
 -- Items for order 1
-(1, 1, 'Red Rose Bouquet (11 stems)', '/images/products/rose_red_11.jpg', 2, 199.00, 398.00),
+(1, 1, 'Red Rose Bouquet (11 stems)', '/images/products/main/20260201_b8b0f1bbb5c34a8c919b52c65fb1d497.jpg', 2, 199.00, 398.00),
 -- Items for order 2
-(2, 7, 'Monstera Pot', '/images/products/monstera.jpg', 1, 128.00, 128.00),
+(2, 7, 'Monstera Pot', '/images/products/main/20260201_bd1af35d3e384d3aadcf9a0f48030bb6.jpg', 1, 128.00, 128.00),
 -- Items for order 3
-(3, 10, '520 Love Confession Bouquet', '/images/products/love_520.jpg', 1, 520.00, 520.00),
+(3, 10, '520 Love Confession Bouquet', '/images/products/main/20260201_072b8ae13aa14c5481798f080ea9981e.jpg', 1, 520.00, 520.00),
 -- Items for order 4
-(4, 1, 'Red Rose Bouquet (11 stems)', '/images/products/rose_red_11.jpg', 1, 199.00, 199.00),
-(4, 2, 'Champagne Rose Bouquet (19 stems)', '/images/products/rose_champagne_19.jpg', 1, 299.00, 299.00),
-(4, 5, 'White Peony Succulent', '/images/products/succulent_white.jpg', 2, 29.90, 59.80),
+(4, 1, 'Red Rose Bouquet (11 stems)', '/images/products/main/20260201_f8b78e83965548dbb7ca35594fbf6075.jpg', 1, 199.00, 199.00),
+(4, 2, 'Champagne Rose Bouquet (19 stems)', '/images/products/main/20260201_514f1f4f3c8346d2b81b8af0c51935a7.jpg', 1, 299.00, 299.00),
+(4, 5, 'White Peony Succulent', '/images/products/main/20260201_89e74a94ca4c4c96ae6c355e3ede5f8b.jpg', 2, 29.90, 59.80),
 -- Items for order 5
-(5, 8, 'Fiddle Leaf Fig Pot', '/images/products/ficus_lyrata.jpg', 1, 168.00, 168.00),
-(5, 6, 'Succulent Combo (6 varieties)', '/images/products/succulent_combo.jpg', 1, 59.90, 59.90),
+(5, 8, 'Fiddle Leaf Fig Pot', '/images/products/main/20260201_8cbf1ecc1c6842aca377920ddc3df756.jpg', 1, 168.00, 168.00),
+(5, 6, 'Succulent Combo (6 varieties)', '/images/products/main/20260201_9d79df6217e2408aa522ceaac3730113.jpg', 1, 59.90, 59.90),
 -- Items for order 6
-(6, 11, 'Carnation Bouquet', '/images/products/carnation.jpg', 1, 88.00, 88.00);
+(6, 11, 'Carnation Bouquet', '/images/products/main/20260201_32079a3344f94057845c46c35d04c663.jpg', 1, 88.00, 88.00);
 
 -- ============================================
 -- 10. Product favorites

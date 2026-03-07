@@ -181,8 +181,7 @@ const statusTextMap = {
   COMPLETED: 'Completed',
   CANCELLED: 'Cancelled',
   REFUND_APPLIED: 'Refund Applied',
-  REFUNDED: 'Refunded',
-  REFUND_REJECTED: 'Refund Rejected'
+  REFUNDED: 'Refunded'
 }
 
 const getStatusType = (status) => {
@@ -287,7 +286,10 @@ const handleAudit = async (row, approved) => {
       }
     })
 
-    await auditRefund(row.id, approved, auditRemark || (approved ? 'Approved' : ''))
+    await auditRefund(row.id, {
+      approved,
+      remark: auditRemark || (approved ? 'Approved' : '')
+    })
     ElMessage.success(`Refund ${action}d successfully`)
     fetchOrders()
   } catch (error) {

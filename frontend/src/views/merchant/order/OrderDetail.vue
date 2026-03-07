@@ -86,8 +86,13 @@
       </div>
 
       <!-- Actions -->
-      <div class="section" v-if="orderData.status === 'PAID'">
+      <div class="operation-section section" v-if="orderData.status === 'PAID'">
         <el-button type="primary" @click="handleShip">Ship Order</el-button>
+      </div>
+
+      <div class="operation-section section" v-if="orderData.status === 'REFUND_APPLIED'">
+        <el-button type="success" @click="handleAudit(true)" :loading="auditing">Approve Refund</el-button>
+        <el-button type="danger" @click="handleAudit(false)" :loading="auditing">Reject Refund</el-button>
       </div>
     </el-card>
 
@@ -113,12 +118,14 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getMerchantOrder, shipOrder } from '@/api/merchant'
-import { ElMessage } from 'element-plus'
+import { auditRefund } from '@/api/order'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
 const loading = ref(false)
 const shipping = ref(false)
+const auditing = ref(false)
 const shipDialogVisible = ref(false)
 const shipFormRef = ref(null)
 
@@ -157,7 +164,9 @@ const statusTextMap = {
   PAID: 'To Ship',
   SHIPPED: 'To Receive',
   COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled'
+  CANCELLED: 'Cancelled',
+  REFUND_APPLIED: 'Refund Applied',
+  REFUNDED: 'Refunded'
 }
 
 const getStatusType = (status) => {
@@ -166,7 +175,9 @@ const getStatusType = (status) => {
     PAID: 'info',
     SHIPPED: 'primary',
     COMPLETED: 'success',
-    CANCELLED: 'danger'
+    CANCELLED: 'danger',
+    REFUND_APPLIED: 'warning',
+    REFUNDED: 'info'
   }
   return types[status] || 'info'
 }
@@ -212,6 +223,40 @@ const handleConfirmShip = async () => {
     ElMessage.error(error.message || 'Shipping failed')
   } finally {
     shipping.value = false
+  }
+}
+
+const handleAudit = async (approved) => {
+  const action = approved ? 'Approve' : 'Reject'
+  const remarkPrompt = approved ? 'Optional audit remark:' : 'Please enter rejection reason (required):'
+
+  try {
+    const { value: auditRemark } = await ElMessageBox.prompt(remarkPrompt, `${action} Refund`, {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      inputPlaceholder: approved ? 'Default: Approved' : 'Please enter why you rejected this refund',
+      inputValidator: (val) => {
+        if (!approved && (!val || val.trim() === '')) {
+          return 'Reason is required for rejection'
+        }
+        return true
+      }
+    })
+
+    auditing.value = true
+    await auditRefund(route.params.id, {
+      approved,
+      remark: auditRemark || (approved ? 'Approved' : '')
+    })
+    ElMessage.success(`Refund ${action}d successfully`)
+    fetchOrderDetail()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error(error)
+      ElMessage.error(`Failed to ${action.toLowerCase()} refund`)
+    }
+  } finally {
+    auditing.value = false
   }
 }
 
