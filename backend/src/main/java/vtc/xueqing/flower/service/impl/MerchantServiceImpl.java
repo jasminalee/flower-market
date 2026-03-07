@@ -2,6 +2,7 @@ package vtc.xueqing.flower.service.impl;
 
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -412,7 +413,7 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public com.baomidou.mybatisplus.core.metadata.IPage<Order> getMerchantOrders(
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<Order> page,
-            Long merchId, String status) {
+            Long merchId, String status, String orderNo, String customerName, String startDate, String endDate) {
         
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Order::getMerchId, merchId);
@@ -420,6 +421,32 @@ public class MerchantServiceImpl implements MerchantService {
         // Status filter
         if (status != null && !status.trim().isEmpty()) {
             wrapper.eq(Order::getStatus, status);
+        }
+        
+        // Order Number filter (subset of OrderVO search, but here we are returning Order entity)
+        if (orderNo != null && !orderNo.trim().isEmpty()) {
+            wrapper.like(Order::getOrderNo, orderNo);
+        }
+        
+        // Customer Name filter - Since Order entity doesn't have customer name, 
+        // we might need to query customer IDs if we want to stay with selectPage<Order>
+        if (customerName != null && !customerName.trim().isEmpty()) {
+            List<Long> userIds = customerMapper.selectList(new LambdaQueryWrapper<vtc.xueqing.flower.entity.Customer>()
+                    .like(vtc.xueqing.flower.entity.Customer::getName, customerName))
+                    .stream().map(vtc.xueqing.flower.entity.Customer::getUserId).collect(Collectors.toList());
+            if (userIds.isEmpty()) {
+                // Return empty page if no customers found
+                return new Page<>();
+            }
+            wrapper.in(Order::getUserId, userIds);
+        }
+        
+        // Date range filter
+        if (startDate != null && !startDate.trim().isEmpty()) {
+            wrapper.ge(Order::getOrderDate, startDate);
+        }
+        if (endDate != null && !endDate.trim().isEmpty()) {
+            wrapper.le(Order::getOrderDate, endDate);
         }
         
         wrapper.orderByDesc(Order::getOrderDate);

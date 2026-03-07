@@ -147,7 +147,11 @@ public class MerchantController {
             @RequestParam(required = false) Long merchId,
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String orderNo,
+            @RequestParam(required = false) String customerName,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
     ) {
         try {
             // If merchId is not passed, return error message
@@ -158,7 +162,7 @@ public class MerchantController {
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Order> page = 
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(current, size);
             com.baomidou.mybatisplus.core.metadata.IPage<vtc.xueqing.flower.entity.Order> orderPage = 
-                merchantService.getMerchantOrders(page, merchId, status);
+                merchantService.getMerchantOrders(page, merchId, status, orderNo, customerName, startDate, endDate);
             
             return Result.success(orderPage);
         } catch (Exception e) {

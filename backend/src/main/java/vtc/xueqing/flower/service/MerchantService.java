@@ -58,11 +58,15 @@ public interface MerchantService {
      * @param page page object
      * @param merchId merchant ID
      * @param status order status (optional)
+     * @param orderNo order number (optional)
+     * @param customerName customer name (optional)
+     * @param startDate start date (optional)
+     * @param endDate end date (optional)
      * @return order page data
      */
     com.baomidou.mybatisplus.core.metadata.IPage<vtc.xueqing.flower.entity.Order> getMerchantOrders(
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.entity.Order> page,
-        Long merchId, String status);
+        Long merchId, String status, String orderNo, String customerName, String startDate, String endDate);
     
     /**
      * Get merchant coupon list.
