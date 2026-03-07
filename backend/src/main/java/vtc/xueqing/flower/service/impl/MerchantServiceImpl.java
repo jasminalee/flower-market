@@ -373,6 +373,9 @@ public class MerchantServiceImpl implements MerchantService {
                              .like(vtc.xueqing.flower.entity.Product::getDescription, keyword));
         }
         
+        // Exclude deleted items
+        wrapper.ne(vtc.xueqing.flower.entity.Product::getStatus, Constants.PRODUCT_STATUS_DELETED);
+        
         wrapper.orderByDesc(vtc.xueqing.flower.entity.Product::getCreateDate);
         
         return productMapper.selectPage(page, wrapper);
@@ -403,6 +406,9 @@ public class MerchantServiceImpl implements MerchantService {
         // Status filter
         if (status != null && !status.trim().isEmpty()) {
             wrapper.eq(vtc.xueqing.flower.entity.Product::getStatus, status);
+        } else {
+            // Exclude deleted items by default if no status filter is provided or for all statuses
+            wrapper.ne(vtc.xueqing.flower.entity.Product::getStatus, Constants.PRODUCT_STATUS_DELETED);
         }
         
         wrapper.orderByDesc(vtc.xueqing.flower.entity.Product::getCreateDate);
