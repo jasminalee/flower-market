@@ -21,6 +21,10 @@ public interface OrderMapper extends BaseMapper<Order> {
      * @param userId user ID (optional)
      * @param merchId merchant ID (optional)
      * @param status order status (optional)
+     * @param orderNo order number (optional)
+     * @param customerName customer name (optional)
+     * @param startDate start date (optional)
+     * @param endDate end date (optional)
      * @return order VO pagination list
      */
     @Select("<script>" +
@@ -38,13 +42,29 @@ public interface OrderMapper extends BaseMapper<Order> {
             "  <if test='status != null and status != \"\"'>" +
             "    AND o.status = #{status} " +
             "  </if>" +
+            "  <if test='orderNo != null and orderNo != \"\"'>" +
+            "    AND o.order_no LIKE CONCAT('%', #{orderNo}, '%') " +
+            "  </if>" +
+            "  <if test='customerName != null and customerName != \"\"'>" +
+            "    AND c.name LIKE CONCAT('%', #{customerName}, '%') " +
+            "  </if>" +
+            "  <if test='startDate != null and startDate != \"\"'>" +
+            "    AND o.order_date &gt;= #{startDate} " +
+            "  </if>" +
+            "  <if test='endDate != null and endDate != \"\"'>" +
+            "    AND o.order_date &lt;= #{endDate} " +
+            "  </if>" +
             "</where> " +
             "ORDER BY o.order_date DESC" +
             "</script>")
     IPage<OrderVO> selectOrdersWithMerchant(Page<OrderVO> page,
                                             @Param("userId") Long userId,
                                             @Param("merchId") Long merchId,
-                                            @Param("status") String status);
+                                            @Param("status") String status,
+                                            @Param("orderNo") String orderNo,
+                                            @Param("customerName") String customerName,
+                                            @Param("startDate") String startDate,
+                                            @Param("endDate") String endDate);
 
     /**
      * Query all orders (with customer and merchant names) - for administrators

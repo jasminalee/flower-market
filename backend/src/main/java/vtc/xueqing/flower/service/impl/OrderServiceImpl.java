@@ -157,10 +157,10 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status) {
+    public IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status, String orderNo, String customerName, String startDate, String endDate) {
         // Only pagination parameters are passed through from external Page<Order>, query returns OrderVO (includes merchant name)
         Page<OrderVO> voPage = new Page<>(page.getCurrent(), page.getSize());
-        return orderMapper.selectOrdersWithMerchant(voPage, userId, merchId, status);
+        return orderMapper.selectOrdersWithMerchant(voPage, userId, merchId, status, orderNo, customerName, startDate, endDate);
     }
     
     @Override

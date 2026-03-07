@@ -26,9 +26,13 @@ public interface OrderService {
      * @param userId user ID (optional)
      * @param merchId merchant ID (optional)
      * @param status order status (optional)
+     * @param orderNo order number (optional)
+     * @param customerName customer name (optional)
+     * @param startDate start date (optional)
+     * @param endDate end date (optional)
      * @return order list
      */
-    IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status);
+    IPage<OrderVO> getOrderPage(Page<Order> page, Long userId, Long merchId, String status, String orderNo, String customerName, String startDate, String endDate);
     
     /**
      * Get order detail by ID.

@@ -1,36 +1,47 @@
 <template>
-  <div class="order-list">
-    <!-- Status tabs -->
-    <el-tabs v-model="activeTab" @tab-change="handleTabChange">
-      <el-tab-pane label="All" name="ALL" />
-      <el-tab-pane label="Pending Payment" name="SUBMITTED" />
-      <el-tab-pane label="To Ship" name="PAID" />
-      <el-tab-pane label="To Receive" name="SHIPPED" />
-      <el-tab-pane label="Completed" name="COMPLETED" />
-      <el-tab-pane label="Cancelled" name="CANCELLED" />
-      <el-tab-pane label="Refunding" name="REFUND_APPLIED" />
-      <el-tab-pane label="Refunded" name="REFUNDED" />
-    </el-tabs>
+  <div class="order-list-container">
+    <div class="page-header">
+      <h2 class="page-title">Order Management</h2>
+      <div class="header-actions">
+        <el-select
+          v-model="activeTab"
+          placeholder="All Status"
+          clearable
+          style="width: 200px"
+          @change="handleTabChange"
+        >
+          <el-option label="All Status" value="ALL" />
+          <el-option label="Pending Payment" value="SUBMITTED" />
+          <el-option label="To Ship" value="PAID" />
+          <el-option label="To Receive" value="SHIPPED" />
+          <el-option label="Completed" value="COMPLETED" />
+          <el-option label="Cancelled" value="CANCELLED" />
+          <el-option label="Refunding" value="REFUND_APPLIED" />
+          <el-option label="Refunded" value="REFUNDED" />
+        </el-select>
+      </div>
+    </div>
 
     <!-- Search filters -->
-    <el-card class="search-card">
-      <el-form :inline="true" :model="searchForm">
+    <el-card shadow="never" class="search-card">
+      <el-form :inline="true" :model="searchForm" class="filter-form">
         <el-form-item label="Order No">
-          <el-input v-model="searchForm.orderNo" placeholder="Enter order number" clearable />
+          <el-input v-model="searchForm.orderNo" placeholder="Order #" clearable @keyup.enter="handleSearch" style="width: 200px" />
         </el-form-item>
         <el-form-item label="Customer">
-          <el-input v-model="searchForm.customerName" placeholder="Enter customer name" clearable />
+          <el-input v-model="searchForm.customerName" placeholder="Customer name" clearable @keyup.enter="handleSearch" style="width: 180px" />
         </el-form-item>
         <el-form-item label="Date Range">
           <el-date-picker
             v-model="searchForm.dateRange"
             type="daterange"
-            range-separator="to"
-            start-placeholder="Start date"
-            end-placeholder="End date"
+            range-separator="-"
+            start-placeholder="Start"
+            end-placeholder="End"
+            style="width: 240px"
           />
         </el-form-item>
-        <el-form-item>
+        <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSearch">Search</el-button>
           <el-button @click="handleReset">Reset</el-button>
         </el-form-item>
@@ -38,48 +49,58 @@
     </el-card>
 
     <!-- Orders table -->
-    <el-card>
+    <el-card shadow="never" class="table-card">
       <el-table :data="tableData" v-loading="loading" style="width: 100%">
-        <el-table-column prop="orderNo" label="Order No" width="180" />
-        <el-table-column prop="receiverName" label="Receiver" width="120" />
-        <el-table-column prop="receiverPhone" label="Phone" width="130" />
-        <el-table-column prop="address" label="Address" min-width="200" show-overflow-tooltip />
-        <el-table-column label="Paid" width="100">
+        <el-table-column label="Order Info" min-width="200">
           <template #default="{ row }">
-            ¥{{ row.actualPrice || row.totalPrice || 0 }}
+            <div class="order-id-cell">
+              <span class="order-no">#{{ row.orderNo }}</span>
+              <span class="order-time">{{ formatDateTime(row.orderDate) }}</span>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column label="Status" width="100">
+        <el-table-column label="Customer" min-width="150">
           <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">{{ row.statusText }}</el-tag>
+            <div class="customer-info-cell">
+              <div class="customer-name">{{ row.receiverName }}</div>
+              <div class="customer-phone">{{ row.receiverPhone }}</div>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column label="Order Time" width="160">
+        <el-table-column prop="address" label="Shipping Address" min-width="200" show-overflow-tooltip />
+        <el-table-column label="Amount" width="120" align="right">
           <template #default="{ row }">
-            {{ formatDateTime(row.orderDate) }}
+            <span class="price-value">¥{{ row.actualPrice || row.totalPrice || 0 }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="260" fixed="right">
+        <el-table-column label="Status" width="130" align="center">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleViewDetail(row)">View</el-button>
-            <el-button
-              v-if="row.status === 'PAID'"
-              type="success"
-              link
-              @click="handleShip(row)"
-            >
-              Ship
-            </el-button>
-            <template v-if="row.status === 'REFUND_APPLIED'">
-              <el-button type="success" link @click="handleAudit(row, true)">Approve</el-button>
-              <el-button type="danger" link @click="handleAudit(row, false)">Reject</el-button>
-            </template>
+            <el-tag :type="getStatusType(row.status)" effect="light" round>{{ row.statusText }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="Actions" width="200" fixed="right" align="left">
+          <template #default="{ row }">
+            <div class="action-buttons">
+              <el-button type="primary" link @click="handleViewDetail(row)">Details</el-button>
+              <el-button
+                v-if="row.status === 'PAID'"
+                type="success"
+                link
+                @click="handleShip(row)"
+              >
+                Ship
+              </el-button>
+              <template v-if="row.status === 'REFUND_APPLIED'">
+                <el-button type="success" link @click="handleAudit(row, true)">Approve</el-button>
+                <el-button type="danger" link @click="handleAudit(row, false)">Reject</el-button>
+              </template>
+            </div>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- Pagination -->
-      <div class="pagination">
+      <div class="pagination-footer">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.size"
@@ -93,8 +114,8 @@
     </el-card>
 
     <!-- Ship dialog -->
-    <el-dialog v-model="shipDialogVisible" title="Ship Order" width="500px">
-      <el-form ref="shipFormRef" :model="shipForm" :rules="shipRules" label-width="100px">
+    <el-dialog v-model="shipDialogVisible" title="Ship Order" width="460px" destroy-on-close>
+      <el-form ref="shipFormRef" :model="shipForm" :rules="shipRules" label-position="top">
         <el-form-item label="Courier" prop="courier">
           <el-input v-model="shipForm.courier" placeholder="Enter courier company" />
         </el-form-item>
@@ -301,21 +322,97 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.order-list {
-  padding: 20px;
+.order-list-container {
+  padding: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
 }
 
 .search-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   margin-bottom: 20px;
 }
 
-.product-info {
-  line-height: 1.5;
+.table-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.pagination {
-  margin-top: 20px;
+.order-id-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-no {
+  font-weight: 600;
+  color: #334155;
+  font-family: monospace;
+}
+
+.order-time {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.customer-info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customer-name {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.customer-phone {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.price-value {
+  font-weight: 700;
+  color: #334155;
+  font-size: 15px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.pagination-footer {
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
+}
+
+:deep(.el-table__header) {
+  th {
+    background-color: #f8fafc !important;
+    color: #475569;
+    font-weight: 600;
+  }
+}
+
+:deep(.el-form-item__label) {
+  font-weight: 500;
 }
 </style>

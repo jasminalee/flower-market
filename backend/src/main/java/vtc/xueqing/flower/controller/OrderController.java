@@ -45,11 +45,15 @@ public class OrderController {
             @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
             @ApiParam("User ID") @RequestParam(required = false) Long userId,
             @ApiParam("Merchant ID") @RequestParam(required = false) Long merchId,
-            @ApiParam("Order Status") @RequestParam(required = false) String status
+            @ApiParam("Order Status") @RequestParam(required = false) String status,
+            @ApiParam("Order Number") @RequestParam(required = false) String orderNo,
+            @ApiParam("Customer Name") @RequestParam(required = false) String customerName,
+            @ApiParam("Start Date") @RequestParam(required = false) String startDate,
+            @ApiParam("End Date") @RequestParam(required = false) String endDate
     ) {
         try {
             Page<Order> page = new Page<>(current, size);
-            IPage<OrderVO> orderPage = orderService.getOrderPage(page, userId, merchId, status);
+            IPage<OrderVO> orderPage = orderService.getOrderPage(page, userId, merchId, status, orderNo, customerName, startDate, endDate);
             return Result.success(orderPage);
         } catch (Exception e) {
             return Result.error(e.getMessage());
