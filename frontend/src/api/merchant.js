@@ -59,9 +59,9 @@ export const getMerchantDashboard = (merchId) => {
 }
 
 // Get merchant profile
-export const getMerchantProfile = (id) => {
+export const getMerchantProfile = (merchId) => {
   return request({
-    url: `/api/merchant/profile/${id}`,
+    url: `/api/merchant/profile/${merchId}`,
     method: 'get'
   })
 }
@@ -291,50 +291,41 @@ export const uploadProductImage = (file, type = 'detail') => {
 // Delete product
 export const deleteProduct = (id) => {
   return request({
-    url: `/api/merchant/products/${id}`,
+    url: `/api/products/${id}`,
     method: 'delete'
   })
 }
 
 // Update product status (on/off shelf)
 export const updateProductStatus = (id, status) => {
+  const action = status === 'ACTIVE' ? 'publish' : 'unpublish'
   return request({
-    url: `/api/merchant/products/${id}/status`,
-    method: 'put',
-    data: { status }
+    url: `/api/products/${id}/${action}`,
+    method: 'put'
   })
 }
 
 // Get product trackability
-export const getProductTrackability = (id) => {
+export const getProductTrackability = (prodId) => {
   return request({
-    url: `/api/merchant/products/${id}/trackability`,
+    url: `/api/products/trackability/${prodId}`,
     method: 'get'
   })
 }
 
-// Create trackability record
-export const createTrackability = (id, data) => {
+// Create or update trackability record
+export const saveOrUpdateTrackability = (data) => {
   return request({
-    url: `/api/merchant/products/${id}/trackability`,
+    url: '/api/products/trackability',
     method: 'post',
     data
   })
 }
 
-// Update trackability record
-export const updateTrackability = (id, data) => {
-  return request({
-    url: `/api/merchant/products/trackability/${id}`,
-    method: 'put',
-    data
-  })
-}
-
 // Delete trackability record
-export const deleteTrackability = (id) => {
+export const deleteTrackability = (prodId) => {
   return request({
-    url: `/api/merchant/products/trackability/${id}`,
+    url: `/api/products/trackability/${prodId}`,
     method: 'delete'
   })
 }

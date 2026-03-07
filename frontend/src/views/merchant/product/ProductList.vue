@@ -83,7 +83,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="280" fixed="right" align="center">
+        <el-table-column label="Actions" width="320" fixed="right" align="center">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">Edit</el-button>
             <el-button
@@ -91,7 +91,7 @@
               link
               @click="handleToggleStatus(row)"
             >
-              {{ row.status === 'ACTIVE' ? 'Hide' : 'Show' }}
+              {{ row.status === 'ACTIVE' ? 'Take Off' : 'Put On' }}
             </el-button>
             <el-button type="info" link @click="handleTrackability(row)">Trace</el-button>
             <el-divider direction="vertical" />
@@ -176,7 +176,7 @@ const fetchProducts = async () => {
       return {
         ...item,
         // Ensure a normalized id field is available for routing/editing
-        id: item.id ?? item.prodId ?? item.productId,
+        id: item.prodId ?? item.id ?? item.productId,
         categoryText: categoryMap.value[item.catId] || `Category ${item.catId}`,
         statusText: item.status === 'ACTIVE' ? 'On Sale' : 'Off Sale',
         // Map field names for frontend display
@@ -218,15 +218,17 @@ const handleTrackability = (row) => {
 }
 
 const handleToggleStatus = async (row) => {
-  const newStatus = row.status === 'ON_SALE' ? 'OFF_SALE' : 'ON_SALE'
-  const actionText = newStatus === 'ON_SALE' ? 'Put On Sale' : 'Take Off Sale'
+  const currentStatus = row.status || 'INACTIVE'
+  const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
+  const actionText = newStatus === 'ACTIVE' ? 'Put On Sale' : 'Take Off Sale'
 
   try {
     await ElMessageBox.confirm(`Are you sure you want to ${actionText.toLowerCase()} this product?`, 'Confirmation', {
       type: 'warning'
     })
 
-    await updateProductStatus(row.id, newStatus)
+    const pid = row.prodId ?? row.id
+    await updateProductStatus(pid, newStatus)
     ElMessage.success(`${actionText} successful`)
     fetchProducts()
   } catch (error) {
@@ -242,7 +244,8 @@ const handleDelete = async (row) => {
       type: 'warning'
     })
 
-    await deleteProduct(row.id)
+    const pid = row.prodId ?? row.id
+    await deleteProduct(pid)
     ElMessage.success('Deleted successfully')
     fetchProducts()
   } catch (error) {

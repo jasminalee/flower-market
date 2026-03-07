@@ -29,10 +29,11 @@
 
       <!-- Traceability record list -->
       <el-table :data="trackabilityList" v-loading="loading" style="width: 100%">
-        <el-table-column prop="stage" label="Stage" width="120" />
-        <el-table-column prop="time" label="Time" width="180" />
-        <el-table-column prop="location" label="Location" width="150" />
-        <el-table-column prop="responsible" label="Responsible" width="120" />
+        <el-table-column prop="origin" label="Origin" width="150" />
+        <el-table-column prop="plantingMethod" label="Planting Method" width="150" />
+        <el-table-column prop="pickingDate" label="Picking Date" width="120" />
+        <el-table-column prop="procDate" label="Processing Date" width="120" />
+        <el-table-column prop="certification" label="Certification" width="120" />
         <el-table-column prop="description" label="Description" min-width="200" />
         <el-table-column label="Actions" width="150" fixed="right">
           <template #default="{ row }">
@@ -53,24 +54,34 @@
         ref="formRef"
         :model="formData"
         :rules="rules"
-        label-width="100px"
+        label-width="120px"
       >
-        <el-form-item label="Stage" prop="stage">
-          <el-input v-model="formData.stage" placeholder="e.g. Planting, Harvest, Shipping" />
+        <el-form-item label="Origin" prop="origin">
+          <el-input v-model="formData.origin" placeholder="e.g. Kunming, Yunnan" />
         </el-form-item>
-        <el-form-item label="Time" prop="time">
+        <el-form-item label="Planting Method" prop="plantingMethod">
+          <el-input v-model="formData.plantingMethod" placeholder="e.g. Greenhouse, Organic" />
+        </el-form-item>
+        <el-form-item label="Picking Date" prop="pickingDate">
           <el-date-picker
-            v-model="formData.time"
-            type="datetime"
-            placeholder="Select date & time"
+            v-model="formData.pickingDate"
+            type="date"
+            placeholder="Select date"
             style="width: 100%"
+            value-format="YYYY-MM-DD"
           />
         </el-form-item>
-        <el-form-item label="Location" prop="location">
-          <el-input v-model="formData.location" placeholder="Please enter the location" />
+        <el-form-item label="Processing Date" prop="procDate">
+          <el-date-picker
+            v-model="formData.procDate"
+            type="date"
+            placeholder="Select date"
+            style="width: 100%"
+            value-format="YYYY-MM-DD"
+          />
         </el-form-item>
-        <el-form-item label="Responsible" prop="responsible">
-          <el-input v-model="formData.responsible" placeholder="Please enter the responsible person" />
+        <el-form-item label="Certification" prop="certification">
+          <el-input v-model="formData.certification" placeholder="e.g. ISO9001, Green Food" />
         </el-form-item>
         <el-form-item label="Description" prop="description">
           <el-input
@@ -94,16 +105,17 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import {
   getMerchantProducts,
   getProductTrackability,
-  createTrackability,
-  updateTrackability,
+  saveOrUpdateTrackability,
   deleteTrackability
 } from '@/api/merchant'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
+const userStore = useUserStore()
 const formRef = ref(null)
 const loading = ref(false)
 const saving = ref(false)
@@ -116,24 +128,33 @@ const trackabilityList = ref([])
 
 const formData = reactive({
   id: null,
-  stage: '',
-  time: '',
-  location: '',
-  responsible: '',
+  prodId: null,
+  origin: '',
+  plantingMethod: '',
+  pickingDate: '',
+  procDate: '',
+  certification: '',
   description: ''
 })
 
 const rules = {
-  stage: [{ required: true, message: 'Please enter the stage', trigger: 'blur' }],
-  time: [{ required: true, message: 'Please select the time', trigger: 'change' }],
-  location: [{ required: true, message: 'Please enter the location', trigger: 'blur' }],
-  responsible: [{ required: true, message: 'Please enter the responsible person', trigger: 'blur' }]
+  prodId: [{ required: true, message: 'Please select a product', trigger: 'change' }],
+  origin: [{ required: true, message: 'Please enter the origin', trigger: 'blur' }]
 }
 
 const fetchProducts = async () => {
   try {
-    const res = await getMerchantProducts({ page: 0, size: 100 })
-    products.value = res.data.content
+    const merchId = userStore.userId
+    const res = await getMerchantProducts({ 
+      current: 1, 
+      size: 100, 
+      merchId 
+    })
+    // Backend returns IPage for merchant products
+    products.value = (res.data.records || []).map(item => ({
+      ...item,
+      id: item.id ?? item.prodId ?? item.productId
+    }))
     
     // If the URL includes a product ID, auto-select it
     const productId = route.params.id
@@ -152,9 +173,17 @@ const fetchTrackability = async () => {
   loading.value = true
   try {
     const res = await getProductTrackability(selectedProductId.value)
-    trackabilityList.value = res.data || []
+    // The backend returns a single ProductTrackability object or null
+    // Make sure we handle potential error codes or empty data
+    if (res.code === 200 && res.data) {
+      trackabilityList.value = [res.data]
+    } else {
+      trackabilityList.value = []
+    }
   } catch (error) {
-    ElMessage.error('Failed to load records')
+    // If it's just "not found", we shouldn't show an error message as the merchant might just not have created one yet
+    trackabilityList.value = []
+    console.log('No trackability record found')
   } finally {
     loading.value = false
   }
@@ -162,23 +191,22 @@ const fetchTrackability = async () => {
 
 const handleAdd = () => {
   isEdit.value = false
-  formData.id = null
-  formData.stage = ''
-  formData.time = ''
-  formData.location = ''
-  formData.responsible = ''
-  formData.description = ''
+  Object.assign(formData, {
+    id: null,
+    prodId: selectedProductId.value,
+    origin: '',
+    plantingMethod: '',
+    pickingDate: '',
+    procDate: '',
+    certification: '',
+    description: ''
+  })
   dialogVisible.value = true
 }
 
 const handleEdit = (row) => {
   isEdit.value = true
-  formData.id = row.id
-  formData.stage = row.stage
-  formData.time = row.time
-  formData.location = row.location
-  formData.responsible = row.responsible
-  formData.description = row.description
+  Object.assign(formData, row)
   dialogVisible.value = true
 }
 
@@ -189,20 +217,12 @@ const handleSubmit = async () => {
   saving.value = true
   try {
     const data = {
-      stage: formData.stage,
-      time: formData.time,
-      location: formData.location,
-      responsible: formData.responsible,
-      description: formData.description
+      ...formData,
+      prodId: selectedProductId.value
     }
 
-    if (isEdit.value) {
-      await updateTrackability(formData.id, data)
-      ElMessage.success('Updated successfully')
-    } else {
-      await createTrackability(selectedProductId.value, data)
-      ElMessage.success('Added successfully')
-    }
+    await saveOrUpdateTrackability(data)
+    ElMessage.success(isEdit.value ? 'Updated successfully' : 'Added successfully')
     
     dialogVisible.value = false
     fetchTrackability()
@@ -219,9 +239,20 @@ const handleDelete = async (row) => {
       type: 'warning'
     })
     
-    await deleteTrackability(row.id)
+    await deleteTrackability(selectedProductId.value)
     ElMessage.success('Deleted successfully')
-    fetchTrackability()
+    // Clear the lists and form immediately
+    trackabilityList.value = []
+    Object.assign(formData, {
+      id: null,
+      prodId: selectedProductId.value,
+      origin: '',
+      plantingMethod: '',
+      pickingDate: '',
+      procDate: '',
+      certification: '',
+      description: ''
+    })
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error(error.message || 'Delete failed')

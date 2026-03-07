@@ -37,7 +37,17 @@
             </el-form-item>
 
             <el-form-item label="Business Hours" prop="businessHours">
-              <el-input v-model="formData.businessHours" :disabled="!isEditing" placeholder="e.g. 9:00-22:00" />
+              <el-time-picker
+                v-model="timeRange"
+                is-range
+                range-separator="To"
+                start-placeholder="Start time"
+                end-placeholder="End time"
+                format="HH:mm"
+                value-format="HH:mm"
+                :disabled="!isEditing"
+                @change="handleTimeChange"
+              />
             </el-form-item>
           </el-col>
 
@@ -95,6 +105,7 @@ const userStore = useUserStore()
 const formRef = ref(null)
 const isEditing = ref(false)
 const saving = ref(false)
+const timeRange = ref([])
 
 const formData = reactive({
   merchId: null,
@@ -138,6 +149,14 @@ const handleLogoChange = (file) => {
   reader.readAsDataURL(file.raw)
 }
 
+const handleTimeChange = (val) => {
+  if (val && val.length === 2) {
+    formData.businessHours = `${val[0]}-${val[1]}`
+  } else {
+    formData.businessHours = ''
+  }
+}
+
 const handleEdit = () => {
   isEditing.value = true
   // Create a deep copy to avoid reference issues
@@ -149,6 +168,11 @@ const handleCancel = () => {
   isEditing.value = false
   if (originalData.value) {
     Object.assign(formData, originalData.value)
+    if (formData.businessHours && formData.businessHours.includes('-')) {
+      timeRange.value = formData.businessHours.split('-')
+    } else {
+      timeRange.value = []
+    }
   }
 }
 
@@ -195,6 +219,13 @@ const fetchProfile = async () => {
     if (res.data) {
       Object.assign(formData, res.data)
       formData.statusText = res.data.status === 'ACTIVE' ? 'Open' : 'Frozen'
+      
+      if (res.data.businessHours && res.data.businessHours.includes('-')) {
+        timeRange.value = res.data.businessHours.split('-')
+      } else {
+        timeRange.value = []
+      }
+      
       console.log('Profile updated in state:', formData)
     }
   } catch (error) {
