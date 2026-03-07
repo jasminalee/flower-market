@@ -44,59 +44,61 @@
             {{ formatDate(row.createDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="360" fixed="right">
+        <el-table-column label="Actions" min-width="280" fixed="right">
           <template #default="{ row }">
-            <el-button 
-              type="primary" 
-              plain
-              size="small"
-              icon="View" 
-              @click="handleView(row.merchId)"
-            >
-              View
-            </el-button>
-            <template v-if="row.status === 'PENDING'">
+            <div class="operation-buttons">
               <el-button 
-                type="success" 
+                type="primary" 
                 plain
                 size="small"
-                icon="Check" 
-                @click="handleAudit(row.merchId, 'ACTIVE')"
+                icon="View" 
+                @click="handleView(row.merchId)"
               >
-                Approve
+                View
               </el-button>
-              <el-button 
-                type="danger" 
-                plain
-                size="small"
-                icon="Close" 
-                @click="handleAudit(row.merchId, 'REJECTED')"
-              >
-                Reject
-              </el-button>
-            </template>
-            <template v-if="row.status === 'ACTIVE'">
-              <el-button 
-                type="warning" 
-                plain
-                size="small"
-                icon="VideoPause" 
-                @click="handleToggleStatus(row.merchId, 'SUSPENDED')"
-              >
-                Suspend
-              </el-button>
-            </template>
-            <template v-if="row.status === 'SUSPENDED'">
-              <el-button 
-                type="success" 
-                plain
-                size="small"
-                icon="VideoPlay" 
-                @click="handleToggleStatus(row.merchId, 'ACTIVE')"
-              >
-                Enable
-              </el-button>
-            </template>
+              <template v-if="row.status === 'PENDING'">
+                <el-button 
+                  type="success" 
+                  plain
+                  size="small"
+                  icon="Check" 
+                  @click="handleAudit(row.merchId, 'ACTIVE')"
+                >
+                  Approve
+                </el-button>
+                <el-button 
+                  type="danger" 
+                  plain
+                  size="small"
+                  icon="Close" 
+                  @click="handleAudit(row.merchId, 'REJECTED')"
+                >
+                  Reject
+                </el-button>
+              </template>
+              <template v-if="row.status === 'ACTIVE'">
+                <el-button 
+                  type="warning" 
+                  plain
+                  size="small"
+                  icon="VideoPause" 
+                  @click="handleToggleStatus(row.merchId, 'SUSPENDED')"
+                >
+                  Suspend
+                </el-button>
+              </template>
+              <template v-if="row.status === 'SUSPENDED'">
+                <el-button 
+                  type="success" 
+                  plain
+                  size="small"
+                  icon="VideoPlay" 
+                  @click="handleToggleStatus(row.merchId, 'ACTIVE')"
+                >
+                  Enable
+                </el-button>
+              </template>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -280,5 +282,10 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+.operation-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
 }
 </style>

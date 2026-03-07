@@ -45,35 +45,37 @@
           </template>
         </el-table-column>
         <el-table-column prop="createDate" label="Create Date" width="170" />
-        <el-table-column label="Actions" width="200" fixed="right">
+        <el-table-column label="Actions" min-width="260" fixed="right">
           <template #default="scope">
-            <el-button 
-              type="primary" 
-              plain
-              size="small"
-              icon="Edit" 
-              @click="handleUpdate(scope.row)"
-            >
-              Edit
-            </el-button>
-            <el-button 
-              :type="scope.row.status === 'ACTIVE' ? 'warning' : 'success'" 
-              plain
-              size="small"
-              :icon="scope.row.status === 'ACTIVE' ? 'VideoPause' : 'VideoPlay'"
-              @click="toggleStatus(scope.row)"
-            >
-              {{ scope.row.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
-            </el-button>
-            <el-button 
-              type="danger" 
-              plain
-              size="small"
-              icon="Delete" 
-              @click="handleDelete(scope.row)"
-            >
-              Delete
-            </el-button>
+            <div class="operation-buttons">
+              <el-button 
+                type="primary" 
+                plain
+                size="small"
+                icon="Edit" 
+                @click="handleUpdate(scope.row)"
+              >
+                Edit
+              </el-button>
+              <el-button 
+                :type="scope.row.status === 'ACTIVE' ? 'warning' : 'success'" 
+                plain
+                size="small"
+                :icon="scope.row.status === 'ACTIVE' ? 'VideoPause' : 'VideoPlay'"
+                @click="toggleStatus(scope.row)"
+              >
+                {{ scope.row.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+              </el-button>
+              <el-button 
+                type="danger" 
+                plain
+                size="small"
+                icon="Delete" 
+                @click="handleDelete(scope.row)"
+              >
+                Delete
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -292,5 +294,10 @@ onMounted(() => {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+.operation-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
 }
 </style>

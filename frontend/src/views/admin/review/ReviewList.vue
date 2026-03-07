@@ -80,37 +80,39 @@
             <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="200" fixed="right">
+        <el-table-column label="Actions" min-width="260" fixed="right">
           <template #default="{ row }">
-            <el-button 
-              type="primary" 
-              plain
-              size="small"
-              icon="View" 
-              @click="handleViewDetail(row)"
-            >
-              Details
-            </el-button>
-            <template v-if="isPendingStatus(row.status)">
+            <div class="operation-buttons">
               <el-button 
-                type="success" 
+                type="primary" 
                 plain
                 size="small"
-                icon="Check" 
-                @click="handleAudit(row.id, 'APPROVED')"
+                icon="View" 
+                @click="handleViewDetail(row)"
               >
-                Approve
+                Details
               </el-button>
-              <el-button 
-                type="danger" 
-                plain
-                size="small"
-                icon="Close" 
-                @click="handleAudit(row.id, 'REJECTED')"
-              >
-                Reject
-              </el-button>
-            </template>
+              <template v-if="isPendingStatus(row.status)">
+                <el-button 
+                  type="success" 
+                  plain
+                  size="small"
+                  icon="Check" 
+                  @click="handleAudit(row.id, 'APPROVED')"
+                >
+                  Approve
+                </el-button>
+                <el-button 
+                  type="danger" 
+                  plain
+                  size="small"
+                  icon="Close" 
+                  @click="handleAudit(row.id, 'REJECTED')"
+                >
+                  Reject
+                </el-button>
+              </template>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -430,5 +432,10 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+.operation-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
 }
 </style>
