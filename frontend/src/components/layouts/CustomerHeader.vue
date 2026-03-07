@@ -38,31 +38,38 @@
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item v-if="userStore.userType === 'ADMIN'" command="dashboard">
+                  <!-- Common Options based on Role -->
+                  <el-dropdown-item v-if="userStore.isAdmin" command="dashboard">
                     <el-icon><Monitor /></el-icon>
                     Admin Dashboard
                   </el-dropdown-item>
-                  <el-dropdown-item v-else-if="userStore.userType === 'MERCHANT'" command="dashboard">
+                  <el-dropdown-item v-else-if="userStore.isMerchant" command="dashboard">
                     <el-icon><Shop /></el-icon>
                     Merchant Center
                   </el-dropdown-item>
-                  <el-dropdown-item v-else command="profile">
+                  
+                  <!-- Profile (Visible to everyone) -->
+                  <el-dropdown-item command="profile">
                     <el-icon><User /></el-icon>
                     Profile
                   </el-dropdown-item>
                   
-                  <el-dropdown-item v-if="userStore.userType === 'CUSTOMER'" command="orders">
-                    <el-icon><DocumentCopy /></el-icon>
-                    My Orders
-                  </el-dropdown-item>
-                  <el-dropdown-item v-if="userStore.userType === 'CUSTOMER'" command="favorites">
-                    <el-icon><StarFilled /></el-icon>
-                    My Favorites
-                  </el-dropdown-item>
-                  <el-dropdown-item v-if="userStore.userType === 'CUSTOMER'" command="coupons">
-                    <el-icon><Ticket /></el-icon>
-                    My Coupons
-                  </el-dropdown-item>
+                  <!-- Customer Specific Options -->
+                  <template v-if="userStore.isCustomer">
+                    <el-dropdown-item command="orders">
+                      <el-icon><DocumentCopy /></el-icon>
+                      My Orders
+                    </el-dropdown-item>
+                    <el-dropdown-item command="favorites">
+                      <el-icon><StarFilled /></el-icon>
+                      My Favorites
+                    </el-dropdown-item>
+                    <el-dropdown-item command="coupons">
+                      <el-icon><Ticket /></el-icon>
+                      My Coupons
+                    </el-dropdown-item>
+                  </template>
+                  
                   <el-dropdown-item divided command="logout">
                     <el-icon><SwitchButton /></el-icon>
                     Log out
