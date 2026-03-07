@@ -1,26 +1,38 @@
 <template>
   <div class="config-list">
-    <h2 class="page-title">System Configuration</h2>
-
-    <!-- Configuration group tabs -->
-    <el-tabs v-model="activeCategory" @tab-change="handleCategoryChange" class="tabs">
-      <el-tab-pane label="Basic Settings" name="basic" />
-      <el-tab-pane label="Contact Info" name="contact" />
-      <el-tab-pane label="Points Reward" name="reward" />
-      <el-tab-pane label="Shipping" name="shipping" />
-      <el-tab-pane label="Order Settings" name="order" />
-      <el-tab-pane label="Review Settings" name="review" />
-      <el-tab-pane label="Shopping Cart" name="cart" />
-      <el-tab-pane label="Upload Settings" name="upload" />
-    </el-tabs>
+    <div class="page-header">
+      <h2 class="page-title">System Configuration</h2>
+      <div class="header-actions">
+        <el-select
+          v-model="activeCategory"
+          style="width: 200px"
+          @change="handleCategoryChange"
+          placeholder="Filter Category"
+        >
+          <el-option label="Basic Settings" value="basic" />
+          <el-option label="Contact Info" value="contact" />
+          <el-option label="Points Reward" value="reward" />
+          <el-option label="Shipping" value="shipping" />
+          <el-option label="Order Settings" value="order" />
+          <el-option label="Review Settings" value="review" />
+          <el-option label="Shopping Cart" value="cart" />
+          <el-option label="Upload Settings" value="upload" />
+        </el-select>
+      </div>
+    </div>
 
     <!-- Configuration table -->
     <el-card shadow="never" class="table-card">
       <el-table :data="configList" v-loading="loading" style="width: 100%">
         <el-table-column prop="configKey" label="Config Key" width="250" />
-        <el-table-column prop="configValue" label="Config Value" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="description" label="Description" min-width="250" />
-        <el-table-column label="Action" width="120" fixed="right">
+        <el-table-column prop="configValue" label="Value" min-width="200">
+          <template #default="{ row }">
+            <el-tag v-if="!row.configValue" type="info">Not Set</el-tag>
+            <span v-else class="config-value">{{ row.configValue }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="description" label="Description" min-width="250" show-overflow-tooltip />
+        <el-table-column label="Action" width="100" fixed="right" align="center">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleEdit(row)">Edit</el-button>
           </template>
@@ -29,13 +41,13 @@
     </el-card>
 
     <!-- Edit configuration dialog -->
-    <el-dialog v-model="dialogVisible" title="Edit Configuration" width="600px">
-      <el-form :model="formData" :rules="rules" ref="formRef" label-width="100px">
+    <el-dialog v-model="dialogVisible" title="Edit Configuration" width="500px" destroy-on-close>
+      <el-form :model="formData" :rules="rules" ref="formRef" label-position="top">
         <el-form-item label="Config Key">
           <el-input v-model="formData.configKey" disabled />
         </el-form-item>
         <el-form-item label="Config Value" prop="configValue">
-          <el-input v-model="formData.configValue" placeholder="Please enter config value" />
+          <el-input v-model="formData.configValue" placeholder="Please enter config value" clearable />
         </el-form-item>
         <el-form-item label="Description">
           <el-input v-model="formData.description" type="textarea" :rows="3" disabled />
@@ -43,7 +55,7 @@
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="handleSave" :loading="submitting">Save</el-button>
+        <el-button type="primary" @click="handleSave" :loading="submitting">Save Changes</el-button>
       </template>
     </el-dialog>
   </div>
@@ -128,21 +140,46 @@ onMounted(() => {
 
 <style scoped>
 .config-list {
-  padding: 20px;
+  padding: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
 .page-title {
-  margin: 0 0 20px;
+  margin: 0;
   font-size: 24px;
-  font-weight: 500;
-  color: #303133;
-}
-
-.tabs {
-  margin-bottom: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
 .table-card {
-  margin-bottom: 20px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.config-value {
+  font-family: monospace;
+  background: #f8fafc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #409eff;
+}
+
+:deep(.el-table__header) {
+  th {
+    background-color: #f8fafc !important;
+    color: #475569;
+    font-weight: 600;
+  }
+}
+
+:deep(.el-form-item__label) {
+  font-weight: 600;
 }
 </style>

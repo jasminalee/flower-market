@@ -1,20 +1,23 @@
 <template>
-  <div class="product-list">
-    <div class="header-actions">
-      <el-button type="primary" @click="handleAdd">
-        <el-icon><Plus /></el-icon>
-        Add Product
-      </el-button>
+  <div class="product-list-container">
+    <div class="page-header">
+      <h2 class="page-title">Product Management</h2>
+      <div class="header-actions">
+        <el-button type="primary" @click="handleAdd" class="add-btn">
+          <el-icon><Plus /></el-icon>
+          Add New Product
+        </el-button>
+      </div>
     </div>
 
     <!-- Search filters -->
-    <el-card class="search-card">
-      <el-form :inline="true" :model="searchForm">
+    <el-card shadow="never" class="search-card">
+      <el-form :inline="true" :model="searchForm" class="filter-form">
         <el-form-item label="Product Name">
-          <el-input v-model="searchForm.name" placeholder="Enter product name" clearable />
+          <el-input v-model="searchForm.name" placeholder="Search by name..." clearable @keyup.enter="handleSearch" style="width: 220px" />
         </el-form-item>
         <el-form-item label="Category">
-          <el-select v-model="searchForm.catId" placeholder="Select category" clearable>
+          <el-select v-model="searchForm.catId" placeholder="All Categories" clearable style="width: 180px">
             <el-option 
               v-for="cat in categories" 
               :key="cat.cateId" 
@@ -24,12 +27,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Status">
-          <el-select v-model="searchForm.status" placeholder="Select status" clearable>
+          <el-select v-model="searchForm.status" placeholder="All Status" clearable style="width: 150px">
             <el-option label="On Sale" value="ACTIVE" />
             <el-option label="Off Sale" value="INACTIVE" />
           </el-select>
         </el-form-item>
-        <el-form-item>
+        <el-form-item class="form-actions">
           <el-button type="primary" @click="handleSearch">Search</el-button>
           <el-button @click="handleReset">Reset</el-button>
         </el-form-item>
@@ -37,63 +40,68 @@
     </el-card>
 
     <!-- Product table -->
-    <el-card>
+    <el-card shadow="never" class="table-card">
       <el-table :data="tableData" v-loading="loading" style="width: 100%">
-        <el-table-column label="Product Image" width="100">
+        <el-table-column label="Product" min-width="250">
           <template #default="{ row }">
-            <el-image
-              :src="row.image"
-              fit="cover"
-              style="width: 60px; height: 60px; border-radius: 4px"
-              :preview-src-list="[row.image]"
-              :preview-teleported="true"
-              @error="onImageError(row)"
-              @load="onImageLoad(row)"
-              crossorigin="anonymous"
-            >
-              <template #placeholder>
-                <div class="image-placeholder">Loading...</div>
-              </template>
-              <template #error>
-                <div class="image-error">Failed</div>
-              </template>
-            </el-image>
+            <div class="product-info-cell">
+              <el-image
+                :src="row.image"
+                fit="cover"
+                class="product-thumb"
+                :preview-src-list="[row.image]"
+                :preview-teleported="true"
+                crossorigin="anonymous"
+              >
+                <template #error>
+                  <div class="image-error-slot">
+                    <el-icon><Picture /></el-icon>
+                  </div>
+                </template>
+              </el-image>
+              <div class="product-details">
+                <div class="product-name">{{ row.name }}</div>
+                <div class="product-cat-tag">{{ row.categoryText }}</div>
+              </div>
+            </div>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="Product Name" min-width="150" />
-        <el-table-column prop="categoryText" label="Category" width="100" />
-        <el-table-column prop="price" label="Price" width="100">
+        <el-table-column prop="price" label="Price" width="120">
           <template #default="{ row }">
-            ¥{{ row.price }}
+            <span class="price-value">¥{{ row.price }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="stock" label="Stock" width="80" />
-        <el-table-column label="Status" width="100">
+        <el-table-column prop="stock" label="Stock" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'">
+            <span :class="['stock-count', { 'low-stock': row.stock < 10 }]">{{ row.stock }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Status" width="120" align="center">
+          <template #default="{ row }">
+            <el-tag :type="row.status === 'ACTIVE' ? 'success' : 'info'" effect="light">
               {{ row.statusText }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="300" fixed="right">
+        <el-table-column label="Actions" width="280" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button type="primary" link icon="Edit" @click="handleEdit(row)">Edit</el-button>
+            <el-button type="primary" link @click="handleEdit(row)">Edit</el-button>
             <el-button
               :type="row.status === 'ACTIVE' ? 'warning' : 'success'"
               link
-              :icon="row.status === 'ACTIVE' ? 'Bottom' : 'Top'"
               @click="handleToggleStatus(row)"
             >
-              {{ row.status === 'ACTIVE' ? 'Off Sale' : 'On Sale' }}
+              {{ row.status === 'ACTIVE' ? 'Hide' : 'Show' }}
             </el-button>
-            <el-button type="info" link icon="Search" @click="handleTrackability(row)">Traceability</el-button>
-            <el-button type="danger" link icon="Delete" @click="handleDelete(row)">Delete</el-button>
+            <el-button type="info" link @click="handleTrackability(row)">Trace</el-button>
+            <el-divider direction="vertical" />
+            <el-button type="danger" link @click="handleDelete(row)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- Pagination -->
-      <div class="pagination">
+      <div class="pagination-footer">
         <el-pagination
           v-model:current-page="pagination.page"
           v-model:page-size="pagination.size"
@@ -282,43 +290,111 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.product-list {
-  padding: 20px;
+.product-list-container {
+  padding: 0;
 }
 
-.header-actions {
-  margin-bottom: 20px;
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
 }
 
 .search-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   margin-bottom: 20px;
 }
 
-.pagination {
-  margin-top: 20px;
+.table-card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.product-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: 8px;
+  background-color: #f1f5f9;
+  flex-shrink: 0;
+}
+
+.product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.product-name {
+  font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-cat-tag {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.price-value {
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.stock-count {
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.low-stock {
+  color: #f59e0b;
+}
+
+.image-error-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #cbd5e1;
+  font-size: 20px;
+}
+
+.pagination-footer {
+  margin-top: 24px;
   display: flex;
   justify-content: flex-end;
 }
 
-.image-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  background: #f5f5f5;
-  color: #999;
+:deep(.el-table__header) {
+  th {
+    background-color: #f8fafc !important;
+    color: #475569;
+    font-weight: 600;
+  }
 }
 
-.image-error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  background: #f5f5f5;
-  color: #909399;
-  font-size: 12px;
+:deep(.el-button--link) {
+  padding: 4px 8px;
 }
 </style>
 
