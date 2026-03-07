@@ -47,6 +47,12 @@ public class Constants {
     public static final String ORDER_STATUS_COMPLETED = "COMPLETED";
     /** Order cancelled */
     public static final String ORDER_STATUS_CANCELLED = "CANCELLED";
+    /** Refund applied */
+    public static final String ORDER_STATUS_REFUND_APPLIED = "REFUND_APPLIED";
+    /** Refunded and transaction closed */
+    public static final String ORDER_STATUS_REFUNDED = "REFUNDED";
+    /** Refund application rejected */
+    public static final String ORDER_STATUS_REFUND_REJECTED = "REFUND_REJECTED";
 
     /**
      * Payment statuses.

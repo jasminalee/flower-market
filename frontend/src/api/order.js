@@ -64,6 +64,27 @@ export const shipOrder = (id, data) => {
   })
 }
 
+// User refund request
+export const applyRefund = (id, reason) => {
+  return request({
+    url: `/api/orders/${id}/refund/apply`,
+    method: 'put',
+    params: { reason }
+  })
+}
+
+// Audit refund (admin/merchant)
+export const auditRefund = (id, params) => {
+  return request({
+    url: `/api/orders/${id}/refund/audit`,
+    method: 'put',
+    params: {
+      approved: params.approved,
+      remark: params.remark
+    }
+  })
+}
+
 // Order item list
 export const getOrderItemList = (params) => {
   return request({

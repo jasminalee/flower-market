@@ -73,8 +73,31 @@
         </el-card>
       </el-col>
 
-      <!-- Recent Registered Merchants -->
+      <!-- Top Selling Products (Global) -->
       <el-col :span="12">
+        <el-card shadow="hover">
+          <template #header>
+            <div class="card-header">
+              <span>Top Selling Products (Global)</span>
+              <el-button type="primary" link @click="$router.push('/admin/merchants')">View All Merchants</el-button>
+            </div>
+          </template>
+          <el-table :data="topProducts" style="width: 100%" v-loading="loading">
+            <el-table-column type="index" label="Rank" width="60" />
+            <el-table-column prop="name" label="Product Name" />
+            <el-table-column prop="sales" label="Total Sales" width="120">
+              <template #default="{ row }">
+                <span style="font-weight: bold; color: #f56c6c">{{ row.sales }}</span> Units
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="20" class="content-row">
+      <!-- Recent Registered Merchants -->
+      <el-col :span="24">
         <el-card shadow="hover">
           <template #header>
             <div class="card-header">
@@ -84,13 +107,13 @@
           </template>
           <el-table :data="recentMerchants" style="width: 100%" v-loading="loading">
             <el-table-column prop="name" label="Store Name" />
-            <el-table-column prop="phone" label="Contact Phone" width="120" />
-            <el-table-column prop="status" label="Status" width="80">
+            <el-table-column prop="phone" label="Contact Phone" width="150" />
+            <el-table-column prop="status" label="Status" width="120">
               <template #default="{ row }">
                 <el-tag :type="getMerchantStatusType(row.status)">{{ getMerchantStatusText(row.status) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="createDate" label="Registration Time" width="160">
+            <el-table-column prop="createDate" label="Registration Time" width="180">
               <template #default="{ row }">
                 {{ formatDate(row.createDate) }}
               </template>
@@ -140,6 +163,7 @@ const stats = ref({
 const recentUsers = ref([])
 const recentMerchants = ref([])
 const orderTrend = ref([])
+const topProducts = ref([])
 
 // Calculate Maximum Order Count
 const maxOrderCount = computed(() => {
@@ -159,6 +183,7 @@ const fetchDashboardData = async () => {
     recentUsers.value = data.recentUsers
     recentMerchants.value = data.recentMerchants
     orderTrend.value = data.orderTrend
+    topProducts.value = data.topProducts || []
   } catch (error) {
     ElMessage.error('Failed to load data')
   } finally {

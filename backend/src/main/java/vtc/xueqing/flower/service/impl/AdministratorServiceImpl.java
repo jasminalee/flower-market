@@ -10,15 +10,23 @@ import vtc.xueqing.flower.entity.Administrator;
 import vtc.xueqing.flower.entity.Customer;
 import vtc.xueqing.flower.entity.Merchant;
 import vtc.xueqing.flower.entity.CareKnowledge;
+import vtc.xueqing.flower.entity.Order;
+import vtc.xueqing.flower.entity.OrderItem;
 import vtc.xueqing.flower.mapper.AdministratorMapper;
 import vtc.xueqing.flower.mapper.CareKnowledgeMapper;
 import vtc.xueqing.flower.mapper.CustomerMapper;
 import vtc.xueqing.flower.mapper.MerchantMapper;
 import vtc.xueqing.flower.mapper.OrderMapper;
+import vtc.xueqing.flower.mapper.OrderItemMapper;
 import vtc.xueqing.flower.service.AdministratorService;
 import vtc.xueqing.flower.vo.OrderVO;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Administrator Service Implementation Class
@@ -37,6 +45,9 @@ public class AdministratorServiceImpl implements AdministratorService {
     
     @Resource
     private OrderMapper orderMapper;
+    
+    @Resource
+    private OrderItemMapper orderItemMapper;
     
     @Resource
     private CareKnowledgeMapper careKnowledgeMapper;
@@ -179,9 +190,18 @@ public class AdministratorServiceImpl implements AdministratorService {
         Long totalMerchants = merchantMapper.selectCount(null);
         stats.put("totalMerchants", totalMerchants);
         
-        // Total order count and total sales (requires OrderMapper)
-        stats.put("totalOrders", 0);
-        stats.put("totalSales", "0.00");
+        // Total order count and total sales
+        LambdaQueryWrapper<Order> orderWrapper = new LambdaQueryWrapper<>();
+        orderWrapper.ne(Order::getStatus, "CANCELLED");
+        List<Order> allOrders = orderMapper.selectList(orderWrapper);
+        
+        long totalOrders = allOrders.size();
+        java.math.BigDecimal totalSales = allOrders.stream()
+                .map(Order::getTotalPrice)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        
+        stats.put("totalOrders", totalOrders);
+        stats.put("totalSales", totalSales.setScale(2, java.math.RoundingMode.HALF_UP).toString());
         
         result.put("stats", stats);
         
@@ -203,17 +223,57 @@ public class AdministratorServiceImpl implements AdministratorService {
         recentMerchants.forEach(m -> m.setPassword(null));
         result.put("recentMerchants", recentMerchants);
         
-        // 4. Order trend (last 7 days) - Simplified implementation, return mock data
+        // 4. Order trend (last 7 days)
         java.util.List<java.util.Map<String, Object>> orderTrend = new java.util.ArrayList<>();
         java.time.LocalDate today = java.time.LocalDate.now();
         for (int i = 6; i >= 0; i--) {
             java.util.Map<String, Object> dayData = new java.util.HashMap<>();
             java.time.LocalDate date = today.minusDays(i);
+            java.time.LocalDateTime dayStart = date.atStartOfDay();
+            java.time.LocalDateTime dayEnd = date.plusDays(1).atStartOfDay();
+            
+            LambdaQueryWrapper<Order> dayWrapper = new LambdaQueryWrapper<>();
+            dayWrapper.ge(Order::getOrderDate, dayStart)
+                      .lt(Order::getOrderDate, dayEnd)
+                      .ne(Order::getStatus, "CANCELLED");
+            
+            Long count = orderMapper.selectCount(dayWrapper);
+            
             dayData.put("date", date.format(java.time.format.DateTimeFormatter.ofPattern("MM-dd")));
-            dayData.put("count", 0); // Actually should query database
+            dayData.put("count", count);
             orderTrend.add(dayData);
         }
         result.put("orderTrend", orderTrend);
+
+        // 5. Integration of Global TOP products (Heat Analysis)
+        List<Map<String, Object>> topProducts = new ArrayList<>();
+        // Query completed orders to calculate sales
+        LambdaQueryWrapper<Order> completedWrapper = new LambdaQueryWrapper<>();
+        completedWrapper.eq(Order::getStatus, "COMPLETED");
+        List<Order> completedOrders = orderMapper.selectList(completedWrapper);
+        
+        if (!completedOrders.isEmpty()) {
+            List<Long> orderIds = completedOrders.stream().map(Order::getId).collect(Collectors.toList());
+            LambdaQueryWrapper<OrderItem> itemWrapper = new LambdaQueryWrapper<>();
+            itemWrapper.in(OrderItem::getOrderId, orderIds);
+            List<OrderItem> items = orderItemMapper.selectList(itemWrapper);
+            
+            Map<Long, Map<String, Object>> productStats = new HashMap<>();
+            for (OrderItem item : items) {
+                Long prodId = item.getProdId();
+                productStats.putIfAbsent(prodId, new HashMap<>());
+                Map<String, Object> stat = productStats.get(prodId);
+                stat.put("name", item.getName());
+                int sales = (int) stat.getOrDefault("sales", 0) + item.getQuantity();
+                stat.put("sales", sales);
+            }
+            
+            topProducts = productStats.values().stream()
+                .sorted((a, b) -> Integer.compare((int)b.get("sales"), (int)a.get("sales")))
+                .limit(5)
+                .collect(Collectors.toList());
+        }
+        result.put("topProducts", topProducts);
         
         return result;
     }

@@ -9,6 +9,8 @@
       <el-tab-pane label="Pending Shipment" name="PAID" />
       <el-tab-pane label="Pending Receipt" name="SHIPPED" />
       <el-tab-pane label="Completed" name="COMPLETED" />
+      <el-tab-pane label="Refund Applied" name="REFUND_APPLIED" />
+      <el-tab-pane label="Refunded" name="REFUNDED" />
       <el-tab-pane label="Cancelled" name="CANCELLED" />
     </el-tabs>
 
@@ -46,9 +48,31 @@
             {{ formatDate(row.orderDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="130" fixed="right">
+        <el-table-column label="Actions" min-width="260" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" link @click="handleViewDetail(row.id)">View</el-button>
+            <div class="operation-buttons">
+              <el-button type="primary" plain size="small" icon="View" @click="handleViewDetail(row.id)">Details</el-button>
+              <el-button 
+                v-if="row.status === 'REFUND_APPLIED'" 
+                type="success" 
+                plain
+                size="small" 
+                icon="Check"
+                @click="handleAudit(row, true)"
+              >
+                Approve
+              </el-button>
+              <el-button 
+                v-if="row.status === 'REFUND_APPLIED'" 
+                type="danger" 
+                plain
+                size="small" 
+                icon="Close"
+                @click="handleAudit(row, false)"
+              >
+                Reject
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -110,9 +134,11 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import request from '@/utils/request'
 import { formatDate } from '@/utils/format'
+import { auditRefund } from '@/api/order'
+import { View, Check, Close } from '@element-plus/icons-vue'
 
 const loading = ref(false)
 const detailLoading = ref(false)
@@ -155,6 +181,35 @@ const fetchOrderList = async () => {
     ElMessage.error('Failed to load orders')
   } finally {
     loading.value = false
+  }
+}
+
+// Handle refund audit logic
+const handleAudit = async (row, approved) => {
+  const action = approved ? 'Approve' : 'Reject'
+  const remarkPrompt = approved ? 'Optional audit remark:' : 'Please enter rejection reason (required):'
+
+  try {
+    const { value: auditRemark } = await ElMessageBox.prompt(remarkPrompt, `${action} Refund`, {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      inputPlaceholder: approved ? 'Default: Approved' : 'Please enter why you rejected this refund',
+      inputValidator: (val) => {
+        if (!approved && (!val || val.trim() === '')) {
+          return 'Reason is required for rejection'
+        }
+        return true
+      }
+    })
+
+    await auditRefund(row.id, approved, auditRemark || (approved ? 'Approved' : ''))
+    ElMessage.success(`Refund ${action}d successfully`)
+    fetchOrderList()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error(error)
+      ElMessage.error(`Failed to ${action.toLowerCase()} refund`)
+    }
   }
 }
 
@@ -201,7 +256,10 @@ const getStatusType = (status) => {
     PAID: 'primary',
     SHIPPED: 'info',
     COMPLETED: 'success',
-    CANCELLED: 'danger'
+    CANCELLED: 'danger',
+    REFUND_APPLIED: 'warning',
+    REFUNDED: 'info',
+    REFUND_REJECTED: 'danger'
   }
   return map[status] || 'info'
 }
@@ -213,7 +271,10 @@ const getStatusText = (status) => {
     PAID: 'Pending Shipment',
     SHIPPED: 'Pending Receipt',
     COMPLETED: 'Completed',
-    CANCELLED: 'Cancelled'
+    CANCELLED: 'Cancelled',
+    REFUND_APPLIED: 'Refund Applied',
+    REFUNDED: 'Refunded',
+    REFUND_REJECTED: 'Refund Rejected'
   }
   return map[status] || 'Unknown'
 }

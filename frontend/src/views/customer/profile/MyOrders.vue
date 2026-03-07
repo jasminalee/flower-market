@@ -15,6 +15,8 @@
           <el-radio-button label="PAID">Pending Shipment</el-radio-button>
           <el-radio-button label="SHIPPED">Pending Receipt</el-radio-button>
           <el-radio-button label="COMPLETED">Completed</el-radio-button>
+          <el-radio-button label="REFUND_APPLIED">Refunding</el-radio-button>
+          <el-radio-button label="REFUNDED">Refunded</el-radio-button>
           <el-radio-button label="CANCELLED">Cancelled</el-radio-button>
         </el-radio-group>
       </div>
@@ -87,6 +89,16 @@
               >
                 Confirm Receipt
               </el-button>
+
+              <el-button 
+                v-if="order.status === 'PAID' || order.status === 'SHIPPED'" 
+                type="danger" 
+                plain
+                size="small"
+                @click="handleRefund(order)"
+              >
+                Refund
+              </el-button>
               
               <el-button 
                 v-if="order.status === 'COMPLETED' && !order.hasReview" 
@@ -149,7 +161,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getOrderList, cancelOrder, confirmOrder, payOrder } from '@/api/order'
+import { getOrderList, cancelOrder, confirmOrder, payOrder, applyRefund } from '@/api/order'
 import { useUserStore } from '@/stores/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -215,7 +227,10 @@ const getStatusType = (status) => {
     PAID: 'info',
     SHIPPED: 'primary',
     COMPLETED: 'success',
-    CANCELLED: 'danger'
+    CANCELLED: 'danger',
+    REFUND_APPLIED: 'warning',
+    REFUNDED: 'info',
+    REFUND_REJECTED: 'danger'
   }
   return typeMap[status] || 'info'
 }
@@ -226,7 +241,10 @@ const getStatusText = (status) => {
     PAID: 'Paid',
     SHIPPED: 'Shipped',
     COMPLETED: 'Completed',
-    CANCELLED: 'Cancelled'
+    CANCELLED: 'Cancelled',
+    REFUND_APPLIED: 'Refunding',
+    REFUNDED: 'Refunded',
+    REFUND_REJECTED: 'Refund Rejected'
   }
   return textMap[status] || status
 }
@@ -283,6 +301,28 @@ const handleConfirmReceipt = async (order) => {
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error(error.message || 'Failed to confirm receipt')
+    }
+  }
+}
+
+const handleRefund = async (order) => {
+  try {
+    const { value: reason } = await ElMessageBox.prompt('Please enter the reason for refund:', 'Apply for Refund', {
+      confirmButtonText: 'Submit',
+      cancelButtonText: 'Cancel',
+      inputValidator: (value) => {
+        if (!value || value.trim().length === 0) {
+          return 'Refund reason cannot be empty'
+        }
+      }
+    })
+    
+    await applyRefund(order.id, reason)
+    ElMessage.success('Refund application submitted')
+    await loadOrders()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(error.message || 'Failed to submit refund application')
     }
   }
 }

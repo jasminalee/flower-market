@@ -397,6 +397,84 @@ public class OrderServiceImpl implements OrderService {
         
         return order;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Order applyRefund(Long orderId, String reason) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new RuntimeException("Order does not exist");
+        }
+
+        // Only paid or shipped orders can apply for refund
+        if (!Constants.ORDER_STATUS_PAID.equals(order.getStatus()) && !Constants.ORDER_STATUS_SHIPPED.equals(order.getStatus())) {
+            throw new RuntimeException("Order status is incorrect, cannot apply for refund");
+        }
+
+        order.setStatus(Constants.ORDER_STATUS_REFUND_APPLIED);
+        order.setCancelReason(reason); // Reuse cancelReason as refund reason
+        orderMapper.updateById(order);
+        return order;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Order auditRefund(Long orderId, boolean approved, String auditRemark) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new RuntimeException("Order does not exist");
+        }
+
+        if (!Constants.ORDER_STATUS_REFUND_APPLIED.equals(order.getStatus())) {
+            throw new RuntimeException("Order is not in refund applied status");
+        }
+
+        if (approved) {
+            // Logic for refunding money (similar to cancelOrder)
+            if (Constants.PAYMENT_STATUS_PAID.equals(order.getPaymentStatus())) {
+                if (Constants.PAYMENT_METHOD_BALANCE.equals(order.getPaymentMethod())) {
+                    Customer customer = customerMapper.selectById(order.getUserId());
+                    if (customer != null) {
+                        customer.setBalance(customer.getBalance().add(order.getActualPrice()));
+                        customerMapper.updateById(customer);
+                    }
+                }
+                order.setPaymentStatus(Constants.PAYMENT_STATUS_REFUNDED);
+            }
+
+            // Restore inventory
+            LambdaQueryWrapper<OrderItem> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(OrderItem::getOrderId, orderId);
+            List<OrderItem> orderItems = orderItemMapper.selectList(wrapper);
+            
+            for (OrderItem item : orderItems) {
+                Product product = productMapper.selectById(item.getProdId());
+                if (product != null) {
+                    product.setStock(product.getStock() + item.getQuantity());
+                    product.setSales(Math.max(0, product.getSales() - item.getQuantity()));
+                    
+                    if (product.getStock() > 10) {
+                        product.setStockStatus(Constants.STOCK_STATUS_IN_STOCK);
+                    } else if (product.getStock() > 0) {
+                        product.setStockStatus(Constants.STOCK_STATUS_LOW_STOCK);
+                    } else {
+                        product.setStockStatus(Constants.STOCK_STATUS_OUT_OF_STOCK);
+                    }
+                    productMapper.updateById(product);
+                }
+            }
+
+            order.setStatus(Constants.ORDER_STATUS_REFUNDED);
+        } else {
+            // Revert status to previous (approximated, since we didn't store previous status. Typically PAID)
+            // For now, move to REFUND_REJECTED
+            order.setStatus(Constants.ORDER_STATUS_REFUND_REJECTED);
+        }
+        
+        order.setRemark(auditRemark); // Reuse remark or similar for audit comments
+        orderMapper.updateById(order);
+        return order;
+    }
     
     /**
      * Generate order number

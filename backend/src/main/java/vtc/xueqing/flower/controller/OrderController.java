@@ -116,4 +116,33 @@ public class OrderController {
             return Result.error(e.getMessage());
         }
     }
+
+    @ApiOperation("Apply for Refund")
+    @PutMapping("/{id}/refund/apply")
+    public Result<Order> applyRefund(
+            @PathVariable("id") Long id,
+            @ApiParam("Refund Reason") @RequestParam String reason
+    ) {
+        try {
+            Order order = orderService.applyRefund(id, reason);
+            return Result.success(order);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @ApiOperation("Audit Refund Request")
+    @PutMapping("/{id}/refund/audit")
+    public Result<Order> auditRefund(
+            @PathVariable("id") Long id,
+            @ApiParam("Approved: true/false") @RequestParam boolean approved,
+            @ApiParam("Audit Remark") @RequestParam(required = false) String remark
+    ) {
+        try {
+            Order order = orderService.auditRefund(id, approved, remark);
+            return Result.success(order);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

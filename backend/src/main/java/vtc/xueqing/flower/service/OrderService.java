@@ -73,4 +73,21 @@ public interface OrderService {
      * @return shipped order
      */
     Order shipOrder(Long orderId);
+
+    /**
+     * User applies for refund.
+     * @param orderId order ID
+     * @param reason refund reason
+     * @return order with refund applied status
+     */
+    Order applyRefund(Long orderId, String reason);
+
+    /**
+     * Admin/Merchant audits refund.
+     * @param orderId order ID
+     * @param approved true to approve, false to reject
+     * @param auditRemark remark from auditor
+     * @return updated order
+     */
+    Order auditRefund(Long orderId, boolean approved, String auditRemark);
 }

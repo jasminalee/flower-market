@@ -8,6 +8,8 @@
       <el-tab-pane label="To Receive" name="SHIPPED" />
       <el-tab-pane label="Completed" name="COMPLETED" />
       <el-tab-pane label="Cancelled" name="CANCELLED" />
+      <el-tab-pane label="Refunding" name="REFUND_APPLIED" />
+      <el-tab-pane label="Refunded" name="REFUNDED" />
     </el-tabs>
 
     <!-- Search filters -->
@@ -57,7 +59,7 @@
             {{ formatDateTime(row.orderDate) }}
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="180" fixed="right">
+        <el-table-column label="Actions" width="260" fixed="right">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleViewDetail(row)">View</el-button>
             <el-button
@@ -68,6 +70,10 @@
             >
               Ship
             </el-button>
+            <template v-if="row.status === 'REFUND_APPLIED'">
+              <el-button type="success" link @click="handleAudit(row, true)">Approve</el-button>
+              <el-button type="danger" link @click="handleAudit(row, false)">Reject</el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -108,7 +114,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getMerchantOrders, shipOrder } from '@/api/merchant'
-import { ElMessage } from 'element-plus'
+import { auditRefund } from '@/api/order'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
@@ -149,7 +156,10 @@ const statusTextMap = {
   PAID: 'Paid',
   SHIPPED: 'To Receive',
   COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled'
+  CANCELLED: 'Cancelled',
+  REFUND_APPLIED: 'Refund Applied',
+  REFUNDED: 'Refunded',
+  REFUND_REJECTED: 'Refund Rejected'
 }
 
 const getStatusType = (status) => {
@@ -158,7 +168,10 @@ const getStatusType = (status) => {
     PAID: 'info',
     SHIPPED: 'primary',
     COMPLETED: 'success',
-    CANCELLED: 'danger'
+    CANCELLED: 'danger',
+    REFUND_APPLIED: 'warning',
+    REFUNDED: 'info',
+    REFUND_REJECTED: 'danger'
   }
   return types[status] || 'info'
 }
@@ -232,6 +245,34 @@ const handleShip = (row) => {
   shipForm.courier = ''
   shipForm.trackingNo = ''
   shipDialogVisible.value = true
+}
+
+const handleAudit = async (row, approved) => {
+  const action = approved ? 'Approve' : 'Reject'
+  const remarkPrompt = approved ? 'Optional audit remark:' : 'Please enter rejection reason (required):'
+
+  try {
+    const { value: auditRemark } = await ElMessageBox.prompt(remarkPrompt, `${action} Refund`, {
+      confirmButtonText: 'Confirm',
+      cancelButtonText: 'Cancel',
+      inputPlaceholder: approved ? 'Default: Approved' : 'Please enter why you rejected this refund',
+      inputValidator: (val) => {
+        if (!approved && (!val || val.trim() === '')) {
+          return 'Reason is required for rejection'
+        }
+        return true
+      }
+    })
+
+    await auditRefund(row.id, approved, auditRemark || (approved ? 'Approved' : ''))
+    ElMessage.success(`Refund ${action}d successfully`)
+    fetchOrders()
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error(error)
+      ElMessage.error(`Failed to ${action.toLowerCase()} refund`)
+    }
+  }
 }
 
 const handleConfirmShip = async () => {
