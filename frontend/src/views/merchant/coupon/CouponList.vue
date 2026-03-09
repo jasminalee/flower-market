@@ -108,28 +108,28 @@
         <el-form-item 
           v-if="formData.type === 'FULL_REDUCTION'" 
           label="Discount Amount" 
-          prop="amount"
+          prop="value"
         >
-          <el-input-number v-model="formData.amount" :min="0" :precision="2" :step="1" />
+          <el-input-number v-model="formData.value" :min="0" :precision="2" :step="1" />
           <span style="margin-left: 10px">CNY</span>
         </el-form-item>
 
         <el-form-item 
           v-if="formData.type === 'DISCOUNT'" 
           label="Discount" 
-          prop="discount"
+          prop="value"
         >
-          <el-input-number v-model="formData.discount" :min="0.1" :max="9.9" :precision="1" :step="0.1" />
-          <span style="margin-left: 10px">(×10 = %)</span>
+          <el-input-number v-model="formData.value" :min="0.1" :max="9.9" :precision="1" :step="0.1" />
+          <span style="margin-left: 10px">(1-9.9, e.g. 8.5 for 15% off)</span>
         </el-form-item>
 
-        <el-form-item label="Min Order Amount" prop="minAmount">
-          <el-input-number v-model="formData.minAmount" :min="0" :precision="2" :step="1" />
+        <el-form-item label="Min Order Amount" prop="minPrice">
+          <el-input-number v-model="formData.minPrice" :min="0" :precision="2" :step="1" />
           <span style="margin-left: 10px">CNY (minimum to use)</span>
         </el-form-item>
 
-        <el-form-item label="Total Quantity" prop="stock">
-          <el-input-number v-model="formData.stock" :min="1" :step="1" />
+        <el-form-item label="Total Quantity" prop="totalQuantity">
+          <el-input-number v-model="formData.totalQuantity" :min="1" :step="1" />
         </el-form-item>
 
         <el-form-item label="Validity" prop="dateRange">
@@ -195,10 +195,9 @@ const tableData = ref([])
 const formData = reactive({
   name: '',
   type: 'FULL_REDUCTION',
-  amount: 0,
-  discount: 8.0,
-  minAmount: 0,
-  stock: 100,
+  value: 0,
+  minPrice: 0,
+  totalQuantity: 100,
   dateRange: [],
   description: ''
 })
@@ -206,10 +205,9 @@ const formData = reactive({
 const rules = {
   name: [{ required: true, message: 'Please enter coupon name', trigger: 'blur' }],
   type: [{ required: true, message: 'Please select coupon type', trigger: 'change' }],
-  amount: [{ required: true, message: 'Please enter discount amount', trigger: 'blur' }],
-  discount: [{ required: true, message: 'Please enter discount', trigger: 'blur' }],
-  minAmount: [{ required: true, message: 'Please enter minimum order amount', trigger: 'blur' }],
-  stock: [{ required: true, message: 'Please enter total quantity', trigger: 'blur' }],
+  value: [{ required: true, message: 'Please enter value', trigger: 'blur' }],
+  minPrice: [{ required: true, message: 'Please enter minimum order amount', trigger: 'blur' }],
+  totalQuantity: [{ required: true, message: 'Please enter total quantity', trigger: 'blur' }],
   dateRange: [{ required: true, message: 'Please select validity period', trigger: 'change' }]
 }
 
@@ -236,10 +234,9 @@ const handleAdd = () => {
   currentId.value = null
   formData.name = ''
   formData.type = 'FULL_REDUCTION'
-  formData.amount = 0
-  formData.discount = 8.0
-  formData.minAmount = 0
-  formData.stock = 100
+  formData.value = 0
+  formData.minPrice = 0
+  formData.totalQuantity = 100
   formData.dateRange = []
   formData.description = ''
   dialogVisible.value = true
@@ -254,10 +251,9 @@ const handleEdit = async (row) => {
     const data = res.data
     formData.name = data.name
     formData.type = data.type
-    formData.amount = data.value || 0
-    formData.discount = data.value || 8.0
-    formData.minAmount = data.minPrice
-    formData.stock = data.totalQuantity
+    formData.value = data.value || 0
+    formData.minPrice = data.minPrice
+    formData.totalQuantity = data.totalQuantity
     formData.dateRange = [data.startDate, data.endDate]
     formData.description = data.description || ''
     dialogVisible.value = true
@@ -276,9 +272,9 @@ const handleSubmit = async () => {
       merchId: userStore.userId,
       name: formData.name,
       type: formData.type,
-      value: formData.type === 'FULL_REDUCTION' ? formData.amount : formData.discount,
-      minPrice: formData.minAmount,
-      totalQuantity: formData.stock,
+      value: formData.value,
+      minPrice: formData.minPrice,
+      totalQuantity: formData.totalQuantity,
       startDate: formData.dateRange[0],
       endDate: formData.dateRange[1],
       description: formData.description
