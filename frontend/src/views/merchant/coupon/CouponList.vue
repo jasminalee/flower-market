@@ -273,14 +273,14 @@ const handleSubmit = async () => {
   saving.value = true
   try {
     const data = {
+      merchId: userStore.userId,
       name: formData.name,
       type: formData.type,
-      amount: formData.type === 'FULL_REDUCTION' ? formData.amount : 0,
-      discount: formData.type === 'DISCOUNT' ? formData.discount : 0,
-      minAmount: formData.minAmount,
-      stock: formData.stock,
-      startTime: formData.dateRange[0],
-      endTime: formData.dateRange[1],
+      value: formData.type === 'FULL_REDUCTION' ? formData.amount : formData.discount,
+      minPrice: formData.minAmount,
+      totalQuantity: formData.stock,
+      startDate: formData.dateRange[0],
+      endDate: formData.dateRange[1],
       description: formData.description
     }
 
