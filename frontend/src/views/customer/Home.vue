@@ -12,7 +12,7 @@
               <div class="carousel-content">
                 <h3 class="carousel-title">{{ item.title }}</h3>
                 <p class="carousel-subtitle">{{ item.subtitle }}</p>
-                <el-button type="primary" class="cta-button">{{ item.ctaText }}</el-button>
+                <el-button type="primary" class="cta-button" @click="router.push(item.route)">{{ item.ctaText }}</el-button>
               </div>
             </div>
           </div>
@@ -93,9 +93,9 @@ const StarIcon = Star
 const StarFilledIcon = StarFilled
 
 const banners = ref([
-  { id: 1, title: 'Spring New Arrivals', subtitle: 'Discover our fresh collection of seasonal flowers', ctaText: 'Shop Now', image: banner1 },
-  { id: 2, title: 'Hot-Selling Flower Picks', subtitle: 'Our most popular arrangements loved by customers', ctaText: 'View Collection', image: banner2 },
-  { id: 3, title: 'Limited Time Offers', subtitle: 'Special discounts on premium flower selections', ctaText: 'Get Deals', image: banner3 }
+  { id: 1, title: 'Spring New Arrivals', subtitle: 'Discover our fresh collection of seasonal flowers', ctaText: 'Shop Now', image: banner1, route: '/products' },
+  { id: 2, title: 'Hot-Selling Flower Picks', subtitle: 'Our most popular arrangements loved by customers', ctaText: 'View Collection', image: banner2, route: '/products' },
+  { id: 3, title: 'Limited Time Offers', subtitle: 'Special discounts on premium flower selections', ctaText: 'Get Deals', image: banner3, route: '/products' }
 ])
 
 // Theme color mapping
@@ -260,10 +260,10 @@ const toggleFavorite = async (product) => {
   align-items: center;
   text-align: center;
 
-  /* Frosted glass effect */
-  background-image: linear-gradient(45deg, rgba(255, 102, 65, 0.15), rgba(228, 70, 122, 0.15));
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* Frosted glass effect - light transparent */
+  background-image: linear-gradient(45deg, rgba(255, 102, 65, 0.05), rgba(228, 70, 122, 0.05));
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 
   /* Smooth transition */
   transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
@@ -282,7 +282,11 @@ const toggleFavorite = async (product) => {
   padding: 30px 40px;
   max-width: 600px;
   border-radius: 12px;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .carousel-title {
@@ -303,6 +307,16 @@ const toggleFavorite = async (product) => {
 .cta-button {
   font-size: 16px;
   padding: 12px 24px;
+  background-color: rgba(64, 158, 255, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: rgba(64, 158, 255, 0.85) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .section-title {
