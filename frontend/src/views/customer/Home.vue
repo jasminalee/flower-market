@@ -3,59 +3,17 @@
     <CustomerHeader />
     
     <div class="container">
-      <!-- Hero-themed SVG Carousel -->
-      <el-carousel height="400px" class="mt-lg">
-        <el-carousel-item v-for="(item, index) in banners" :key="item.id">
-          <div class="hero-carousel-item" :class="`carousel-theme-${index % 3 + 1}`">
-            <div class="svg-background">
-              <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
-                <!-- Decorative background shapes -->
-                <circle cx="100" cy="100" r="80" :fill="getThemeColor(index, 'bg')" opacity="0.1" />
-                <circle cx="1100" cy="300" r="120" :fill="getThemeColor(index, 'accent')" opacity="0.1" />
-                
-                <!-- Main decorative elements based on theme -->
-                <g :data-theme="index">
-                  <!-- Blue theme - flowers/blooms (index 0) -->
-                  <g v-show="index === 0">
-                    <path d="M600,180 C610,160 630,160 640,180 C630,200 610,200 600,180 Z" fill="#409EFF" opacity="0.6" />
-                    <path d="M580,200 C590,180 610,180 620,200 C610,220 590,220 580,200 Z" fill="#409EFF" opacity="0.6" />
-                    <path d="M620,200 C630,180 650,180 660,200 C650,220 630,220 620,200 Z" fill="#409EFF" opacity="0.6" />
-                    <path d="M600,220 C610,200 630,200 640,220 C630,240 610,240 600,220 Z" fill="#409EFF" opacity="0.6" />
-                    <circle cx="600" cy="200" r="10" fill="#217CE8" />
-                  </g>
-                  <!-- Green theme - leaves/plants (index 1) -->
-                  <g v-show="index === 1">
-                    <path d="M500,250 C520,220 550,230 560,260 C540,280 510,270 500,250 Z" fill="#67C23A" opacity="0.7" />
-                    <path d="M650,200 C670,170 700,180 710,210 C690,230 660,220 650,200 Z" fill="#67C23A" opacity="0.7" />
-                    <path d="M580,300 C600,270 630,280 640,310 C620,330 590,320 580,300 Z" fill="#67C23A" opacity="0.7" />
-                    <line x1="600" y1="350" x2="600" y2="150" stroke="#529B2E" stroke-width="3" />
-                  </g>
-                  <!-- Pink theme - floral elements (index 2) -->
-                  <g v-show="index !== 0 && index !== 1">
-                    <circle cx="480" cy="130" r="15" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="500" cy="110" r="12" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="520" cy="130" r="10" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="500" cy="150" r="12" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="580" cy="150" r="18" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="600" cy="130" r="15" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="620" cy="150" r="12" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="600" cy="170" r="15" fill="#F7CAC9" opacity="0.7" />
-                    <circle cx="580" cy="150" r="8" fill="#D6A8A6" />
-                  </g>
-                </g>
-                
-                <!-- Central decorative element that changes with theme -->
-                <g :class="`theme-${index % 3 + 1}`">
-                  <circle cx="600" cy="200" r="60" :fill="getThemeColor(index, 'primary')" opacity="0.1" />
-                  <circle cx="600" cy="200" r="40" :fill="getThemeColor(index, 'primary')" opacity="0.2" />
-                  <circle cx="600" cy="200" r="20" :fill="getThemeColor(index, 'primary')" opacity="0.3" />
-                </g>
-              </svg>
-            </div>
-            <div class="carousel-content">
-              <h3 class="carousel-title">{{ item.title }}</h3>
-              <p class="carousel-subtitle">{{ item.subtitle }}</p>
-              <el-button type="primary" class="cta-button">{{ item.ctaText }}</el-button>
+      <!-- Banner Carousel with Frosted Glass Effect -->
+      <el-carousel height="400px" class="mt-lg banner-carousel">
+        <el-carousel-item v-for="item in banners" :key="item.id">
+          <div class="banner-carousel-item">
+            <img :src="item.image" class="banner-bg-image" />
+            <div class="frosted-glass-overlay">
+              <div class="carousel-content">
+                <h3 class="carousel-title">{{ item.title }}</h3>
+                <p class="carousel-subtitle">{{ item.subtitle }}</p>
+                <el-button type="primary" class="cta-button">{{ item.ctaText }}</el-button>
+              </div>
             </div>
           </div>
         </el-carousel-item>
@@ -122,6 +80,10 @@ import { ElMessage } from 'element-plus'
 import { Star, StarFilled } from '@element-plus/icons-vue'
 import CategoryIcons from '@/components/icons/CategoryIcons.vue'
 
+import banner1 from '@/assets/image/home/banner1.jpg'
+import banner2 from '@/assets/image/home/banner2.jpg'
+import banner3 from '@/assets/image/home/banner3.jpg'
+
 const router = useRouter()
 const cartStore = useCartStore()
 const userStore = useUserStore()
@@ -131,9 +93,9 @@ const StarIcon = Star
 const StarFilledIcon = StarFilled
 
 const banners = ref([
-  { id: 1, title: 'Spring New Arrivals', subtitle: 'Discover our fresh collection of seasonal flowers', ctaText: 'Shop Now' },
-  { id: 2, title: 'Hot-Selling Flower Picks', subtitle: 'Our most popular arrangements loved by customers', ctaText: 'View Collection' },
-  { id: 3, title: 'Limited Time Offers', subtitle: 'Special discounts on premium flower selections', ctaText: 'Get Deals' }
+  { id: 1, title: 'Spring New Arrivals', subtitle: 'Discover our fresh collection of seasonal flowers', ctaText: 'Shop Now', image: banner1 },
+  { id: 2, title: 'Hot-Selling Flower Picks', subtitle: 'Our most popular arrangements loved by customers', ctaText: 'View Collection', image: banner2 },
+  { id: 3, title: 'Limited Time Offers', subtitle: 'Special discounts on premium flower selections', ctaText: 'Get Deals', image: banner3 }
 ])
 
 // Theme color mapping
@@ -268,134 +230,74 @@ const toggleFavorite = async (product) => {
   background: var(--color-bg-base);
 }
 
-.hero-carousel-item {
+/* === Banner Carousel with Frosted Glass Effect === */
+.banner-carousel-item {
   position: relative;
+  width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
 }
 
-.hero-carousel-item.carousel-theme-1 {
-  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); /* Blue theme */
+.banner-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
 }
 
-.hero-carousel-item.carousel-theme-2 {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); /* Green theme */
-}
-
-.hero-carousel-item.carousel-theme-3 {
-  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); /* Pink theme */
-}
-
-/* Specific theme adjustments */
-.carousel-theme-1 .carousel-title,
-.carousel-theme-1 .carousel-subtitle {
-  color: #1976d2;
-}
-
-.carousel-theme-2 .carousel-title,
-.carousel-theme-2 .carousel-subtitle {
-  color: #388e3c;
-}
-
-.carousel-theme-3 .carousel-title,
-.carousel-theme-3 .carousel-subtitle {
-  color: #c2185b;
-}
-
-/* Button styling for each theme */
-.carousel-theme-1 .el-button--primary {
-  background-color: #409EFF;
-  border-color: #409EFF;
-}
-
-.carousel-theme-2 .el-button--primary {
-  background-color: #67C23A;
-  border-color: #67C23A;
-}
-
-.carousel-theme-3 .el-button--primary {
-  background-color: #F7CAC9;
-  border-color: #F7CAC9;
-  color: #303133;
-}
-
-.svg-background {
+.frosted-glass-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  /* Frosted glass effect */
+  background-image: linear-gradient(45deg, rgba(255, 102, 65, 0.15), rgba(228, 70, 122, 0.15));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* Smooth transition */
+  transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease;
 }
 
-.hero-svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* Animations for SVG elements */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.hero-carousel-item {
-  animation: slide-in 0.8s ease-out;
-}
-
-@keyframes slide-in {
-  from { opacity: 0; transform: translateX(50px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.theme-1 g, .theme-2 g, .theme-3 g {
-  animation: float 4s ease-in-out infinite;
-}
-
-.hero-carousel-item g {
-  animation-duration: 6s;
-}
-
-.hero-carousel-item g:nth-child(2) {
-  animation-delay: 0.5s;
-}
-
-.hero-carousel-item g:nth-child(3) {
-  animation-delay: 1s;
-}
-
-.hero-carousel-item g:nth-child(4) {
-  animation-delay: 1.5s;
-}
-
-.hero-carousel-item g:nth-child(5) {
-  animation-delay: 2s;
+.banner-carousel-item:hover .frosted-glass-overlay {
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  background-image: linear-gradient(45deg, rgba(255, 102, 65, 0), rgba(228, 70, 122, 0));
 }
 
 .carousel-content {
   position: relative;
   z-index: 2;
   text-align: center;
-  padding: var(--spacing-lg);
+  padding: 30px 40px;
   max-width: 600px;
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0.25);
 }
 
 .carousel-title {
   font-size: 32px;
   font-weight: bold;
-  margin-bottom: var(--spacing-md);
-  color: var(--color-text-primary);
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  margin-bottom: 12px;
+  color: #fff;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .carousel-subtitle {
   font-size: 18px;
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-lg);
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  margin-bottom: 20px;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .cta-button {
