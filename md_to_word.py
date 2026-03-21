@@ -63,13 +63,38 @@ def set_col_width(cell, width_cm):
 
 
 # ── Text helpers ──────────────────────────────────────────────────────────
-def add_runs_with_linebreaks(paragraph, text, font_size=Pt(10), bold=False):
+FONT_NAME = 'Times New Roman'
+FONT_SIZE = Pt(12)  # 小四号
+
+
+def set_doc_default_font(doc):
+    """Set Times New Roman 12pt as the document-level default."""
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+    style = doc.styles['Normal']
+    style.font.name = FONT_NAME
+    style.font.size = FONT_SIZE
+    # Also set the East-Asian / complex-script font via rPr XML
+    rPr = style.element.get_or_add_rPr()
+    rFonts = rPr.find(qn('w:rFonts'))
+    if rFonts is None:
+        rFonts = OxmlElement('w:rFonts')
+        rPr.insert(0, rFonts)
+    rFonts.set(qn('w:ascii'),    FONT_NAME)
+    rFonts.set(qn('w:hAnsi'),   FONT_NAME)
+    rFonts.set(qn('w:cs'),      FONT_NAME)
+
+
+def add_runs_with_linebreaks(paragraph, text, font_size=None, bold=False):
     """Split on '<br />' and add runs with XML linebreaks in between."""
+    if font_size is None:
+        font_size = FONT_SIZE
     parts = re.split(r'\s*<br\s*/>\s*', text)
     for idx, part in enumerate(parts):
         if part == '':
             continue
         run = paragraph.add_run(part)
+        run.font.name = FONT_NAME
         run.font.size = font_size
         run.font.bold = bold
         if idx < len(parts) - 1 and parts[idx + 1] != '':
@@ -170,20 +195,26 @@ def append_module(doc, blocks, module_name):
         if btype == 'h1':
             h = doc.add_heading(block['text'], level=1)
             h.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-            h.runs[0].font.size = Pt(16)
+            for run in h.runs:
+                run.font.name = FONT_NAME
+                run.font.size = Pt(16)
 
         elif btype == 'h2':
             h = doc.add_heading(block['text'], level=2)
-            h.runs[0].font.size = Pt(13)
+            for run in h.runs:
+                run.font.name = FONT_NAME
+                run.font.size = Pt(14)
 
         elif btype == 'h3':
             h = doc.add_heading(block['text'], level=3)
-            h.runs[0].font.size = Pt(11)
+            for run in h.runs:
+                run.font.name = FONT_NAME
+                run.font.size = FONT_SIZE
 
         # ── Paragraph ─────────────────────────────────────────────────────
         elif btype == 'paragraph':
             p = doc.add_paragraph()
-            add_runs_with_linebreaks(p, block['text'], font_size=Pt(10))
+            add_runs_with_linebreaks(p, block['text'])
 
         # ── HR ────────────────────────────────────────────────────────────
         elif btype == 'hr':
@@ -204,20 +235,20 @@ def append_module(doc, blocks, module_name):
                 set_col_width(key_cell, 4.5)
                 set_col_width(val_cell, 12.5)
 
-                # Key cell – bold, grey background
+                # Key cell – bold, no background
                 key_cell.text = ''
                 kp = key_cell.paragraphs[0]
                 kp.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
-                add_runs_with_linebreaks(kp, key, font_size=Pt(10), bold=True)
-                shade_cell(key_cell)
+                add_runs_with_linebreaks(kp, key, bold=True)
 
                 # Value cell
                 val_cell.text = ''
                 vp = val_cell.paragraphs[0]
-                add_runs_with_linebreaks(vp, val, font_size=Pt(10))
+                add_runs_with_linebreaks(vp, val)
 
             set_table_borders(tbl)
-            doc.add_paragraph()   # small spacing after each test‑case table
+            # Each test-case table starts a new page (page break AFTER the table)
+            doc.add_page_break()
 
         # ── Grid table (e.g. coverage summary) ───────────────────────────
         elif btype == 'grid_table':
@@ -235,8 +266,7 @@ def append_module(doc, blocks, module_name):
                 hdr_cells[ci].text = ''
                 hp = hdr_cells[ci].paragraphs[0]
                 hp.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-                add_runs_with_linebreaks(hp, h, font_size=Pt(10), bold=True)
-                shade_cell(hdr_cells[ci])
+                add_runs_with_linebreaks(hp, h, bold=True)
 
             # Data rows
             for ri, row in enumerate(rows):
@@ -245,7 +275,7 @@ def append_module(doc, blocks, module_name):
                     if ci < len(dcells):
                         dcells[ci].text = ''
                         dp = dcells[ci].paragraphs[0]
-                        add_runs_with_linebreaks(dp, cell_text, font_size=Pt(9))
+                        add_runs_with_linebreaks(dp, cell_text)
 
             set_table_borders(tbl)
             doc.add_paragraph()
@@ -273,6 +303,8 @@ def main():
         print(f"Opening existing document: {OUTPUT_DOC}")
     else:
         doc = Document()
+        # Set default font: Times New Roman 小四号 (12pt)
+        set_doc_default_font(doc)
         # Page setup: A4, landscape for wide tables
         section = doc.sections[0]
         section.page_width  = Cm(29.7)
