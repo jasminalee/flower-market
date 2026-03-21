@@ -188,8 +188,14 @@ def append_module(doc, blocks, module_name):
     if len(doc.paragraphs) > 1 or any(t.text for t in doc.paragraphs):
         doc.add_page_break()
 
+    # Only keep: sub-section headings (h3) and test-case tables (kv_table)
+    KEEP = {'h3', 'kv_table'}
+
     for block in blocks:
         btype = block['type']
+
+        if btype not in KEEP:
+            continue
 
         # ── Headings ──────────────────────────────────────────────────────
         if btype == 'h1':
@@ -198,18 +204,21 @@ def append_module(doc, blocks, module_name):
             for run in h.runs:
                 run.font.name = FONT_NAME
                 run.font.size = Pt(16)
+                run.font.bold = True
 
         elif btype == 'h2':
             h = doc.add_heading(block['text'], level=2)
             for run in h.runs:
                 run.font.name = FONT_NAME
                 run.font.size = Pt(14)
+                run.font.bold = True
 
         elif btype == 'h3':
-            h = doc.add_heading(block['text'], level=3)
-            for run in h.runs:
-                run.font.name = FONT_NAME
-                run.font.size = FONT_SIZE
+            h = doc.add_paragraph()
+            run = h.add_run(block['text'])
+            run.font.name = FONT_NAME
+            run.font.size = FONT_SIZE
+            run.font.bold = True
 
         # ── Paragraph ─────────────────────────────────────────────────────
         elif btype == 'paragraph':
@@ -235,11 +244,11 @@ def append_module(doc, blocks, module_name):
                 set_col_width(key_cell, 4.5)
                 set_col_width(val_cell, 12.5)
 
-                # Key cell – bold, no background
+                # Key cell – no background, no bold
                 key_cell.text = ''
                 kp = key_cell.paragraphs[0]
                 kp.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
-                add_runs_with_linebreaks(kp, key, bold=True)
+                add_runs_with_linebreaks(kp, key, bold=False)
 
                 # Value cell
                 val_cell.text = ''
