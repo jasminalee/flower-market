@@ -12,8 +12,8 @@ USE `flower_market`;
 -- Password: admin123 (MD5: 0192023a7bbd73250516f069df18b500)
 -- ============================================
 INSERT INTO `administrators` (`admin_id`, `name`, `password`, `email`, `permission`, `status`) VALUES
-(1, 'Super Admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin@flowermarket.com', 'SUPER_ADMIN', 'ACTIVE'),
-(2, 'Standard Admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin2@flowermarket.com', 'ADMIN', 'ACTIVE');
+                                                                                                   (1, 'Super Admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin@flowermarket.com', 'SUPER_ADMIN', 'ACTIVE'),
+                                                                                                   (2, 'Standard Admin', 'e10adc3949ba59abbe56e057f20f883e', 'admin2@flowermarket.com', 'ADMIN', 'ACTIVE');
 
 -- ============================================
 -- 2. Customers
@@ -51,22 +51,22 @@ INSERT INTO `merchants` (`merch_id`, `name`, `email`, `password`, `phone`, `shop
 -- 4. Product categories
 -- ============================================
 INSERT INTO `product_categories` (`cate_id`, `name`, `parent_id`, `sort_order`, `icon`, `description`) VALUES
-(1, 'Fresh Flowers', 0, 1, '/images/category/fresh.png', 'Freshly cut flowers, delivered daily'),
-(2, 'Green Plants', 0, 2, '/images/category/plant.png', 'Indoor and outdoor plants for clean air'),
-(3, 'Bouquets', 1, 1, '/images/category/bouquet.png', 'Gift-ready bouquets'),
-(4, 'Potted Flowers', 1, 2, '/images/category/potted.png', 'Potted blooms for long-lasting displays'),
-(5, 'Preserved Flowers', 1, 3, '/images/category/preserved.png', 'Long-lasting preserved arrangements'),
-(6, 'Succulents', 2, 1, '/images/category/succulent.png', 'Easy-care succulents'),
-(7, 'Foliage Plants', 2, 2, '/images/category/foliage.png', 'Lush leafy plants'),
-(8, 'Flowering Pots', 2, 3, '/images/category/flowering.png', 'Flowering plants for all seasons');
+                                                                                                           (1, 'Fresh Flowers', 0, 1, '/images/category/fresh.png', 'Freshly cut flowers, delivered daily'),
+                                                                                                           (2, 'Green Plants', 0, 2, '/images/category/plant.png', 'Indoor and outdoor plants for clean air'),
+                                                                                                           (3, 'Bouquets', 1, 1, '/images/category/bouquet.png', 'Gift-ready bouquets'),
+                                                                                                           (4, 'Potted Flowers', 1, 2, '/images/category/potted.png', 'Potted blooms for long-lasting displays'),
+                                                                                                           (5, 'Preserved Flowers', 1, 3, '/images/category/preserved.png', 'Long-lasting preserved arrangements'),
+                                                                                                           (6, 'Succulents', 2, 1, '/images/category/succulent.png', 'Easy-care succulents'),
+                                                                                                           (7, 'Foliage Plants', 2, 2, '/images/category/foliage.png', 'Lush leafy plants'),
+                                                                                                           (8, 'Flowering Pots', 2, 3, '/images/category/flowering.png', 'Flowering plants for all seasons');
 
 -- ============================================
 -- 4.1 Suppliers
 -- ============================================
 INSERT INTO `suppliers` (`id`, `name`, `contact_person`, `phone`, `email`, `address`, `description`, `rating`, `status`) VALUES
-(1, 'Kunming Highland Flower Base', 'Li Ming', '13500135001', 'liming@highlandflower.com', 'Dounan, Kunming, Yunnan', 'Largest fresh flower production base in Asia', 4.9, 'ACTIVE'),
-(2, 'Ecuador Rose Garden', 'Maria Garcia', '00593-987654321', 'maria@ecuadorrose.com', 'Quito, Ecuador', 'Premium high-altitude rose exporter', 5.0, 'ACTIVE'),
-(3, 'Guangdong Green Nursery', 'Chen Wei', '13500135003', 'chenwei@green-nursery.com', 'Shunde, Foshan, Guangdong', 'Specialized in indoor decorative plants', 4.7, 'ACTIVE');
+                                                                                                                             (1, 'Kunming Highland Flower Base', 'Li Ming', '13500135001', 'liming@highlandflower.com', 'Dounan, Kunming, Yunnan', 'Largest fresh flower production base in Asia', 4.9, 'ACTIVE'),
+                                                                                                                             (2, 'Ecuador Rose Garden', 'Maria Garcia', '00593-987654321', 'maria@ecuadorrose.com', 'Quito, Ecuador', 'Premium high-altitude rose exporter', 5.0, 'ACTIVE'),
+                                                                                                                             (3, 'Guangdong Green Nursery', 'Chen Wei', '13500135003', 'chenwei@green-nursery.com', 'Shunde, Foshan, Guangdong', 'Specialized in indoor decorative plants', 4.7, 'ACTIVE');
 
 -- ============================================
 -- 5. Products
@@ -90,39 +90,39 @@ INSERT INTO `flower_market`.`products`(`prod_id`, `merch_id`, `cat_id`, `supplie
 -- 6. Product traceability
 -- ============================================
 INSERT INTO `product_trackability` (`prod_id`, `origin`, `planting_method`, `picking_date`, `proc_date`, `certification`, `description`) VALUES
-(1, 'Ecuador', 'Greenhouse cultivation', '2025-12-10', '2025-12-11', 'ISO9001 quality certification', 'High-altitude 2800m roses with long vase life and vivid color'),
-(2, 'Ecuador', 'Greenhouse cultivation', '2025-12-09', '2025-12-10', 'ISO9001 quality certification', 'Selected champagne rose variety with elegant tone'),
-(3, 'Japan', 'Greenhouse cooling', '2025-12-15', '2025-12-17', 'JFA Standard', 'Preserved rose using advanced dehydration technology'),
-(4, 'Kunming, China', 'Modern Smart Greenhouse', '2026-01-05', '2026-01-06', 'Green Food Certification', 'A colorful blend of premium seasonal blossoms'),
-(5, 'Kunming, Yunnan', 'Open field cultivation', '2025-11-20', '2025-11-21', 'Organic certification', 'Yunnan highland succulents, premium quality'),
-(6, 'Kunming, Yunnan', 'Highland Greenhouse', '2025-11-22', '2025-11-23', 'Organic certification', 'Diverse succulent collection for enthusiasts'),
-(7, 'Foshan, Guangdong', 'Greenhouse cultivation', '2025-10-15', '2025-10-16', 'Green plant certification', 'Grown in professional nursery with guaranteed quality'),
-(8, 'Netherlands', 'Professional Nursery', '2025-09-20', '2025-09-25', 'NPS Quality Seal', 'Acclimatized indoor tree with lush green foliage'),
-(9, 'Taiwan', 'Temperature Controlled Lab', '2025-11-30', '2025-12-01', 'TGA Agricultural Standard', 'Prized orchid variety with extended blooming period'),
-(10, 'Quito, Ecuador', 'Premium Rose Base', '2026-02-10', '2026-02-11', 'Rose Origin Protection', 'Large-headed luxury red roses for confessions'),
-(11, 'Shandong, China', 'Base Cultivation', '2026-02-12', '2026-02-13', 'GAP Certification', 'Fresh carnations for gratitude expressions'),
-(12, 'Zhejiang, China', 'Farm field', '2026-02-14', '2026-02-15', 'Safe Farm Cert', 'Sunny sunflowers grown with sustainable methods');
+                                                                                                                                             (1, 'Ecuador', 'Greenhouse cultivation', '2025-12-10', '2025-12-11', 'ISO9001 quality certification', 'High-altitude 2800m roses with long vase life and vivid color'),
+                                                                                                                                             (2, 'Ecuador', 'Greenhouse cultivation', '2025-12-09', '2025-12-10', 'ISO9001 quality certification', 'Selected champagne rose variety with elegant tone'),
+                                                                                                                                             (3, 'Japan', 'Greenhouse cooling', '2025-12-15', '2025-12-17', 'JFA Standard', 'Preserved rose using advanced dehydration technology'),
+                                                                                                                                             (4, 'Kunming, China', 'Modern Smart Greenhouse', '2026-01-05', '2026-01-06', 'Green Food Certification', 'A colorful blend of premium seasonal blossoms'),
+                                                                                                                                             (5, 'Kunming, Yunnan', 'Open field cultivation', '2025-11-20', '2025-11-21', 'Organic certification', 'Yunnan highland succulents, premium quality'),
+                                                                                                                                             (6, 'Kunming, Yunnan', 'Highland Greenhouse', '2025-11-22', '2025-11-23', 'Organic certification', 'Diverse succulent collection for enthusiasts'),
+                                                                                                                                             (7, 'Foshan, Guangdong', 'Greenhouse cultivation', '2025-10-15', '2025-10-16', 'Green plant certification', 'Grown in professional nursery with guaranteed quality'),
+                                                                                                                                             (8, 'Netherlands', 'Professional Nursery', '2025-09-20', '2025-09-25', 'NPS Quality Seal', 'Acclimatized indoor tree with lush green foliage'),
+                                                                                                                                             (9, 'Taiwan', 'Temperature Controlled Lab', '2025-11-30', '2025-12-01', 'TGA Agricultural Standard', 'Prized orchid variety with extended blooming period'),
+                                                                                                                                             (10, 'Quito, Ecuador', 'Premium Rose Base', '2026-02-10', '2026-02-11', 'Rose Origin Protection', 'Large-headed luxury red roses for confessions'),
+                                                                                                                                             (11, 'Shandong, China', 'Base Cultivation', '2026-02-12', '2026-02-13', 'GAP Certification', 'Fresh carnations for gratitude expressions'),
+                                                                                                                                             (12, 'Zhejiang, China', 'Farm field', '2026-02-14', '2026-02-15', 'Safe Farm Cert', 'Sunny sunflowers grown with sustainable methods');
 
 -- ============================================
 -- 7. Shopping cart
 -- ============================================
 INSERT INTO `shopping_cart` (`user_id`, `prod_id`, `quantity`, `selected`) VALUES
-(1, 1, 2, 1),
-(1, 5, 3, 1),
-(2, 7, 1, 1),
-(2, 10, 1, 0),
-(3, 3, 1, 1);
+                                                                               (1, 1, 2, 1),
+                                                                               (1, 5, 3, 1),
+                                                                               (2, 7, 1, 1),
+                                                                               (2, 10, 1, 0),
+                                                                               (3, 3, 1, 1);
 
 -- ============================================
 -- 8. Orders
 -- ============================================
 INSERT INTO `orders` (`id`, `order_no`, `user_id`, `merch_id`, `order_date`, `total_price`, `discount_amount`, `actual_price`, `address`, `receiver_name`, `receiver_phone`, `payment_status`, `payment_time`, `payment_method`, `status`, `delivery_time`, `completion_time`, `remark`) VALUES
-(1, 'ORD202512130001', 1, 1, '2025-12-10 10:30:00', 398.00, 50.00, 348.00, 'No. 88 Jianguo Rd, Chaoyang, Beijing', 'Zhang San', '13800138001', 'PAID', '2025-12-10 10:32:00', 'ALIPAY', 'COMPLETED', '2025-12-10 14:00:00', '2025-12-11 16:00:00', 'Please deliver before noon'),
-(2, 'ORD202512130002', 1, 2, '2025-12-11 15:20:00', 128.00, 0.00, 128.00, 'No. 88 Jianguo Rd, Chaoyang, Beijing', 'Zhang San', '13800138001', 'PAID', '2025-12-11 15:22:00', 'WECHAT', 'SHIPPED', '2025-12-11 18:00:00', NULL, NULL),
-(3, 'ORD202512130003', 2, 3, '2025-12-12 09:15:00', 520.00, 0.00, 520.00, 'No. 100 Century Ave, Pudong, Shanghai', 'Li Si', '13800138002', 'PAID', '2025-12-12 09:17:00', 'BALANCE', 'PROCESSING', NULL, NULL, 'Please call ahead before delivery'),
-(4, 'ORD202512130004', 3, 1, '2025-12-12 16:45:00', 597.00, 100.00, 497.00, 'No. 123 Tianhe Rd, Tianhe, Guangzhou', 'Wang Wu', '13800138003', 'PAID', '2025-12-12 16:50:00', 'ALIPAY', 'COMPLETED', '2025-12-12 20:00:00', '2025-12-13 10:00:00', NULL),
-(5, 'ORD202512130005', 4, 2, '2025-12-13 08:30:00', 256.00, 0.00, 256.00, 'No. 66 Keji Park Rd, Nanshan, Shenzhen', 'Zhao Liu', '13800138004', 'UNPAID', NULL, NULL, 'PENDING', NULL, NULL, NULL),
-(6, 'ORD202512130006', 1, 3, '2025-12-09 14:20:00', 88.00, 0.00, 88.00, 'No. 88 Jianguo Rd, Chaoyang, Beijing', 'Zhang San', '13800138001', 'PAID', '2025-12-09 14:22:00', 'WECHAT', 'CANCELLED', NULL, NULL, 'Changed plans, no longer needed');
+                                                                                                                                                                                                                                                                                             (1, 'ORD202512130001', 1, 1, '2025-12-10 10:30:00', 398.00, 50.00, 348.00, 'No. 88 Jianguo Rd, Chaoyang, Beijing', 'Zhang San', '13800138001', 'PAID', '2025-12-10 10:32:00', 'ALIPAY', 'COMPLETED', '2025-12-10 14:00:00', '2025-12-11 16:00:00', 'Please deliver before noon'),
+                                                                                                                                                                                                                                                                                             (2, 'ORD202512130002', 1, 2, '2025-12-11 15:20:00', 128.00, 0.00, 128.00, 'No. 88 Jianguo Rd, Chaoyang, Beijing', 'Zhang San', '13800138001', 'PAID', '2025-12-11 15:22:00', 'WECHAT', 'SHIPPED', '2025-12-11 18:00:00', NULL, NULL),
+                                                                                                                                                                                                                                                                                             (3, 'ORD202512130003', 2, 3, '2025-12-12 09:15:00', 520.00, 0.00, 520.00, 'No. 100 Century Ave, Pudong, Shanghai', 'Li Si', '13800138002', 'PAID', '2025-12-12 09:17:00', 'BALANCE', 'PROCESSING', NULL, NULL, 'Please call ahead before delivery'),
+                                                                                                                                                                                                                                                                                             (4, 'ORD202512130004', 3, 1, '2025-12-12 16:45:00', 597.00, 100.00, 497.00, 'No. 123 Tianhe Rd, Tianhe, Guangzhou', 'Wang Wu', '13800138003', 'PAID', '2025-12-12 16:50:00', 'ALIPAY', 'COMPLETED', '2025-12-12 20:00:00', '2025-12-13 10:00:00', NULL),
+                                                                                                                                                                                                                                                                                             (5, 'ORD202512130005', 4, 2, '2025-12-13 08:30:00', 256.00, 0.00, 256.00, 'No. 66 Keji Park Rd, Nanshan, Shenzhen', 'Zhao Liu', '13800138004', 'UNPAID', NULL, NULL, 'PENDING', NULL, NULL, NULL),
+                                                                                                                                                                                                                                                                                             (6, 'ORD202512130006', 1, 3, '2025-12-09 14:20:00', 88.00, 0.00, 88.00, 'No. 88 Jianguo Rd, Chaoyang, Beijing', 'Zhang San', '13800138001', 'PAID', '2025-12-09 14:22:00', 'WECHAT', 'CANCELLED', NULL, NULL, 'Changed plans, no longer needed');
 
 -- ============================================
 -- 9. Order items
@@ -135,7 +135,7 @@ INSERT INTO `order_items` (`order_id`, `prod_id`, `name`, `main_image`, `quantit
 -- Items for order 3
 (3, 10, '520 Love Confession Bouquet', '/images/products/main/20260201_072b8ae13aa14c5481798f080ea9981e.jpg', 1, 520.00, 520.00),
 -- Items for order 4
-(4, 1, 'Red Rose Bouquet (11 stems)', '/images/products/main/20260201_f8b78e83965548dbb7ca35594fbf6075.jpg', 1, 199.00, 199.00),
+(4, 1, 'Red Rose Bouquet (11 stems)', '/images/products/main/20260201_b8b0f1bbb5c34a8c919b52c65fb1d497.jpg', 1, 199.00, 199.00),
 (4, 2, 'Champagne Rose Bouquet (19 stems)', '/images/products/main/20260201_514f1f4f3c8346d2b81b8af0c51935a7.jpg', 1, 299.00, 299.00),
 (4, 5, 'White Peony Succulent', '/images/products/main/20260201_89e74a94ca4c4c96ae6c355e3ede5f8b.jpg', 2, 29.90, 59.80),
 -- Items for order 5
@@ -148,108 +148,108 @@ INSERT INTO `order_items` (`order_id`, `prod_id`, `name`, `main_image`, `quantit
 -- 10. Product favorites
 -- ============================================
 INSERT INTO `product_favorites` (`user_id`, `prod_id`, `fav_date`) VALUES
-(1, 3, '2025-12-08 10:20:00'),
-(1, 7, '2025-12-09 15:30:00'),
-(1, 10, '2025-12-10 09:15:00'),
-(2, 1, '2025-12-07 14:20:00'),
-(2, 5, '2025-12-11 11:30:00'),
-(3, 2, '2025-12-06 16:45:00'),
-(3, 9, '2025-12-12 08:20:00'),
-(4, 11, '2025-12-10 13:10:00');
+                                                                       (1, 3, '2025-12-08 10:20:00'),
+                                                                       (1, 7, '2025-12-09 15:30:00'),
+                                                                       (1, 10, '2025-12-10 09:15:00'),
+                                                                       (2, 1, '2025-12-07 14:20:00'),
+                                                                       (2, 5, '2025-12-11 11:30:00'),
+                                                                       (3, 2, '2025-12-06 16:45:00'),
+                                                                       (3, 9, '2025-12-12 08:20:00'),
+                                                                       (4, 11, '2025-12-10 13:10:00');
 
 -- ============================================
 -- 11. Product reviews
 -- ============================================
 INSERT INTO `product_reviews` (`user_id`, `prod_id`, `order_id`, `rating`, `content`, `images`, `verified`, `status`, `create_date`) VALUES
-(1, 1, 1, 5, 'Flowers were very fresh, packaging was great, delivery on time, my girlfriend loved it!', '[]', 1, 'APPROVED', '2025-12-11 17:00:00'),
-(3, 1, 4, 5, 'Huge rose blooms, bright color, great value', '[]', 1, 'APPROVED', '2025-12-13 11:00:00'),
-(2, 1, 1, 5, 'The best red roses I have ever purchased. Stunning!', '[]', 1, 'APPROVED', '2026-01-10 10:00:00'),
-(1, 2, 4, 5, 'Elegant color, wife was very happy with them.', '[]', 1, 'APPROVED', '2026-01-12 15:30:00'),
-(3, 2, 4, 4, 'Champagne roses are beautiful, just a bit pricey', '[]', 1, 'APPROVED', '2025-12-13 11:05:00'),
-(2, 3, 3, 5, 'Lasts so much longer than fresh flowers, looks real too.', '[]', 1, 'APPROVED', '2026-01-15 09:00:00'),
-(1, 5, 1, 5, 'Cute little succulent, perfect for my office desk.', '[]', 1, 'APPROVED', '2026-02-05 14:00:00'),
-(4, 7, 2, 4, 'Healthy plant, air feels fresher already.', '[]', 1, 'APPROVED', '2026-01-20 11:00:00'),
-(1, 11, 6, 3, 'Carnations were average and a little wilted', '[]', 1, 'PENDING', '2025-12-10 10:00:00');
+                                                                                                                                         (1, 1, 1, 5, 'Flowers were very fresh, packaging was great, delivery on time, my girlfriend loved it!', '[]', 1, 'APPROVED', '2025-12-11 17:00:00'),
+                                                                                                                                         (3, 1, 4, 5, 'Huge rose blooms, bright color, great value', '[]', 1, 'APPROVED', '2025-12-13 11:00:00'),
+                                                                                                                                         (2, 1, 1, 5, 'The best red roses I have ever purchased. Stunning!', '[]', 1, 'APPROVED', '2026-01-10 10:00:00'),
+                                                                                                                                         (1, 2, 4, 5, 'Elegant color, wife was very happy with them.', '[]', 1, 'APPROVED', '2026-01-12 15:30:00'),
+                                                                                                                                         (3, 2, 4, 4, 'Champagne roses are beautiful, just a bit pricey', '[]', 1, 'APPROVED', '2025-12-13 11:05:00'),
+                                                                                                                                         (2, 3, 3, 5, 'Lasts so much longer than fresh flowers, looks real too.', '[]', 1, 'APPROVED', '2026-01-15 09:00:00'),
+                                                                                                                                         (1, 5, 1, 5, 'Cute little succulent, perfect for my office desk.', '[]', 1, 'APPROVED', '2026-02-05 14:00:00'),
+                                                                                                                                         (4, 7, 2, 4, 'Healthy plant, air feels fresher already.', '[]', 1, 'APPROVED', '2026-01-20 11:00:00'),
+                                                                                                                                         (1, 11, 6, 3, 'Carnations were average and a little wilted', '[]', 1, 'PENDING', '2025-12-10 10:00:00');
 
 -- ============================================
 -- 12. Coupons
 -- ============================================
 INSERT INTO `coupons` (`coupon_id`, `merch_id`, `name`, `type`, `value`, `min_price`, `total_quantity`, `received_quantity`, `start_date`, `end_date`, `status`, `description`) VALUES
-(1, NULL, 'New User Coupon', 'FIXED_AMOUNT', 50.00, 200.00, 1000, 234, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', 'First order: save 50'),
-(2, NULL, 'Christmas Full Reduction', 'FULL_REDUCTION', 100.00, 500.00, 500, 123, '2025-12-20 00:00:00', '2026-12-26 23:59:59', 'ACTIVE', 'Holiday deal: spend 500 save 100'),
-(3, 1, 'Flower Shop 10% Off', 'DISCOUNT', 0.90, 100.00, 200, 89, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', 'Exclusive 10% off at Flower Shop Expert'),
-(4, 2, 'Green Plant 20% Off', 'DISCOUNT', 0.80, 150.00, 150, 67, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', '20% off everything at Green Plant Living'),
-(5, NULL, 'Expired Coupon', 'FIXED_AMOUNT', 30.00, 100.00, 100, 100, '2025-11-01 00:00:00', '2025-11-30 23:59:59', 'EXPIRED', 'November-only coupon');
+                                                                                                                                                                                    (1, NULL, 'New User Coupon', 'FIXED_AMOUNT', 50.00, 200.00, 1000, 234, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', 'First order: save 50'),
+                                                                                                                                                                                    (2, NULL, 'Christmas Full Reduction', 'FULL_REDUCTION', 100.00, 500.00, 500, 123, '2025-12-20 00:00:00', '2026-12-26 23:59:59', 'ACTIVE', 'Holiday deal: spend 500 save 100'),
+                                                                                                                                                                                    (3, 1, 'Flower Shop 10% Off', 'DISCOUNT', 0.90, 100.00, 200, 89, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', 'Exclusive 10% off at Flower Shop Expert'),
+                                                                                                                                                                                    (4, 2, 'Green Plant 20% Off', 'DISCOUNT', 0.80, 150.00, 150, 67, '2025-12-01 00:00:00', '2026-12-31 23:59:59', 'ACTIVE', '20% off everything at Green Plant Living'),
+                                                                                                                                                                                    (5, NULL, 'Expired Coupon', 'FIXED_AMOUNT', 30.00, 100.00, 100, 100, '2025-11-01 00:00:00', '2025-11-30 23:59:59', 'EXPIRED', 'November-only coupon');
 
 -- ============================================
 -- 13. Customer coupons
 -- ============================================
 INSERT INTO `customer_coupons` (`user_id`, `coupon_id`, `code`, `status`, `receive_date`, `used_date`, `order_id`) VALUES
-(1, 1, 'NEW50-USER1-001', 'USED', '2025-12-10 09:00:00', '2025-12-10 10:30:00', 1),
-(1, 2, 'XMAS100-USER1-002', 'UNUSED', '2025-12-12 10:00:00', NULL, NULL),
-(1, 3, 'FLOWER90-USER1-003', 'UNUSED', '2026-03-01 10:00:00', NULL, NULL),
-(1, 4, 'GREEN80-USER1-004', 'UNUSED', '2026-03-01 10:00:00', NULL, NULL),
-(2, 1, 'NEW50-USER2-001', 'UNUSED', '2025-12-11 14:00:00', NULL, NULL),
-(2, 2, 'XMAS100-USER2-002', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
-(2, 3, 'FLOWER90-USER2-003', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
-(2, 4, 'GREEN80-USER2-004', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
-(3, 1, 'NEW50-USER3-003', 'UNUSED', '2026-03-01 12:00:00', NULL, NULL),
-(3, 2, 'XMAS100-USER3-001', 'USED', '2025-12-12 15:00:00', '2025-12-12 16:45:00', 4),
-(3, 3, 'FLOWER90-USER3-002', 'UNUSED', '2025-12-11 11:00:00', NULL, NULL),
-(3, 4, 'GREEN80-USER3-004', 'UNUSED', '2026-03-01 12:00:00', NULL, NULL),
-(4, 1, 'NEW50-USER4-001', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
-(4, 2, 'XMAS100-USER4-002', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
-(4, 3, 'FLOWER90-USER4-003', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
-(4, 4, 'GREEN80-USER4-004', 'UNUSED', '2025-12-10 16:00:00', NULL, NULL),
-(5, 1, 'NEW50-USER5-001', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
-(5, 2, 'XMAS100-USER5-002', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
-(5, 3, 'FLOWER90-USER5-003', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
-(5, 4, 'GREEN80-USER5-004', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL);
+                                                                                                                       (1, 1, 'NEW50-USER1-001', 'USED', '2025-12-10 09:00:00', '2025-12-10 10:30:00', 1),
+                                                                                                                       (1, 2, 'XMAS100-USER1-002', 'UNUSED', '2025-12-12 10:00:00', NULL, NULL),
+                                                                                                                       (1, 3, 'FLOWER90-USER1-003', 'UNUSED', '2026-03-01 10:00:00', NULL, NULL),
+                                                                                                                       (1, 4, 'GREEN80-USER1-004', 'UNUSED', '2026-03-01 10:00:00', NULL, NULL),
+                                                                                                                       (2, 1, 'NEW50-USER2-001', 'UNUSED', '2025-12-11 14:00:00', NULL, NULL),
+                                                                                                                       (2, 2, 'XMAS100-USER2-002', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
+                                                                                                                       (2, 3, 'FLOWER90-USER2-003', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
+                                                                                                                       (2, 4, 'GREEN80-USER2-004', 'UNUSED', '2026-03-01 11:00:00', NULL, NULL),
+                                                                                                                       (3, 1, 'NEW50-USER3-003', 'UNUSED', '2026-03-01 12:00:00', NULL, NULL),
+                                                                                                                       (3, 2, 'XMAS100-USER3-001', 'USED', '2025-12-12 15:00:00', '2025-12-12 16:45:00', 4),
+                                                                                                                       (3, 3, 'FLOWER90-USER3-002', 'UNUSED', '2025-12-11 11:00:00', NULL, NULL),
+                                                                                                                       (3, 4, 'GREEN80-USER3-004', 'UNUSED', '2026-03-01 12:00:00', NULL, NULL),
+                                                                                                                       (4, 1, 'NEW50-USER4-001', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
+                                                                                                                       (4, 2, 'XMAS100-USER4-002', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
+                                                                                                                       (4, 3, 'FLOWER90-USER4-003', 'UNUSED', '2026-03-01 13:00:00', NULL, NULL),
+                                                                                                                       (4, 4, 'GREEN80-USER4-004', 'UNUSED', '2025-12-10 16:00:00', NULL, NULL),
+                                                                                                                       (5, 1, 'NEW50-USER5-001', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
+                                                                                                                       (5, 2, 'XMAS100-USER5-002', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
+                                                                                                                       (5, 3, 'FLOWER90-USER5-003', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL),
+                                                                                                                       (5, 4, 'GREEN80-USER5-004', 'UNUSED', '2026-03-01 14:00:00', NULL, NULL);
 
 -- ============================================
 -- 14. Check-ins
 -- ============================================
 INSERT INTO `check_ins` (`user_id`, `check_date`, `continuous_days`, `reward_points`) VALUES
-(1, '2025-12-07', 1, 10),
-(1, '2025-12-08', 2, 10),
-(1, '2025-12-09', 3, 10),
-(1, '2025-12-10', 4, 10),
-(1, '2025-12-11', 5, 15),
-(1, '2025-12-12', 6, 15),
-(1, '2025-12-13', 7, 15),
-(2, '2025-12-12', 1, 10),
-(2, '2025-12-13', 2, 10),
-(3, '2025-12-10', 1, 10),
-(3, '2025-12-13', 1, 10);
+                                                                                          (1, '2025-12-07', 1, 10),
+                                                                                          (1, '2025-12-08', 2, 10),
+                                                                                          (1, '2025-12-09', 3, 10),
+                                                                                          (1, '2025-12-10', 4, 10),
+                                                                                          (1, '2025-12-11', 5, 15),
+                                                                                          (1, '2025-12-12', 6, 15),
+                                                                                          (1, '2025-12-13', 7, 15),
+                                                                                          (2, '2025-12-12', 1, 10),
+                                                                                          (2, '2025-12-13', 2, 10),
+                                                                                          (3, '2025-12-10', 1, 10),
+                                                                                          (3, '2025-12-13', 1, 10);
 
 -- ============================================
 -- 15. Care knowledge articles
 -- ============================================
 INSERT INTO `care_knowledge` (`title`, `content`, `keywords`, `cover_image`, `category`, `author`, `view_count`, `status`) VALUES
-('Daily Care Tips for Roses', 'Roses are among the most popular flowers; proper care extends vase life...\n\n1. Water: use clean water and change daily\n2. Pruning: cut stems at 45 degrees to improve uptake\n3. Temperature: avoid direct sun, keep cool\n4. Add preservative: can extend vase life 3-5 days', 'rose,care,preservation,flowers', '/images/knowledge/rose_care.jpg', 'Flower Care', 'Florist Xiao Wang', 1234, 'PUBLISHED'),
-('Watering Secrets for Succulents', 'Succulents are beloved for being cute and easy to grow...\n\nWatering rules:\n1. Dry then soak: water only after soil is fully dry\n2. Water thoroughly each time\n3. Seasonal changes: less in summer, control even more in winter\n4. Avoid standing water: pots must have drainage holes', 'succulent,watering,care,plants', '/images/knowledge/succulent_water.jpg', 'Plant Care', 'Garden Enthusiast', 2345, 'PUBLISHED'),
-('Choosing and Placing Indoor Plants', 'Indoor plants beautify and purify the air...\n\nGood indoor picks:\n1. Monstera: shade tolerant, great for living rooms\n2. Golden pothos: strong purifier, good for bedrooms\n3. Fiddle leaf fig: Nordic style, fits studies\n4. Snake plant: absorbs formaldehyde, ideal for new homes', 'indoor,plants,placement,air quality', '/images/knowledge/indoor_plants.jpg', 'Plant Encyclopedia', 'Botanist', 3456, 'PUBLISHED'),
-('Bouquet Wrapping Techniques', 'Great wrapping adds ceremony and beauty...\n\nSteps:\n1. Choose suitable wrapping paper\n2. Decide bouquet shape (round, cascade, etc.)\n3. Use spiral technique to secure stems\n4. Add decorative elements\n5. Tie a ribbon', 'bouquet,wrapping,floral,technique', '/images/knowledge/bouquet_wrap.jpg', 'Floral Tutorial', 'Florist Xiao Wang', 567, 'PUBLISHED'),
-('Spring Flower Planting Guide', 'Spring is ideal for sowing; using the right methods matters...', 'spring,planting,flowers,gardening', '/images/knowledge/spring_planting.jpg', 'Seasonal Guide', 'Garden Enthusiast', 123, 'DRAFT');
+                                                                                                                               ('Daily Care Tips for Roses', 'Roses are among the most popular flowers; proper care extends vase life...\n\n1. Water: use clean water and change daily\n2. Pruning: cut stems at 45 degrees to improve uptake\n3. Temperature: avoid direct sun, keep cool\n4. Add preservative: can extend vase life 3-5 days', 'rose,care,preservation,flowers', '/images/knowledge/rose_care.jpg', 'Flower Care', 'Florist Xiao Wang', 1234, 'PUBLISHED'),
+                                                                                                                               ('Watering Secrets for Succulents', 'Succulents are beloved for being cute and easy to grow...\n\nWatering rules:\n1. Dry then soak: water only after soil is fully dry\n2. Water thoroughly each time\n3. Seasonal changes: less in summer, control even more in winter\n4. Avoid standing water: pots must have drainage holes', 'succulent,watering,care,plants', '/images/knowledge/succulent_water.jpg', 'Plant Care', 'Garden Enthusiast', 2345, 'PUBLISHED'),
+                                                                                                                               ('Choosing and Placing Indoor Plants', 'Indoor plants beautify and purify the air...\n\nGood indoor picks:\n1. Monstera: shade tolerant, great for living rooms\n2. Golden pothos: strong purifier, good for bedrooms\n3. Fiddle leaf fig: Nordic style, fits studies\n4. Snake plant: absorbs formaldehyde, ideal for new homes', 'indoor,plants,placement,air quality', '/images/knowledge/indoor_plants.jpg', 'Plant Encyclopedia', 'Botanist', 3456, 'PUBLISHED'),
+                                                                                                                               ('Bouquet Wrapping Techniques', 'Great wrapping adds ceremony and beauty...\n\nSteps:\n1. Choose suitable wrapping paper\n2. Decide bouquet shape (round, cascade, etc.)\n3. Use spiral technique to secure stems\n4. Add decorative elements\n5. Tie a ribbon', 'bouquet,wrapping,floral,technique', '/images/knowledge/bouquet_wrap.jpg', 'Floral Tutorial', 'Florist Xiao Wang', 567, 'PUBLISHED'),
+                                                                                                                               ('Spring Flower Planting Guide', 'Spring is ideal for sowing; using the right methods matters...', 'spring,planting,flowers,gardening', '/images/knowledge/spring_planting.jpg', 'Seasonal Guide', 'Garden Enthusiast', 123, 'DRAFT');
 
 -- ============================================
 -- 16. System configuration
 -- ============================================
 INSERT INTO `system_configuration` (`config_key`, `config_value`, `description`, `category`) VALUES
-('site_name', 'Flower Market', 'Site name', 'basic'),
-('site_logo', '/images/logo.png', 'Site logo', 'basic'),
-('site_description', 'Professional e-commerce platform for flowers and plants', 'Site description', 'basic'),
-('customer_service_phone', '400-888-9999', 'Customer service phone', 'contact'),
-('customer_service_email', 'service@flowermarket.com', 'Customer service email', 'contact'),
-('check_in_points', '10', 'Daily check-in reward points', 'reward'),
-('continuous_check_in_bonus', '5', 'Bonus points for continuous check-ins (from day 5)', 'reward'),
-('free_shipping_amount', '99.00', 'Free shipping threshold', 'shipping'),
-('default_shipping_fee', '10.00', 'Default shipping fee', 'shipping'),
-('order_auto_cancel_minutes', '30', 'Auto-cancel unpaid orders after minutes', 'order'),
-('order_auto_complete_days', '7', 'Auto-confirm receipt after shipped days', 'order'),
-('review_auto_approve', 'false', 'Whether reviews auto-approve', 'review'),
-('max_cart_items', '20', 'Maximum items in cart', 'cart'),
-('product_image_max_size', '5', 'Max product image size (MB)', 'upload');
+                                                                                                 ('site_name', 'Flower Market', 'Site name', 'basic'),
+                                                                                                 ('site_logo', '/images/logo.png', 'Site logo', 'basic'),
+                                                                                                 ('site_description', 'Professional e-commerce platform for flowers and plants', 'Site description', 'basic'),
+                                                                                                 ('customer_service_phone', '400-888-9999', 'Customer service phone', 'contact'),
+                                                                                                 ('customer_service_email', 'service@flowermarket.com', 'Customer service email', 'contact'),
+                                                                                                 ('check_in_points', '10', 'Daily check-in reward points', 'reward'),
+                                                                                                 ('continuous_check_in_bonus', '5', 'Bonus points for continuous check-ins (from day 5)', 'reward'),
+                                                                                                 ('free_shipping_amount', '99.00', 'Free shipping threshold', 'shipping'),
+                                                                                                 ('default_shipping_fee', '10.00', 'Default shipping fee', 'shipping'),
+                                                                                                 ('order_auto_cancel_minutes', '30', 'Auto-cancel unpaid orders after minutes', 'order'),
+                                                                                                 ('order_auto_complete_days', '7', 'Auto-confirm receipt after shipped days', 'order'),
+                                                                                                 ('review_auto_approve', 'false', 'Whether reviews auto-approve', 'review'),
+                                                                                                 ('max_cart_items', '20', 'Maximum items in cart', 'cart'),
+                                                                                                 ('product_image_max_size', '5', 'Max product image size (MB)', 'upload');
 
 -- ============================================
 -- Data initialization complete
