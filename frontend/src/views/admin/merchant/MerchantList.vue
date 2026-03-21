@@ -151,7 +151,8 @@ const fetchMerchantList = async () => {
     const params = {
       current: pagination.page,
       size: pagination.pageSize,
-      status: searchForm.status || undefined
+      status: searchForm.status || undefined,
+      keyword: searchForm.keyword || undefined
     }
     const { data } = await getMerchantList(params)
     // Backend returns IPage structure: records, total, size, current

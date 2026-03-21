@@ -11,14 +11,14 @@
         <el-form-item label="Title">
           <el-input v-model="searchForm.keyword" placeholder="Enter title" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item label="Category">
-          <el-select v-model="searchForm.category" placeholder="All" clearable style="width: 150px">
-            <el-option label="Care Tips" value="care" />
-            <el-option label="Flower Knowledge" value="knowledge" />
-            <el-option label="Styling Guide" value="guide" />
-            <el-option label="Festival Floristry" value="festival" />
-          </el-select>
-        </el-form-item>
+<!--        <el-form-item label="Category">-->
+<!--          <el-select v-model="searchForm.category" placeholder="All" clearable style="width: 150px">-->
+<!--            <el-option label="Care Tips" value="care" />-->
+<!--            <el-option label="Flower Knowledge" value="knowledge" />-->
+<!--            <el-option label="Styling Guide" value="guide" />-->
+<!--            <el-option label="Festival Floristry" value="festival" />-->
+<!--          </el-select>-->
+<!--        </el-form-item>-->
         <el-form-item label="Status">
           <el-select v-model="searchForm.status" placeholder="All" clearable style="width: 150px">
             <el-option label="Published" value="PUBLISHED" />

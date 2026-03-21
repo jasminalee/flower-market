@@ -71,11 +71,12 @@ public class AdministratorController {
     public Result<IPage<Customer>> getCustomerList(
             @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
             @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("Membership Level") @RequestParam(required = false) String level
+            @ApiParam("Membership Level") @RequestParam(required = false) String level,
+            @ApiParam("Keyword (name / email / phone)") @RequestParam(required = false) String keyword
     ) {
         try {
             Page<Customer> page = new Page<>(current, size);
-            IPage<Customer> customerPage = administratorService.getCustomerList(page, level);
+            IPage<Customer> customerPage = administratorService.getCustomerList(page, level, keyword);
             return Result.success(customerPage);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -98,11 +99,12 @@ public class AdministratorController {
     public Result<IPage<Merchant>> getMerchantList(
             @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
             @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("Merchant Status") @RequestParam(required = false) String status
+            @ApiParam("Merchant Status") @RequestParam(required = false) String status,
+            @ApiParam("Keyword (store name / phone / contact)") @RequestParam(required = false) String keyword
     ) {
         try {
             Page<Merchant> page = new Page<>(current, size);
-            IPage<Merchant> merchantPage = administratorService.getMerchantList(page, status);
+            IPage<Merchant> merchantPage = administratorService.getMerchantList(page, status, keyword);
             return Result.success(merchantPage);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -153,11 +155,12 @@ public class AdministratorController {
     public Result<IPage<ProductReviewVO>> getAllReviews(
             @ApiParam("Current Page") @RequestParam(defaultValue = "1") Integer current,
             @ApiParam("Page Size") @RequestParam(defaultValue = "10") Integer size,
-            @ApiParam("Review Status") @RequestParam(required = false) String status
+            @ApiParam("Review Status") @RequestParam(required = false) String status,
+            @ApiParam("Rating (1-5)") @RequestParam(required = false) Integer rating
     ) {
         try {
             Page<ProductReviewVO> page = new Page<>(current, size);
-            IPage<ProductReviewVO> reviewPage = productReviewService.getAllReviewsWithDetail(page, status);
+            IPage<ProductReviewVO> reviewPage = productReviewService.getAllReviewsWithDetail(page, status, rating);
             return Result.success(reviewPage);
         } catch (Exception e) {
             return Result.error(e.getMessage());

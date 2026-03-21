@@ -43,9 +43,16 @@ public interface ProductService {
      * @param catId category ID (optional)
      * @param merchId merchant ID (optional)
      * @param keyword keyword (optional)
+     * @param minPrice minimum price (optional)
+     * @param maxPrice maximum price (optional)
+     * @param status product status (optional)
+     * @param sortBy sort field: price / sales (optional)
+     * @param sortOrder sort direction: asc / desc (optional)
      * @return page result
      */
-    Page<Product> getProductPage(Long current, Long size, Long catId, Long merchId, String keyword);
+    Page<Product> getProductPage(Long current, Long size, Long catId, Long merchId, String keyword,
+                                 java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice,
+                                 String status, String sortBy, String sortOrder);
 
     /**
      * Update product status (publish/unpublish).

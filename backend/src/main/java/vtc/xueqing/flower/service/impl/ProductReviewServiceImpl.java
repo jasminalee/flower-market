@@ -116,7 +116,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     @Override
     public IPage<vtc.xueqing.flower.vo.ProductReviewVO> getAllReviewsWithDetail(
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<vtc.xueqing.flower.vo.ProductReviewVO> page, 
-            String status) {
-        return productReviewMapper.selectAllReviewsWithDetail(page, status);
+            String status, Integer rating) {
+        return productReviewMapper.selectAllReviewsWithDetail(page, status, rating);
     }
 }

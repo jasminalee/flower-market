@@ -111,11 +111,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> getProductPage(Long current, Long size, Long catId, Long merchId, String keyword) {
+    public Page<Product> getProductPage(Long current, Long size, Long catId, Long merchId, String keyword,
+                                        java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice,
+                                        String status, String sortBy, String sortOrder) {
         // 1. Build query conditions
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
         wrapper.ne(Product::getStatus, Constants.PRODUCT_STATUS_DELETED); // Exclude deleted items
-        
+
+        // Filter by status if provided, otherwise default to ACTIVE only
+        if (StrUtil.isNotBlank(status)) {
+            wrapper.eq(Product::getStatus, status);
+        }
+
         if (catId != null) {
             wrapper.eq(Product::getCatId, catId);
         }
@@ -123,13 +130,33 @@ public class ProductServiceImpl implements ProductService {
             wrapper.eq(Product::getMerchId, merchId);
         }
         if (StrUtil.isNotBlank(keyword)) {
-            wrapper.like(Product::getName, keyword)
+            wrapper.and(w -> w.like(Product::getName, keyword)
                    .or()
-                   .like(Product::getDescription, keyword);
+                   .like(Product::getDescription, keyword));
         }
-        
-        // Order by creation time descending
-        wrapper.orderByDesc(Product::getCreateDate);
+        if (minPrice != null) {
+            wrapper.ge(Product::getPrice, minPrice);
+        }
+        if (maxPrice != null) {
+            wrapper.le(Product::getPrice, maxPrice);
+        }
+
+        // Sorting
+        if (StrUtil.isNotBlank(sortBy)) {
+            boolean isAsc = !"desc".equalsIgnoreCase(sortOrder);
+            if ("price".equalsIgnoreCase(sortBy)) {
+                if (isAsc) wrapper.orderByAsc(Product::getPrice);
+                else wrapper.orderByDesc(Product::getPrice);
+            } else if ("sales".equalsIgnoreCase(sortBy)) {
+                if (isAsc) wrapper.orderByAsc(Product::getSales);
+                else wrapper.orderByDesc(Product::getSales);
+            } else {
+                wrapper.orderByDesc(Product::getCreateDate);
+            }
+        } else {
+            // Default: order by creation time descending
+            wrapper.orderByDesc(Product::getCreateDate);
+        }
 
         // 2. Paginate query
         Page<Product> page = new Page<>(current, size);

@@ -46,7 +46,8 @@ public interface ProductReviewService {
      * Get all reviews with detail (admin).
      * @param page pagination info
      * @param status status filter (optional): PENDING, APPROVED, REJECTED
+     * @param rating rating filter (optional): 1-5
      * @return review VO list
      */
-    IPage<ProductReviewVO> getAllReviewsWithDetail(Page<ProductReviewVO> page, String status);
+    IPage<ProductReviewVO> getAllReviewsWithDetail(Page<ProductReviewVO> page, String status, Integer rating);
 }
