@@ -62,9 +62,15 @@ public class ProductController {
             @ApiParam("Page Size") @RequestParam(defaultValue = "10") Long size,
             @ApiParam("Category ID") @RequestParam(required = false) Long catId,
             @ApiParam("Merchant ID") @RequestParam(required = false) Long merchId,
-            @ApiParam("Keyword") @RequestParam(required = false) String keyword
+            @ApiParam("Keyword") @RequestParam(required = false) String keyword,
+            @ApiParam("Min Price") @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @ApiParam("Max Price") @RequestParam(required = false) java.math.BigDecimal maxPrice,
+            @ApiParam("Status") @RequestParam(required = false) String status,
+            @ApiParam("Sort By: price / sales") @RequestParam(required = false) String sortBy,
+            @ApiParam("Sort Order: asc / desc") @RequestParam(required = false) String sortOrder
     ) {
-        Page<Product> page = productService.getProductPage(current, size, catId, merchId, keyword);
+        Page<Product> page = productService.getProductPage(current, size, catId, merchId, keyword,
+                minPrice, maxPrice, status, sortBy, sortOrder);
         return Result.success(page);
     }
 

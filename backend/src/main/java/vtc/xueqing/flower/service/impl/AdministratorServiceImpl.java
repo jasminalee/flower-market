@@ -80,16 +80,21 @@ public class AdministratorServiceImpl implements AdministratorService {
     }
     
     @Override
-    public IPage<Customer> getCustomerList(Page<Customer> page, String level) {
+    public IPage<Customer> getCustomerList(Page<Customer> page, String level, String keyword) {
         LambdaQueryWrapper<Customer> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(level != null && !level.isEmpty(), Customer::getLevel, level)
-                .orderByDesc(Customer::getCreateDate);
-        
+        wrapper.eq(level != null && !level.isEmpty(), Customer::getLevel, level);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            wrapper.and(w -> w.like(Customer::getName, keyword)
+                    .or().like(Customer::getEmail, keyword)
+                    .or().like(Customer::getPhone, keyword));
+        }
+        wrapper.orderByDesc(Customer::getCreateDate);
+
         IPage<Customer> customerPage = customerMapper.selectPage(page, wrapper);
-        
+
         // Set password to null
         customerPage.getRecords().forEach(customer -> customer.setPassword(null));
-        
+
         return customerPage;
     }
     
@@ -116,16 +121,21 @@ public class AdministratorServiceImpl implements AdministratorService {
     }
     
     @Override
-    public IPage<Merchant> getMerchantList(Page<Merchant> page, String status) {
+    public IPage<Merchant> getMerchantList(Page<Merchant> page, String status, String keyword) {
         LambdaQueryWrapper<Merchant> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(status != null && !status.isEmpty(), Merchant::getStatus, status)
-                .orderByDesc(Merchant::getCreateDate);
-        
+        wrapper.eq(status != null && !status.isEmpty(), Merchant::getStatus, status);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            wrapper.and(w -> w.like(Merchant::getName, keyword)
+                    .or().like(Merchant::getPhone, keyword)
+                    .or().like(Merchant::getContactName, keyword));
+        }
+        wrapper.orderByDesc(Merchant::getCreateDate);
+
         IPage<Merchant> merchantPage = merchantMapper.selectPage(page, wrapper);
-        
+
         // Set password to null
         merchantPage.getRecords().forEach(merchant -> merchant.setPassword(null));
-        
+
         return merchantPage;
     }
     

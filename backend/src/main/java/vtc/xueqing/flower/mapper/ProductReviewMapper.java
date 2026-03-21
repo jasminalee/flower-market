@@ -17,6 +17,7 @@ public interface ProductReviewMapper extends BaseMapper<ProductReview> {
      * Get all reviews list (admin) - includes associated information
      * @param page pagination object
      * @param status review status
+     * @param rating rating filter (optional)
      * @return review VO list
      */
     @Select("<script>" +
@@ -34,8 +35,11 @@ public interface ProductReviewMapper extends BaseMapper<ProductReview> {
             "  <if test='status != null and status != \"\"'>" +
             "    AND pr.status = #{status}" +
             "  </if>" +
+            "  <if test='rating != null'>" +
+            "    AND pr.rating = #{rating}" +
+            "  </if>" +
             "</where>" +
             "ORDER BY pr.create_date DESC" +
             "</script>")
-    IPage<ProductReviewVO> selectAllReviewsWithDetail(Page<ProductReviewVO> page, @Param("status") String status);
+    IPage<ProductReviewVO> selectAllReviewsWithDetail(Page<ProductReviewVO> page, @Param("status") String status, @Param("rating") Integer rating);
 }

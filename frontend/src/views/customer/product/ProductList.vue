@@ -9,7 +9,7 @@
           <el-card shadow="never">
             <el-form :inline="true">
               <el-form-item label="Category">
-                <el-select v-model="filters.catId" placeholder="All Categories" clearable @change="handleFilter">
+                <el-select v-model="filters.catId" placeholder="All Categories" clearable @change="handleFilter" style="width: 200px">
                   <el-option
                     v-for="cat in categories"
                     :key="cat.cateId"
@@ -26,7 +26,7 @@
               </el-form-item>
               
               <el-form-item label="Sort">
-                <el-select v-model="filters.sortBy" placeholder="Sort By" @change="handleFilter">
+                <el-select v-model="filters.sortBy" placeholder="Sort By" @change="handleFilter" style="width: 120px">
                   <el-option label="Default" value="" />
                   <el-option label="Price: Low to High" value="price_asc" />
                   <el-option label="Price: High to Low" value="price_desc" />

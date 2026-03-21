@@ -27,10 +27,17 @@ public class ProductReviewController {
     @PostMapping("/{id}/review")
     public Result<ProductReview> addReview(
             @PathVariable("id") Long prodId,
-            @RequestBody ProductReview productReview
+            @RequestBody ProductReview productReview,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
         try {
             productReview.setProdId(prodId);
+            if (userId != null) {
+                productReview.setUserId(userId);
+            }
+            if (productReview.getUserId() == null) {
+                return Result.error("User not logged in");
+            }
             ProductReview review = productReviewService.addReview(productReview);
             return Result.success(review);
         } catch (Exception e) {

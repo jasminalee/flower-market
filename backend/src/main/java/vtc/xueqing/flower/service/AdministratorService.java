@@ -23,9 +23,10 @@ public interface AdministratorService {
      * Get customer list (paginated).
      * @param page pagination info
      * @param level membership level (optional)
+     * @param keyword fuzzy search keyword: name / email / phone (optional)
      * @return customer list
      */
-    IPage<Customer> getCustomerList(Page<Customer> page, String level);
+    IPage<Customer> getCustomerList(Page<Customer> page, String level, String keyword);
     
     /**
      * Get customer detail.
@@ -38,9 +39,10 @@ public interface AdministratorService {
      * Get merchant list (paginated).
      * @param page pagination info
      * @param status merchant status (optional)
+     * @param keyword fuzzy search keyword: name / phone / contactName (optional)
      * @return merchant list
      */
-    IPage<Merchant> getMerchantList(Page<Merchant> page, String status);
+    IPage<Merchant> getMerchantList(Page<Merchant> page, String status, String keyword);
     
     /**
      * Get merchant detail.
