@@ -1,1 +1,0 @@
-import{G as a}from "./index-NaT6AdP8.js";const o= o=>a({url:"/api/coupons",method:"get",params:o}),s=(o, s)=>a({url:`/api/coupons/${o}/receive`,method:"post",params:{userId:s}}),p= o=>a({url:"/api/coupons/my",method:"get",params:o});export{o as a,s as c,p as g};
